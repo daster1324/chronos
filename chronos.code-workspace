@@ -1,0 +1,14 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"files.autoSave": "afterDelay",
+		"files.exclude": {
+			"**/.vscode": true,
+			"**/*.code-workspace": true
+		}
+	}
+}
