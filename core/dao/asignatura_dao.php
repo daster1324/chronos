@@ -52,6 +52,43 @@ class Asignatura_dao implements iDAO{
     }
 
     /**
+     * Devuelve un array con las asignaturas del curso indicado en la carrera indicada.
+     * Devuelve NULL si no hay ninguna asignatura con ese $id 
+     * 
+     * @param $carrera - id de la carrera
+     * @param $curso - curso en cuestión
+     */
+    public function getByCarreraCurso($carrera, $curso){
+        $conn = Connection::connect();
+
+        if (!($sentencia = $conn->prepare("SELECT * FROM `asignaturas` WHERE id_carrera = ? and curso = ?;"))) {
+            echo "Falló la preparación: (" . $conn->errno . ") " . $conn->error;
+        }
+
+        if (!$sentencia->bind_param("is", $carrera, $curso)) {
+            echo "Falló la vinculación de parámetros: (" . $sentencia->errno . ") " . $sentencia->error;
+        }
+
+        $sentencia->execute();
+
+        $result = $sentencia->get_result();
+
+        if($result->num_rows === 0)
+            return NULL;
+
+        while($r = $result->fetch_assoc())
+        {
+            $asignaturas[] = new Asignatura($r["id"], $r["id_carrera"], $r["itinerario"], $r["nombre"],
+                                         $r["abreviatura"], $r["curso"], $r["id_departamento"],
+                                         $r["id_departamento_dos"], $r["creditos"]);
+        }
+        $sentencia->close();
+        $conn->close();
+
+        return $asignaturas;
+    }
+
+    /**
      * Guarda en la base de datos la asignatura proporcionada
      * En caso de que ya exista, se actualizan los datos
      */
