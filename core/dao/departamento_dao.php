@@ -7,12 +7,7 @@ class Departamento_dao implements iDAO{
     private $nombre;        // String 100 chars  - Obligatorio
     private $id_facultad;   // Integer 2 digitos - Obligatorio
 */
-
-    private $departamento;
-
-    public function __construct(){
-        $this->departamento = NULL;
-    }
+    public function __construct(){}
 
     /**
      * Devuelve un objeto con los datos de la departamento correspondiente al $id.
@@ -21,24 +16,84 @@ class Departamento_dao implements iDAO{
      * @param $id - id del departamento a buscar
      */
     public function getById($id){
+        $conn = Connection::connect();
 
+        if (!($sentencia = $conn->prepare("SELECT * FROM `departamentos` WHERE id = ?;"))) {
+            echo "Falló la preparación: (" . $conn->errno . ") " . $conn->error;
+        }
+
+        if (!$sentencia->bind_param("i", $id)) {
+            echo "Falló la vinculación de parámetros: (" . $sentencia->errno . ") " . $sentencia->error;
+        }
+
+        $sentencia->execute();
+
+        $result = $sentencia->get_result();
+
+        if($result->num_rows === 0)
+            return NULL;
+
+        $r = $result->fetch_assoc();
+
+        $departamento = new Departamento($r["id"], $r["nombre"], $r["id_facultad"]);
+
+        $sentencia->close();
+        $conn->close();
+
+        return $departamento;
     }
 
     /**
      * Guarda en la base de datos la departamento proporcionada
      * En caso de que ya exista, se actualizan los datos
+     * 
+     * TODO: falta la parte de actualizar
+     * 
+     * @param $d - departamento a guardar
      */
-    public function store($departamento){
+    public function store($d){
+        $conn = Connection::connect();
 
+        if (!($sentencia = $conn->prepare("INSERT INTO `departamentos` (`id`, `nombre`, `id_facultad`) VALUES (?, ?, ?);"))) {
+            echo "Falló la preparación: (" . $conn->errno . ") " . $conn->error;
+        }
+
+        $id  = $d->getId();
+        $nombre  = $d->getNombre();
+        $id_facultad  = $d->getId_facultad();
+
+        if (!$sentencia->bind_param("isi", $id, $nombre, $id_facultad)) {
+            echo "Falló la vinculación de parámetros: (" . $sentencia->errno . ") " . $sentencia->error;
+        }
+        
+        $sentencia->execute();
+
+        $sentencia->close();
+        $conn->close();
     }
 
     /**
      * Elimina la departamento correspondiente al $id proporcionado
      * Devuelve true si ha habido éxito en el borrado.
      * Devuelve false si no se ha podido borrar.
+     * 
+     * @param $id - id del departamento a borrar
      */
     public function remove($id){
-        
+        $conn = Connection::connect();
+
+        if (!($sentencia = $conn->prepare("DELETE FROM `departamentos` WHERE `id` = ?;"))) {
+            echo "Falló la preparación: (" . $conn->errno . ") " . $conn->error;
+        }
+
+        if (!$sentencia->bind_param("i", $id)) {
+            echo "Falló la vinculación de parámetros: (" . $sentencia->errno . ") " . $sentencia->error;
+        }
+
+        $sentencia->execute();
+
+        $sentencia->close();
+        $conn->close();
     }
 }
 

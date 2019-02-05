@@ -94,6 +94,10 @@ class Clase_dao implements iDAO{
     /**
      * Guarda en la base de datos la clase proporcionada
      * En caso de que ya exista, se actualizan los datos
+     * 
+     * TODO: falta la parte de actualizar
+     * 
+     * @param $clase - clase a guardar
      */
     public function store($clase){
         $conn = Connection::connect();

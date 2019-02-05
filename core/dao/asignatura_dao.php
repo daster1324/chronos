@@ -91,6 +91,10 @@ class Asignatura_dao implements iDAO{
     /**
      * Guarda en la base de datos la asignatura proporcionada
      * En caso de que ya exista, se actualizan los datos
+     * 
+     * TODO: falta la parte de actualizar
+     * 
+     * @param $a - asignatura a guardar
      */
     public function store($a){
         $conn = Connection::connect();
@@ -123,6 +127,8 @@ class Asignatura_dao implements iDAO{
      * Elimina la asignatura correspondiente al $id proporcionado.
      * Devuelve true si ha habido éxito en el borrado.          
      * Devuelve false si no se ha podido borrar.
+     * 
+     * @param $id - id de la asignatura a borrar
      */
     public function remove($id){
         $conn = Connection::connect();
