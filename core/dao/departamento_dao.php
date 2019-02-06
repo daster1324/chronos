@@ -47,29 +47,39 @@ class Departamento_dao implements iDAO{
      * Guarda en la base de datos la departamento proporcionada
      * En caso de que ya exista, se actualizan los datos
      * 
-     * TODO: falta la parte de actualizar
-     * 
      * @param $d - departamento a guardar
      */
     public function store($d){
         $conn = Connection::connect();
 
-        if (!($sentencia = $conn->prepare("INSERT INTO `departamentos` (`id`, `nombre`, `id_facultad`) VALUES (?, ?, ?);"))) {
-            echo "Falló la preparación: (" . $conn->errno . ") " . $conn->error;
-        }
+        $actualizar = ($this->getById($d->getId()) != NULL);
 
         $id  = $d->getId();
         $nombre  = $d->getNombre();
-        $id_facultad  = $d->getId_facultad();
+        $id_facultad  = $d->getid_facultad();
 
-        if (!$sentencia->bind_param("isi", $id, $nombre, $id_facultad)) {
-            echo "Falló la vinculación de parámetros: (" . $sentencia->errno . ") " . $sentencia->error;
+        if($actualizar){
+            if (!($sentencia = $conn->prepare("UPDATE `facultades` SET `nombre` = ?, `campus` = ? WHERE `id` = ?;"))) {
+                echo "Falló la preparación: (" . $conn->errno . ") " . $conn->error;
+            }
+            if (!$sentencia->bind_param("isi", $nombre, $id_facultad, $id)) {
+                echo "Falló la vinculación de parámetros: (" . $sentencia->errno . ") " . $sentencia->error;
+            }
+            $sentencia->execute();
+            $sentencia->close();
+            $conn->close();
         }
-        
-        $sentencia->execute();
-
-        $sentencia->close();
-        $conn->close();
+        else{
+            if (!($sentencia = $conn->prepare("INSERT INTO `departamentos` (`id`, `nombre`, `id_facultad`) VALUES (?, ?, ?);"))) {
+                echo "Falló la preparación: (" . $conn->errno . ") " . $conn->error;
+            }
+            if (!$sentencia->bind_param("isi", $id, $nombre, $id_facultad)) {
+                echo "Falló la vinculación de parámetros: (" . $sentencia->errno . ") " . $sentencia->error;
+            }
+            $sentencia->execute();
+            $sentencia->close();
+            $conn->close();
+        }
     }
 
     /**

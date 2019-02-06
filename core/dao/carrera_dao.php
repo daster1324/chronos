@@ -50,30 +50,40 @@ class Carrera_dao implements iDAO{
      * Guarda en la base de datos la carrera proporcionada
      * En caso de que ya exista, se actualizan los datos
      * 
-     * TODO: falta la parte de actualizar
-     * 
      * @param $c - carrera a guardar
      */
     public function store($c){
         $conn = Connection::connect();
-
-        if (!($sentencia = $conn->prepare("INSERT INTO `carreras` (`id`, `nombre`, `id_facultad`, `id_facultad_dg`) VALUES (?, ?, ?, ?);"))) {
-            echo "Falló la preparación: (" . $conn->errno . ") " . $conn->error;
-        }
-
+        
         $id  = $c->getId();
         $nombre  = $c->getNombre();
         $id_facultad  = $c->getId_facultad();
         $id_facultad_dg  = $c->getId_facultad_dg();
 
-        if (!$sentencia->bind_param("isii", $id, $nombre, $id_facultad, $id_facultad_dg)) {
-            echo "Falló la vinculación de parámetros: (" . $sentencia->errno . ") " . $sentencia->error;
-        }
-        
-        $sentencia->execute();
+        $actualizar = ($this->getById($c->getId()) != NULL);
 
-        $sentencia->close();
-        $conn->close();
+        if($actualizar){
+            if (!($sentencia = $conn->prepare("UPDATE `carreras` SET `nombre` = ?, `id_facultad` = ?, `id_facultad_dg` = ? WHERE `id` = ?;"))) {
+                echo "Falló la preparación: (" . $conn->errno . ") " . $conn->error;
+            }
+            if (!$sentencia->bind_param("siii", $nombre, $id_facultad, $id_facultad_dg, $id)) {
+                echo "Falló la vinculación de parámetros: (" . $sentencia->errno . ") " . $sentencia->error;
+            }
+            $sentencia->execute();
+            $sentencia->close();
+            $conn->close();
+        }
+        else{
+            if (!($sentencia = $conn->prepare("INSERT INTO `carreras` (`id`, `nombre`, `id_facultad`, `id_facultad_dg`) VALUES (?, ?, ?, ?);"))) {
+                echo "Falló la preparación: (" . $conn->errno . ") " . $conn->error;
+            }
+            if (!$sentencia->bind_param("isii", $id, $nombre, $id_facultad, $id_facultad_dg)) {
+                echo "Falló la vinculación de parámetros: (" . $sentencia->errno . ") " . $sentencia->error;
+            }
+            $sentencia->execute();
+            $sentencia->close();
+            $conn->close();
+        }
     }
 
     /**

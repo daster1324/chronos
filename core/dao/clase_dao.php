@@ -95,16 +95,10 @@ class Clase_dao implements iDAO{
      * Guarda en la base de datos la clase proporcionada
      * En caso de que ya exista, se actualizan los datos
      * 
-     * TODO: falta la parte de actualizar
-     * 
      * @param $clase - clase a guardar
      */
     public function store($clase){
         $conn = Connection::connect();
-
-        if (!($sentencia = $conn->prepare("INSERT INTO `clases` (`id`, `id_asignatura`, `cuatrimestre`, `dia`, `hora`, `grupo`, `edificio`) VALUES (?, ?, ?, ?, ?, ?, ?);"))) {
-            echo "Falló la preparación: (" . $conn->errno . ") " . $conn->error;
-        }
 
         $id = $clase->getId();
         $id_asignatura = $clase->getId_asignatura();
@@ -114,14 +108,30 @@ class Clase_dao implements iDAO{
         $grupo = $clase->getGrupo();
         $edificio = $clase->getEdificio();
 
-        if (!$sentencia->bind_param("iiisisi", $id, $id_asignatura, $cuatrimestre, $dia, $hora, $grupo, $edificio)) {
-            echo "Falló la vinculación de parámetros: (" . $sentencia->errno . ") " . $sentencia->error;
-        }
-        
-        $sentencia->execute();
+        $actualizar = ($this->getById($clase->getId()) != NULL);
 
-        $sentencia->close();
-        $conn->close();
+        if($actualizar){
+            if (!($sentencia = $conn->prepare("UPDATE `clases` SET `id_asignatura` = ?, `cuatrimestre` = ?, `dia` = ?, `hora` = ?, `grupo` = ?, `edificio` = ? WHERE `id` = ?"))) {
+                echo "Falló la preparación: (" . $conn->errno . ") " . $conn->error;
+            }
+            if (!$sentencia->bind_param("iisisii", $id_asignatura, $cuatrimestre, $dia, $hora, $grupo, $edificio, $id)) {
+                echo "Falló la vinculación de parámetros: (" . $sentencia->errno . ") " . $sentencia->error;
+            }
+            $sentencia->execute();
+            $sentencia->close();
+            $conn->close();
+        }
+        else{
+            if (!($sentencia = $conn->prepare("INSERT INTO `clases` (`id`, `id_asignatura`, `cuatrimestre`, `dia`, `hora`, `grupo`, `edificio`) VALUES (?, ?, ?, ?, ?, ?, ?);"))) {
+                echo "Falló la preparación: (" . $conn->errno . ") " . $conn->error;
+            }
+            if (!$sentencia->bind_param("iiisisi", $id, $id_asignatura, $cuatrimestre, $dia, $hora, $grupo, $edificio)) {
+                echo "Falló la vinculación de parámetros: (" . $sentencia->errno . ") " . $sentencia->error;
+            }
+            $sentencia->execute();
+            $sentencia->close();
+            $conn->close();
+        }
     }
 
     /**

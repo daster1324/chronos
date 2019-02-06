@@ -31,7 +31,7 @@
                     <option value="3">Olvídate de este</option>
                 </select>
 
-                <input class="btn btn-light w-100 my-1" type="submit" value="¡Al turrón!">
+                <input class="btn btn-light w-100 my-1" type="submit" value="Continuar">
             </form>
         </div>
     </div>

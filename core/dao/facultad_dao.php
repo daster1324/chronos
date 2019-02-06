@@ -47,29 +47,39 @@ class Facultad_dao implements iDAO{
      * Guarda en la base de datos la facultad proporcionada
      * En caso de que ya exista, se actualizan los datos
      * 
-     * TODO: falta la parte de actualizar
-     * 
      * @param $f - facultad a guardar
      */
     public function store($f){
         $conn = Connection::connect();
 
-        if (!($sentencia = $conn->prepare("INSERT INTO `facultades` (`id`, `nombre`, `campus`) VALUES (?, ?, ?);"))) {
-            echo "Falló la preparación: (" . $conn->errno . ") " . $conn->error;
-        }
-
         $id  = $f->getId();
         $nombre  = $f->getNombre();
         $campus  = $f->getCampus();
 
-        if (!$sentencia->bind_param("iss", $id, $nombre, $campus)) {
-            echo "Falló la vinculación de parámetros: (" . $sentencia->errno . ") " . $sentencia->error;
-        }
-        
-        $sentencia->execute();
+        $actualizar = ($this->getById($f->getId()) != NULL);
 
-        $sentencia->close();
-        $conn->close();
+        if($actualizar){
+            if (!($sentencia = $conn->prepare("UPDATE `facultades` SET `nombre` = ?, `campus` = ? WHERE `id` = ?;"))) {
+                echo "Falló la preparación: (" . $conn->errno . ") " . $conn->error;
+            }
+            if (!$sentencia->bind_param("ssi", $nombre, $campus, $id)) {
+                echo "Falló la vinculación de parámetros: (" . $sentencia->errno . ") " . $sentencia->error;
+            }
+            $sentencia->execute();
+            $sentencia->close();
+            $conn->close();
+        }
+        else{
+            if (!($sentencia = $conn->prepare("INSERT INTO `facultades` (`id`, `nombre`, `campus`) VALUES (?, ?, ?);"))) {
+                echo "Falló la preparación: (" . $conn->errno . ") " . $conn->error;
+            }
+            if (!$sentencia->bind_param("iss", $id, $nombre, $campus)) {
+                echo "Falló la vinculación de parámetros: (" . $sentencia->errno . ") " . $sentencia->error;
+            }
+            $sentencia->execute();
+            $sentencia->close();
+            $conn->close();
+        }
     }
 
     /**

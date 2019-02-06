@@ -13,6 +13,7 @@ class Asignatura_dao implements iDAO{
     private $id_departamento_dos;   // Integer 2 digitos    - Opcional
     private $creditos;              // Integer 2 digitos    - Obligatorio
 */
+
     public function __construct(){}
 
     /**
@@ -92,16 +93,12 @@ class Asignatura_dao implements iDAO{
      * Guarda en la base de datos la asignatura proporcionada
      * En caso de que ya exista, se actualizan los datos
      * 
-     * TODO: falta la parte de actualizar
-     * 
      * @param $a - asignatura a guardar
      */
     public function store($a){
         $conn = Connection::connect();
 
-        if (!($sentencia = $conn->prepare("INSERT INTO `asignaturas` (`id`, `id_carrera`, `itinerario`, `nombre`, `abreviatura`, `curso`, `id_departamento`, `id_departamento_dos`, `creditos`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);"))) {
-            echo "Falló la preparación: (" . $conn->errno . ") " . $conn->error;
-        }
+        $actualizar = ($this->getById($a->getId()) != NULL);
 
         $id  = $a->getId();
         $id_carrera  = $a->getId_carrera();
@@ -113,14 +110,34 @@ class Asignatura_dao implements iDAO{
         $id_departamento_dos  = $a->getId_departamento_dos();
         $creditos  = $a->getCreditos();
 
-        if (!$sentencia->bind_param("iisssiisi", $id, $id_carrera, $itinerario, $nombre, $abreviatura, $curso, $id_departamento, $id_departamento_dos, $creditos)) {
-            echo "Falló la vinculación de parámetros: (" . $sentencia->errno . ") " . $sentencia->error;
-        }
-        
-        $sentencia->execute();
+        if($actualizar){
+            if (!($sentencia = $conn->prepare("UPDATE `asignaturas` SET `id_carrera` = ?, `itinerario` = ?, `nombre` = ?, `abreviatura` = ?, `curso` = ?, `id_departamento` = ?, `id_departamento_dos` = ?, `creditos` = ? WHERE `id` = ?"))) {
+                echo "Falló la preparación: (" . $conn->errno . ") " . $conn->error;
+            }
 
-        $sentencia->close();
-        $conn->close();
+            if (!$sentencia->bind_param("issssiiii", $id_carrera, $itinerario, $nombre, $abreviatura, $curso, $id_departamento, $id_departamento_dos, $creditos, $id)) {
+                echo "Falló la vinculación de parámetros: (" . $sentencia->errno . ") " . $sentencia->error;
+            }
+            
+            $sentencia->execute();
+    
+            $sentencia->close();
+            $conn->close();
+        }
+        else{
+            if (!($sentencia = $conn->prepare("INSERT INTO `asignaturas` (`id`, `id_carrera`, `itinerario`, `nombre`, `abreviatura`, `curso`, `id_departamento`, `id_departamento_dos`, `creditos`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);"))) {
+                echo "Falló la preparación: (" . $conn->errno . ") " . $conn->error;
+            }
+    
+            if (!$sentencia->bind_param("iisssiisi", $id, $id_carrera, $itinerario, $nombre, $abreviatura, $curso, $id_departamento, $id_departamento_dos, $creditos)) {
+                echo "Falló la vinculación de parámetros: (" . $sentencia->errno . ") " . $sentencia->error;
+            }
+            
+            $sentencia->execute();
+    
+            $sentencia->close();
+            $conn->close();
+        }
     }
 
     /**
