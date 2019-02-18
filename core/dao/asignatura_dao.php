@@ -24,13 +24,13 @@ class Asignatura_dao implements iDAO{
      */
     public function getById($id){        
         $conn = Connection::connect();
-
+    
         if (!($sentencia = $conn->prepare("SELECT * FROM `asignaturas` WHERE id = ?;"))) {
-            echo "Falló la preparación: (" . $conn->errno . ") " . $conn->error;
+            echo "Fall? la preparaci?n: (" . $conn->errno . ") " . $conn->error;
         }
 
         if (!$sentencia->bind_param("i", $id)) {
-            echo "Falló la vinculación de parámetros: (" . $sentencia->errno . ") " . $sentencia->error;
+            echo "Fall? la vinculaci?n de par?metros: (" . $sentencia->errno . ") " . $sentencia->error;
         }
 
         $sentencia->execute();
@@ -57,17 +57,17 @@ class Asignatura_dao implements iDAO{
      * Devuelve NULL si no hay ninguna asignatura con ese $id 
      * 
      * @param $carrera - id de la carrera
-     * @param $curso - curso en cuestión
+     * @param $curso - curso en cuesti?n
      */
     public function getByCarreraCurso($carrera, $curso){
         $conn = Connection::connect();
 
         if (!($sentencia = $conn->prepare("SELECT * FROM `asignaturas` WHERE id_carrera = ? and curso = ?;"))) {
-            echo "Falló la preparación: (" . $conn->errno . ") " . $conn->error;
+            echo "Fall? la preparaci?n: (" . $conn->errno . ") " . $conn->error;
         }
 
         if (!$sentencia->bind_param("is", $carrera, $curso)) {
-            echo "Falló la vinculación de parámetros: (" . $sentencia->errno . ") " . $sentencia->error;
+            echo "Fall? la vinculaci?n de par?metros: (" . $sentencia->errno . ") " . $sentencia->error;
         }
 
         $sentencia->execute();
@@ -112,11 +112,11 @@ class Asignatura_dao implements iDAO{
 
         if($actualizar){
             if (!($sentencia = $conn->prepare("UPDATE `asignaturas` SET `id_carrera` = ?, `itinerario` = ?, `nombre` = ?, `abreviatura` = ?, `curso` = ?, `id_departamento` = ?, `id_departamento_dos` = ?, `creditos` = ? WHERE `id` = ?"))) {
-                echo "Falló la preparación: (" . $conn->errno . ") " . $conn->error;
+                echo "Fall? la preparaci?n: (" . $conn->errno . ") " . $conn->error;
             }
 
             if (!$sentencia->bind_param("issssiiii", $id_carrera, $itinerario, $nombre, $abreviatura, $curso, $id_departamento, $id_departamento_dos, $creditos, $id)) {
-                echo "Falló la vinculación de parámetros: (" . $sentencia->errno . ") " . $sentencia->error;
+                echo "Fall? la vinculaci?n de par?metros: (" . $sentencia->errno . ") " . $sentencia->error;
             }
             
             $sentencia->execute();
@@ -126,11 +126,11 @@ class Asignatura_dao implements iDAO{
         }
         else{
             if (!($sentencia = $conn->prepare("INSERT INTO `asignaturas` (`id`, `id_carrera`, `itinerario`, `nombre`, `abreviatura`, `curso`, `id_departamento`, `id_departamento_dos`, `creditos`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);"))) {
-                echo "Falló la preparación: (" . $conn->errno . ") " . $conn->error;
+                echo "Fall? la preparaci?n: (" . $conn->errno . ") " . $conn->error;
             }
     
             if (!$sentencia->bind_param("iisssiisi", $id, $id_carrera, $itinerario, $nombre, $abreviatura, $curso, $id_departamento, $id_departamento_dos, $creditos)) {
-                echo "Falló la vinculación de parámetros: (" . $sentencia->errno . ") " . $sentencia->error;
+                echo "Fall? la vinculaci?n de par?metros: (" . $sentencia->errno . ") " . $sentencia->error;
             }
             
             $sentencia->execute();
@@ -142,7 +142,7 @@ class Asignatura_dao implements iDAO{
 
     /**
      * Elimina la asignatura correspondiente al $id proporcionado.
-     * Devuelve true si ha habido éxito en el borrado.          
+     * Devuelve true si ha habido ?xito en el borrado.          
      * Devuelve false si no se ha podido borrar.
      * 
      * @param $id - id de la asignatura a borrar
@@ -151,11 +151,11 @@ class Asignatura_dao implements iDAO{
         $conn = Connection::connect();
 
         if (!($sentencia = $conn->prepare("DELETE FROM `asignaturas` WHERE `id` = ?;"))) {
-            echo "Falló la preparación: (" . $conn->errno . ") " . $conn->error;
+            echo "Fall? la preparaci?n: (" . $conn->errno . ") " . $conn->error;
         }
 
         if (!$sentencia->bind_param("i", $id)) {
-            echo "Falló la vinculación de parámetros: (" . $sentencia->errno . ") " . $sentencia->error;
+            echo "Fall? la vinculaci?n de par?metros: (" . $sentencia->errno . ") " . $sentencia->error;
         }
 
         $sentencia->execute();

@@ -11,7 +11,6 @@ class Clase_dao implements iDAO{
     private $grupo;         // String 10 chars          - Obligatorio
     private $edificio;      // Integer 1 digito         - Obligatorio
 */
-
     private $clase;
 
     public function __construct(){

@@ -1,5 +1,6 @@
 <?php
 // Clase encargada de incluir todos los php del core en orden de dependencia
+header('Content-Type: text/html; charset=UTF-8');
 
 // Estructura de datos
 require("asignatura.php");
