@@ -43,6 +43,17 @@ class Facultad{
     public function setCampus($campus){
         $this->campus = $campus;
     }
+
+    /**
+     *  SERIALIZE
+     */
+    public function jsonSerialize() {
+        return [
+            'id' => $this->id,
+            'nombre' => $this->nombre,
+            'campus' => $this->campus
+        ];
+    }
 }
 
 ?>

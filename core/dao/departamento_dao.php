@@ -59,10 +59,10 @@ class Departamento_dao implements iDAO{
         $id_facultad  = $d->getid_facultad();
 
         if($actualizar){
-            if (!($sentencia = $conn->prepare("UPDATE `facultades` SET `nombre` = ?, `campus` = ? WHERE `id` = ?;"))) {
+            if (!($sentencia = $conn->prepare("UPDATE `departamentos` SET `nombre` = ?, `id_facultad` = ? WHERE `id` = ?;"))) {
                 echo "Falló la preparación: (" . $conn->errno . ") " . $conn->error;
             }
-            if (!$sentencia->bind_param("isi", $nombre, $id_facultad, $id)) {
+            if (!$sentencia->bind_param("sii", $nombre, $id_facultad, $id)) {
                 echo "Falló la vinculación de parámetros: (" . $sentencia->errno . ") " . $sentencia->error;
             }
             $sentencia->execute();

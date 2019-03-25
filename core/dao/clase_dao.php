@@ -82,8 +82,6 @@ class Clase_dao implements iDAO{
             $r["hora"], $r["grupo"], $r["edificio"]);
         }
 
-        var_dump($clases);
-
         $sentencia->close();
         $conn->close();
 

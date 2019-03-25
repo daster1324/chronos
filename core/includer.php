@@ -8,6 +8,7 @@ require("carrera.php");
 require("clase.php");
 require("departamento.php");
 require("facultad.php");
+require("itinerario.php");
 
 // Conector a la BD
 require("connection.php");
@@ -19,7 +20,7 @@ require("dao/carrera_dao.php");
 require("dao/clase_dao.php");
 require("dao/departamento_dao.php");
 require("dao/facultad_dao.php");
-
+require("dao/itinerario_dao.php");
 // Vistas
 
 // Auxiliares

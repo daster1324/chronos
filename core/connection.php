@@ -14,9 +14,6 @@ class Connection{
             echo "Error al conectar a la MySQL: " . mysqli_connect_error();
         }
 
-        $charset = $conn->character_set_name();
-        printf ("El juego de caracteres en uso es %s\n", $charset);
-
         return $conn;
     }
 

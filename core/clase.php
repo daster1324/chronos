@@ -72,6 +72,21 @@ class Clase{
     }
     public function setEdificio($edificio){
         $this->edificio = $edificio;
+    }  
+
+    /**
+     *  SERIALIZE
+     */
+    public function jsonSerialize() {
+        return [
+            'id' => $this->id,
+            'id_asignatura' => $this->id_asignatura,
+            'cuatrimestre' => $this->cuatrimestre,
+            'dia' => $this->dia,
+            'hora' => $this->hora,
+            'grupo' => $this->grupo,
+            'edificio' => $this->edificio
+        ];
     }
 
 }

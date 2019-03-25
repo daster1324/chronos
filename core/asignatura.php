@@ -113,6 +113,23 @@ class Asignatura{
 
     public function setCreditos($creditos){
         $this->creditos = $creditos;
+    }  
+
+    /**
+     *  SERIALIZE
+     */
+    public function jsonSerialize() {
+        return [
+            'id' => $this->id,
+            'id_carrera' => $this->id_carrera,
+            'itinerario' => $this->itinerario,
+            'nombre' => $this->nombre,
+            'abreviatura' => $this->abreviatura,
+            'curso' => $this->curso,
+            'id_departamento' => $this->id_departamento,
+            'id_departamento_dos' => $this->id_departamento_dos,
+            'creditos' => $this->creditos
+        ];
     }
 }
 

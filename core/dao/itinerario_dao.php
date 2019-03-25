@@ -1,25 +1,24 @@
 <?php
 
-class Carrera_dao implements iDAO{
-
+class Itinerario_dao implements iDAO{
+   
 /*
-    private $id;             // Integer 2 digitos - Obligatorio
-    private $nombre;         // String 150 chars  - Obligatorio
-    private $id_facultad;    // Integer 2 digitos - Obligatorio
-    private $id_facultad_dg; // Integer 2 digitos - Opcional
+    private $id;                // Integer 2 digitos - Obligatorio
+    private $id_carrera;        // Integer 2 digitos - Obligatorio
+    private $nombre;            // String 150 chars  - Obligatorio
 */
     public function __construct(){}
 
     /**
-     * Devuelve un objeto con los datos de la carrera correspondiente al $id.
-     * Devuelve NULL si no hay ninguna carrera con ese $id 
+     * Devuelve un objeto con los datos del itinerario correspondiente al $id.
+     * Devuelve NULL si no hay ningun itinerario con ese $id 
      * 
-     * @param $id - id de la carrera a buscar
+     * @param $id - id del itinerario a buscar
      */
     public function getById($id){
         $conn = Connection::connect();
 
-        if (!($sentencia = $conn->prepare("SELECT * FROM `carreras` WHERE id = ?;"))) {
+        if (!($sentencia = $conn->prepare("SELECT * FROM `itinerarios` WHERE id = ?;"))) {
             echo "Falló la preparación: (" . $conn->errno . ") " . $conn->error;
         }
 
@@ -36,24 +35,29 @@ class Carrera_dao implements iDAO{
 
         $r = $result->fetch_assoc();
 
-        $carrera = new Carrera($r["id"], $r["nombre"], $r["id_facultad"], $r["id_facultad_dg"]);
+        $itinerario = new Itinerario($r["id_carrera"], $r["id_itinerario"], $r["nombre"]);
 
         $sentencia->close();
         $conn->close();
 
-        return $carrera;
+        return $itinerario;
     }
 
     /**
-     * Devuelve un objeto con los datos de todas las carreras.
-     * Devuelve NULL si no hay ninguna carrera registrada 
+     * Devuelve un array con los itinerarios correspondientes a la carrera dada.
+     * Devuelve NULL si no hay ninguna carrera
      * 
+     * @param $id_carrera - id de la carrera
      */
-    public function getListado(){
+    public function getByIdCarrera($id_carrera){
         $conn = Connection::connect();
 
-        if (!($sentencia = $conn->prepare("SELECT * FROM `carreras`;"))) {
+        if (!($sentencia = $conn->prepare("SELECT * FROM `itinerarios` WHERE id_carrera = ?;"))) {
             echo "Falló la preparación: (" . $conn->errno . ") " . $conn->error;
+        }
+
+        if (!$sentencia->bind_param("i", $id_carrera)) {
+            echo "Falló la vinculación de parámetros: (" . $sentencia->errno . ") " . $sentencia->error;
         }
 
         $sentencia->execute();
@@ -65,37 +69,35 @@ class Carrera_dao implements iDAO{
 
         while($r = $result->fetch_assoc())
         {
-            $carreras[] = new Carrera($r["id"], $r["nombre"], $r["id_facultad"], $r["id_facultad_dg"]);
+            $itinerarios[] = new Itinerario($r["id"], $r["id_carrera"], $r["nombre"]);
         }
 
         $sentencia->close();
         $conn->close();
 
-        return $carreras;
+        return $itinerarios;
     }
 
-
     /**
-     * Guarda en la base de datos la carrera proporcionada
+     * Guarda en la base de datos el itinerario proporcionado
      * En caso de que ya exista, se actualizan los datos
      * 
-     * @param $c - carrera a guardar
+     * @param $it - itinerario a guardar
      */
-    public function store($c){
+    public function store($it){
         $conn = Connection::connect();
-        
-        $id  = $c->getId();
-        $nombre  = $c->getNombre();
-        $id_facultad  = $c->getId_facultad();
-        $id_facultad_dg  = $c->getId_facultad_dg();
 
-        $actualizar = ($this->getById($c->getId()) != NULL);
+        $id  = $it->getId();
+        $id_carrera  = $it->getIdCarrera();
+        $nombre  = $it->getNombre();
+
+        $actualizar = ($this->getById($it->getId()) != NULL);
 
         if($actualizar){
-            if (!($sentencia = $conn->prepare("UPDATE `carreras` SET `nombre` = ?, `id_facultad` = ?, `id_facultad_dg` = ? WHERE `id` = ?;"))) {
+            if (!($sentencia = $conn->prepare("UPDATE `itinerarios` SET `nombre` = ? WHERE `id` = ?;"))) {
                 echo "Falló la preparación: (" . $conn->errno . ") " . $conn->error;
             }
-            if (!$sentencia->bind_param("siii", $nombre, $id_facultad, $id_facultad_dg, $id)) {
+            if (!$sentencia->bind_param("si", $nombre, $id)) {
                 echo "Falló la vinculación de parámetros: (" . $sentencia->errno . ") " . $sentencia->error;
             }
             $sentencia->execute();
@@ -103,10 +105,10 @@ class Carrera_dao implements iDAO{
             $conn->close();
         }
         else{
-            if (!($sentencia = $conn->prepare("INSERT INTO `carreras` (`id`, `nombre`, `id_facultad`, `id_facultad_dg`) VALUES (?, ?, ?, ?);"))) {
+            if (!($sentencia = $conn->prepare("INSERT INTO `itinerarios` (`id`, `id_carrera`, `nombre`) VALUES (?, ?, ?);"))) {
                 echo "Falló la preparación: (" . $conn->errno . ") " . $conn->error;
             }
-            if (!$sentencia->bind_param("isii", $id, $nombre, $id_facultad, $id_facultad_dg)) {
+            if (!$sentencia->bind_param("iis", $id, $id_carrera, $nombre)) {
                 echo "Falló la vinculación de parámetros: (" . $sentencia->errno . ") " . $sentencia->error;
             }
             $sentencia->execute();
@@ -116,16 +118,16 @@ class Carrera_dao implements iDAO{
     }
 
     /**
-     * Elimina la carrera correspondiente al $id proporcionado
+     * Elimina la itinerario correspondiente al $id proporcionado
      * Devuelve true si ha habido éxito en el borrado.
      * Devuelve false si no se ha podido borrar.
      * 
-     * @param $id - id de la carrera a borrar
+     * @param $id - id de la itinerario a borrar
      */
     public function remove($id){
         $conn = Connection::connect();
 
-        if (!($sentencia = $conn->prepare("DELETE FROM `carreras` WHERE `id` = ?;"))) {
+        if (!($sentencia = $conn->prepare("DELETE FROM `itinerarios` WHERE `id` = ?;"))) {
             echo "Falló la preparación: (" . $conn->errno . ") " . $conn->error;
         }
 
@@ -138,6 +140,10 @@ class Carrera_dao implements iDAO{
         $sentencia->close();
         $conn->close();
     }
+    
 }
+
+
+
 
 ?>

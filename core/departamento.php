@@ -42,7 +42,18 @@ class Departamento{
     }
     public function setId_facultad($id_facultad){
         $this->id_facultad = $id_facultad;
-    }     
+    }  
+
+    /**
+     *  SERIALIZE
+     */
+    public function jsonSerialize() {
+        return [
+            'id' => $this->id,
+            'nombre' => $this->nombre,
+            'id_facultad' => $this->id_facultad
+        ];
+    }   
 
 }
 

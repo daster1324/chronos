@@ -53,6 +53,18 @@ class Carrera{
 
     public function setId_facultad_dg($id_facultad_dg){
         $this->id_facultad_dg = $id_facultad_dg;
+    }  
+
+    /**
+     *  SERIALIZE
+     */
+    public function jsonSerialize() {
+        return [
+            'id' => $this->id,
+            'nombre' => $this->nombre,
+            'id_facultad' => $this->id_facultad,
+            'id_facultad_dg' => $this->id_facultad_dg
+        ];
     }
 
 }
