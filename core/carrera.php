@@ -1,6 +1,6 @@
 <?php
 
-class Carrera{
+class Carrera implements JsonSerializable {
     private $id;             // Integer 2 digitos - Obligatorio
     private $nombre;         // String 150 chars  - Obligatorio
     private $id_facultad;    // Integer 2 digitos - Obligatorio

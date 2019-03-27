@@ -1,6 +1,6 @@
 <?php
 
-class Departamento{
+class Departamento implements JsonSerializable {
 
     private $id;            // Integer 2 digitos - Obligatorio
     private $nombre;        // String 100 chars  - Obligatorio

@@ -79,6 +79,41 @@ class Itinerario_dao implements iDAO{
     }
 
     /**
+     * Devuelve un objeto con los datos del itinerario correspondiente al $id.
+     * Devuelve NULL si la carrera indicada no tiene el itinerario indicado
+     * 
+     * @param $id_carrera    - id de la carrera seleccionada
+     * @param $id_itinerario - id del itinerario seleccionado
+     */
+    public function checkItinerario($id_carrera, $id_itinerario){
+        $conn = Connection::connect();
+
+        if (!($sentencia = $conn->prepare("SELECT * FROM `itinerarios` WHERE id = ? AND id_carrera = ?;"))) {
+            echo "Falló la preparación: (" . $conn->errno . ") " . $conn->error;
+        }
+
+        if (!$sentencia->bind_param("ii", $id_itinerario, $id_carrera)) {
+            echo "Falló la vinculación de parámetros: (" . $sentencia->errno . ") " . $sentencia->error;
+        }
+
+        $sentencia->execute();
+
+        $result = $sentencia->get_result();
+
+        if($result->num_rows === 0)
+            return NULL;
+
+        $r = $result->fetch_assoc();
+
+        $itinerario = new Itinerario($r["id"], $r["id_carrera"], $r["nombre"]);
+
+        $sentencia->close();
+        $conn->close();
+
+        return $itinerario;
+    }
+
+    /**
      * Guarda en la base de datos el itinerario proporcionado
      * En caso de que ya exista, se actualizan los datos
      * 
