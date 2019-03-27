@@ -1,6 +1,6 @@
 <?php
 
-class Clase{
+class Clase implements JsonSerializable {
 
     private $id;            // Long Integer 15 digitos  - Obligatorio
     private $id_asignatura; // Integer 10 digitos       - Obligatorio

@@ -2,7 +2,6 @@
 /*          INDEX          */
 /***************************/
 
-
 // Trigger de los dropdowns
 var handler = $('#form-inicial select').change(function(){ 
 
@@ -11,10 +10,21 @@ var handler = $('#form-inicial select').change(function(){
     let value = $(this).val();
 
     if(name == "carrera" && value != "none"){
+        cleanItinerarios();
+        disableItinerarios();
+        
         carrera_seleccionada(value);
     }
 
+    if(name == "itinerario" && value != "none"){
+        itinerario_seleccionado($('#selector-carrera').val(), value);
+    }
+
     checkStatus();
+});
+
+$("#form-inicial").submit(function(e){
+    reset_form();
 });
 
 
@@ -23,9 +33,9 @@ var handler = $('#form-inicial select').change(function(){
  * Deshabilita dicho dropdown y el botón de envío
  */
 function reset_form() {
-    $("#selector-itinerario").prop( "disabled", true );
-    $('#selector-itinerario').children('option:not(:first)').remove();
-
+    $("#selector-carrera").val('none');
+    cleanItinerarios();
+    disableItinerarios();
     disableSend();
 }
 
@@ -35,14 +45,24 @@ function reset_form() {
 function enableItinerarios() { $("#selector-itinerario").prop( "disabled", false ); }
 
 /**
- * Deshabilita botón de envío
+ * Deshabilita el dropdown de los itinerarios
  */
-function disableSend(){ $("#boton-enviar").prop( "disabled", true ); }
+function disableItinerarios(){ $("#selector-itinerario").prop( "disabled", true ); }
+
+/**
+ * Elimina todos los elementos del dropown salvo el primero
+ */
+function cleanItinerarios() {  $('#selector-itinerario').children('option:not(:first)').remove(); }
 
 /**
  * Habilita el botón de envío
  */
 function enableSend() { $("#boton-enviar").prop( "disabled", false ); }
+
+/**
+ * Deshabilita botón de envío
+ */
+function disableSend(){ $("#boton-enviar").prop( "disabled", true ); }
 
 /**
  * Busca los itinerarios asociados a la carrera seleccionada
@@ -53,9 +73,8 @@ function carrera_seleccionada(id){
         url: '/async.php',
         dataType: 'json',
         type: 'post',
-        data: "idcarrera="+id,
+        data: "op=1&idcarrera="+id,
         success: function( data, textStatus, jQxhr ){
-            response = data;
             if(data.indexOf("Error")>=0){
                 reset_form();
                 alert(data);
@@ -64,22 +83,54 @@ function carrera_seleccionada(id){
                 enableItinerarios();
                 set_itinerarios(data);
             }
-            console.log(data);
         },
         error: function( jqXhr, textStatus, errorThrown ){
-            console.log("error: " +  errorThrown );
+        }
+    });
+}
+
+/**
+ * Comprueba si el itinerario existe para evitar manipulación en el formulario
+ * @param {Number} id 
+ */
+function itinerario_seleccionado(idcarrera, iditinerario){
+    $.ajax({
+        url: '/async.php',
+        dataType: 'json',
+        type: 'post',
+        data: "op=2&idcarrera="+idcarrera+"&iditinerario="+iditinerario,
+        success: function( data, textStatus, jQxhr ){
+            if(data.indexOf("Error")>=0){
+                reset_form();
+                alert(data);
+            }
+            else{
+                enableSend();
+            }
+        },
+        error: function( jqXhr, textStatus, errorThrown ){
         }
     });
 }
 
 function set_itinerarios(itinerarios){
-    $('#selector-itinerario').children('option:not(:first)').remove();
+    let last_id;
+
+    let $it_selector = $('#selector-itinerario');
+    $it_selector.children('option:not(:first)').remove();
+
     $.each(itinerarios, function (i, item) {
-        $('#selector-itinerario').append($('<option>', { 
+        last_id = item.id;
+        $it_selector.append($('<option>', { 
             value: item.id,
             text : item.nombre 
         }));
     });
+
+    if(itinerarios.length == 1){
+        $("#selector-itinerario").val(last_id);
+        enableSend();
+    }
 }
 
 /**

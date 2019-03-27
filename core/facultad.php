@@ -1,6 +1,6 @@
 <?php
 
-class Facultad{
+class Facultad implements JsonSerializable {
     
     private $id;        // Integer 2 digitos - Obligatorio
     private $nombre;    // String 100 chars  - Obligatorio

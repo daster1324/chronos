@@ -1,6 +1,6 @@
 <?php
 
-class Asignatura{
+class Asignatura implements JsonSerializable {
 
     /* Nota: el id de la asignatura no es un autoincremento,
              es el código que le asigna la facultad.
