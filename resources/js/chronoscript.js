@@ -21,12 +21,7 @@ var handler = $('#form-inicial select').change(function(){
     }
 
     checkStatus();
-});
-
-$("#form-inicial").submit(function(e){
-    reset_form();
-});
-
+}); 
 
 /**
  * Limpia  el dropdown de los itinerarios
@@ -159,4 +154,37 @@ function checkStatus(){
             reset_form();
             break;
     }
+}
+
+function submit(){
+    let car = $('#selector-carrera').val();
+    let iti = $('#selector-itinerario').val();
+    return $.ajax({
+        url: '/async.php',
+        dataType: 'json',
+        type: 'post',
+        data: "op=3&idcarrera="+car+"&iditinerario="+iti,
+        success: function( data, textStatus, jQxhr ){
+            if(data.indexOf("Error")>=0){
+                reset_form();
+                alert(data);
+                return false;
+            }
+            else{
+                reset_form();
+                return true;
+            }
+        },
+        error: function( jqXhr, textStatus, errorThrown ){
+        }
+    });
+}
+
+function submitForm() {
+    $.when(submit()).done(function(a1){
+        if(a1 == "OK")
+            return true;
+        
+        return false;
+    });   
 }

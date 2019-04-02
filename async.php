@@ -7,7 +7,7 @@
  * 2 - Comprobar si un itinerario existe
  * 
  */
-
+require('common.php');
 require('core/includer.php');
 
 if(!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest')
@@ -26,6 +26,17 @@ if(!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQU
             echo json_encode("Error. Manipulación de datos detectada.");
          }
          else{
+            echo json_encode("OK");
+         }
+      break;
+
+      case 3:
+         if(!existe_itinerario($_POST['idcarrera'], $_POST['iditinerario'])){
+            echo json_encode("Error. Manipulación de datos detectada.");
+         }
+         else{
+            $success1 = setcookie("carrera", $_POST['idcarrera'], time()+(3600*24*30), "/", DOMAIN, 0, true);
+            $success2 = setcookie("itinerario", $_POST['iditinerario'], time()+(3600*24*30), "/", DOMAIN, 0, true);
             echo json_encode("OK");
          }
       break;
