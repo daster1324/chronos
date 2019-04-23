@@ -1,7 +1,5 @@
 <?php
 
-DEFINE("DOMAIN", "chronos.fdi");
-
 function get_head(){
     $cur = $_SERVER['REQUEST_URI'];
     $title = "";

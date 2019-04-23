@@ -35,8 +35,8 @@ if(!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQU
             echo json_encode("Error. Manipulación de datos detectada.");
          }
          else{
-            $success1 = setcookie("carrera", $_POST['idcarrera'], time()+(3600*24*30), "/", DOMAIN, 0, true);
-            $success2 = setcookie("itinerario", $_POST['iditinerario'], time()+(3600*24*30), "/", DOMAIN, 0, true);
+            $success1 = setcookie("carrera", $_POST['idcarrera'], time()+(3600*24*30), "/", $_SERVER['SERVER_NAME'], 0, true);
+            $success2 = setcookie("itinerario", $_POST['iditinerario'], time()+(3600*24*30), "/", $_SERVER['SERVER_NAME'], 0, true);
             echo json_encode("OK");
          }
       break;
