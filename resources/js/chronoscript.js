@@ -159,7 +159,7 @@ function checkStatus(){
 function submit(){
     let car = $('#selector-carrera').val();
     let iti = $('#selector-itinerario').val();
-    return $.ajax({
+    $.ajax({
         url: '/async.php',
         dataType: 'json',
         type: 'post',
@@ -168,16 +168,17 @@ function submit(){
             if(data.indexOf("Error")>=0){
                 reset_form();
                 alert(data);
-                return false;
+                window.location.href = "/";
             }
             else{
                 reset_form();
-                return true;
+                window.location.href = "/asistente.php";
             }
         },
         error: function( jqXhr, textStatus, errorThrown ){
         }
     });
+    return false;
 }
 
 function submitForm() {
