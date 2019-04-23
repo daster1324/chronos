@@ -10,3 +10,14 @@
     align-items: center;
 }
 
+#form-inicial{
+    max-width: 550px;
+}
+
+.btn-continue{
+    white-space: normal;
+    word-wrap: break-word !important;
+}
+.continue-text{
+    display: inline-block;
+}

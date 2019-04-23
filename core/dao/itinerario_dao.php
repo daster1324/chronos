@@ -35,7 +35,7 @@ class Itinerario_dao implements iDAO{
 
         $r = $result->fetch_assoc();
 
-        $itinerario = new Itinerario($r["id_carrera"], $r["id_itinerario"], $r["nombre"]);
+        $itinerario = new Itinerario($r["id"], $r["id_carrera"], $r["nombre"]);
 
         $sentencia->close();
         $conn->close();
