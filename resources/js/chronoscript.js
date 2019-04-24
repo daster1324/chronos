@@ -23,6 +23,10 @@ var handler = $('#form-inicial select').change(function(){
     checkStatus();
 }); 
 
+$("#form-inicial").submit(function(e) {
+    e.preventDefault();
+});
+
 /**
  * Limpia  el dropdown de los itinerarios
  * Deshabilita dicho dropdown y el botón de envío

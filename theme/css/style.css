@@ -1,6 +1,10 @@
+/* CSS común */
+
 .main-content {
     height: 100vh;  
 }
+
+/* CSS portada */
 
 .section {
     height: 100%;  
@@ -18,6 +22,68 @@
     white-space: normal;
     word-wrap: break-word !important;
 }
+
 .continue-text{
     display: inline-block;
+}
+
+/* CSS horario */
+body{
+    --bh: 51px; /* button-height */
+    --fs: 10pt; /* font-size */
+    --hh: 30px; /* header-height */
+
+    font-size: var(--fs) !important;
+}
+.btn{
+    font-size: var(--fs) !important;
+}
+
+#header {
+    height: var(--hh) !important;
+    font-size: 11pt;
+}
+
+#sidebar{
+    width: 250px;
+    min-width: 250px;
+    height: 100%;
+}
+
+#contador{
+    height: var(--bh);
+    padding-top: 15px;
+}
+
+#horario-container {
+    display: flex;
+    width: 100%;
+    height: calc(100% - var(--hh));
+}
+
+.action-button .btn{
+    display: block;
+    margin: 8px auto;
+    width: calc(100% - 16px);
+}
+
+
+#horario{
+    width: 100%;
+    height: var(--bh);
+}
+
+#cuatrimestres{
+    height: var(--bh);
+    padding: 8px;
+}
+
+#cuatrimestres div {
+    display: inline-flex;
+    vertical-align: middle;
+    margin-left: 16px;
+}
+
+#asignaturas-container {
+    height: calc(100% - var(--bh)*5 - var(--hh) + 9px);
 }

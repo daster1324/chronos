@@ -35,7 +35,7 @@ function get_head(){
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
         <meta http-equiv="X-UA-Compatible" content="ie=edge">
 
-        <link rel="stylesheet" href="theme/css/bootstrap.min.css">
+        <link rel="stylesheet" href="theme/css/bootstrap.css">
         <link rel="stylesheet" href="theme/css/style.css">
 
         <link rel="icon" type="image/png" sizes="16x16" href="/resources/images/favicon.ico">

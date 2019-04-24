@@ -1,4 +1,6 @@
 <?php
+    session_start();
+
     require('common.php');
     require('core/includer.php');
 
@@ -10,7 +12,7 @@
 <body>
     <div class="main-content bg-dark">
         <div class="section px-2">
-            <form id="form-inicial" action="/asistente.php" method="post" onsubmit="return submitForm();">
+            <form id="form-inicial" method="post" onsubmit="return submitForm();">
                 <h1 class="font-weight-light text-center text-light">Chronos</h1>
                 <select id="selector-carrera" name="carrera" class="custom-select text-dark my-1">
                     <option value="none" selected>Selecciona carrera</option>
