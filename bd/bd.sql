@@ -3,11 +3,10 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 25-03-2019 a las 06:34:30
+-- Tiempo de generación: 01-05-2019 a las 13:20:00
 -- Versión del servidor: 10.1.37-MariaDB
 -- Versión de PHP: 7.0.33
 
-SET FOREIGN_KEY_CHECKS=0;
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET AUTOCOMMIT = 0;
 START TRANSACTION;
@@ -31,6 +30,7 @@ USE `chronos`;
 -- Estructura de tabla para la tabla `asignaturas`
 --
 
+DROP TABLE IF EXISTS `asignaturas`;
 CREATE TABLE `asignaturas` (
   `id` int(10) NOT NULL,
   `id_carrera` int(2) NOT NULL,
@@ -48,8 +48,8 @@ CREATE TABLE `asignaturas` (
 --
 
 INSERT INTO `asignaturas` (`id`, `id_carrera`, `itinerario`, `nombre`, `abreviatura`, `curso`, `id_departamento`, `id_departamento_dos`, `creditos`) VALUES
-(1, 1, NULL, 'Cálculo', NULL, '1', 1, NULL, 12),
-(2, 1, NULL, 'Álgebra', NULL, '2', 3, 1, 6);
+(1, 1, NULL, 'Fundamentos de la Programación', 'FP', '1', 1, NULL, 12),
+(2, 1, 2, 'Redes y Seguridad', 'RyS', '3', 2, 1, 9);
 
 -- --------------------------------------------------------
 
@@ -57,6 +57,7 @@ INSERT INTO `asignaturas` (`id`, `id_carrera`, `itinerario`, `nombre`, `abreviat
 -- Estructura de tabla para la tabla `carreras`
 --
 
+DROP TABLE IF EXISTS `carreras`;
 CREATE TABLE `carreras` (
   `id` int(2) NOT NULL,
   `nombre` varchar(150) COLLATE utf8_spanish2_ci NOT NULL,
@@ -79,6 +80,7 @@ INSERT INTO `carreras` (`id`, `nombre`, `id_facultad`, `id_facultad_dg`) VALUES
 -- Estructura de tabla para la tabla `clases`
 --
 
+DROP TABLE IF EXISTS `clases`;
 CREATE TABLE `clases` (
   `id` bigint(15) NOT NULL,
   `id_asignatura` int(10) NOT NULL,
@@ -94,8 +96,8 @@ CREATE TABLE `clases` (
 --
 
 INSERT INTO `clases` (`id`, `id_asignatura`, `cuatrimestre`, `dia`, `hora`, `grupo`, `edificio`) VALUES
-(1, 3, 2, 'j', 1, '2', 2),
-(2, 2, 1, 'm', 5, '1', 1);
+(1, 3, 2, 'j', 0, 'b', 2),
+(2, 2, 1, 'm', 6, 'a', 1);
 
 -- --------------------------------------------------------
 
@@ -103,6 +105,7 @@ INSERT INTO `clases` (`id`, `id_asignatura`, `cuatrimestre`, `dia`, `hora`, `gru
 -- Estructura de tabla para la tabla `departamentos`
 --
 
+DROP TABLE IF EXISTS `departamentos`;
 CREATE TABLE `departamentos` (
   `id` int(2) NOT NULL,
   `nombre` varchar(100) COLLATE utf8_spanish2_ci NOT NULL,
@@ -123,6 +126,7 @@ INSERT INTO `departamentos` (`id`, `nombre`, `id_facultad`) VALUES
 -- Estructura de tabla para la tabla `facultades`
 --
 
+DROP TABLE IF EXISTS `facultades`;
 CREATE TABLE `facultades` (
   `id` int(2) NOT NULL,
   `nombre` varchar(100) COLLATE utf8_spanish2_ci NOT NULL,
@@ -143,6 +147,7 @@ INSERT INTO `facultades` (`id`, `nombre`, `campus`) VALUES
 -- Estructura de tabla para la tabla `itinerarios`
 --
 
+DROP TABLE IF EXISTS `itinerarios`;
 CREATE TABLE `itinerarios` (
   `id` int(2) NOT NULL,
   `id_carrera` int(2) NOT NULL,
@@ -240,7 +245,6 @@ ALTER TABLE `facultades`
 --
 ALTER TABLE `itinerarios`
   MODIFY `id` int(2) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
-SET FOREIGN_KEY_CHECKS=1;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
