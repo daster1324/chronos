@@ -1,4 +1,5 @@
 <?php
+    session_set_cookie_params(time()+(3600*24*30), "/", $_SERVER["SERVER_NAME"], 0, true);
     session_start();
 
     require('common.php');
@@ -12,7 +13,7 @@
 <body>
     <div class="main-content bg-dark">
         <div class="section px-2">
-            <form id="form-inicial" method="post" onsubmit="return submitForm();">
+            <form id="form-inicial" class="app-form" method="post" onsubmit="return submitForm();">
                 <h1 class="font-weight-light text-center text-light">Chronos</h1>
                 <select id="selector-carrera" name="carrera" class="custom-select text-dark my-1">
                     <option value="none" selected>Selecciona carrera</option>
@@ -37,8 +38,8 @@
                 <?php
                 $car = NULL;
                 $iti = NULL;
-                if(isset($_COOKIE['carrera'])) $car = ($_COOKIE['carrera'] != "none") ? $cdao->getById($_COOKIE['carrera']) : NULL;
-                if(isset($_COOKIE['itinerario'])) $iti = ($_COOKIE['itinerario'] != "none") ? $idao->getById($_COOKIE['itinerario']) : NULL;
+                if(isset($_SESSION['carrera'])) $car = ($_SESSION['carrera'] != "none") ? $cdao->getById($_SESSION['carrera']) : NULL;
+                if(isset($_SESSION['itinerario'])) $iti = ($_SESSION['itinerario'] != "none") ? $idao->getById($_SESSION['itinerario']) : NULL;
 
                 if($car != NULL && $iti != NULL)
                     echo '<a href="/asistente.php" class="btn btn-light btn-continue w-100 my-1">Continuar con <span class="continue-text">'. $car->getNombre() 
@@ -50,4 +51,9 @@
         </div>
     </div>
 
-    <?php get_scriptsAndFooter(); ?>
+<?php 
+
+    get_scriptsAndFooter(); 
+    
+    die();
+?>

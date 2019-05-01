@@ -38,6 +38,8 @@ function get_head(){
         <link rel="stylesheet" href="theme/css/bootstrap.css">
         <link rel="stylesheet" href="theme/css/style.css">
 
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
+
         <link rel="icon" type="image/png" sizes="16x16" href="/resources/images/favicon.ico">
 
         <title><?= $title ?></title>
@@ -49,9 +51,39 @@ function get_head(){
 function get_scriptsAndFooter(){
 ?>
     <script src="resources/js/jquery.min.js"></script>
+    <script src="resources/js/ui/jquery-ui.js"></script>
     <script src="resources/js/popper.min.js"></script>
     <script src="theme/js/bootstrap.min.js"></script>
     <script src="resources/js/chronoscript.js"></script>
+    
+    <?php
+    $cur = $_SERVER['REQUEST_URI'];
+    $title = "";
+    switch ($cur) {
+        case '/':
+            echo '    <script src="resources/js/index.js"></script>';
+            break;
+    
+        case '/asistente':
+        case '/asistente.php':
+            echo '    <script src="resources/js/asistente.js"></script>';
+            break;
+    
+        case '/profesores':
+        case '/profesores.php':
+            echo '    <script src="resources/js/profesores.js"></script>';
+            break;
+    
+        case '/gestion':
+        case '/gestion.php':
+            echo '    <script src="resources/js/gestion.js"></script>';
+            break;
+    
+        default:
+            echo '';
+            break;
+    }
+    ?>
     </body>
 </html>
 <?php

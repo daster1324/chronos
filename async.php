@@ -1,5 +1,8 @@
 <?php
 
+session_set_cookie_params(time()+(3600*24*30), "/", $_SERVER["SERVER_NAME"], 0, true);
+session_start();
+
 /**
  * Códigos de operaciones
  * 
@@ -17,10 +20,13 @@ if(!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQU
 
    switch ($op) 
    {
+      // Consultar itinerarios pertenecientes a la carrera indicada
       case 1:
          muestra_itinerarios($_POST['idcarrera']);
          break;
 
+      // Primera comprobación (antes del envío)
+      // Comprobar que el itinerario seleccionado está en la carrera seleccionada
       case 2:
          if(!existe_itinerario($_POST['idcarrera'], $_POST['iditinerario'])){
             echo json_encode("Error. Manipulación de datos detectada.");
@@ -30,25 +36,40 @@ if(!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQU
          }
       break;
 
+      // Segunda comprobación (tras el envío)
+      // Comprobar que el itinerario enviado está en la carrera enviada
       case 3:
          if(!existe_itinerario($_POST['idcarrera'], $_POST['iditinerario'])){
             echo json_encode("Error. Manipulación de datos detectada.");
          }
          else{
-            $success1 = setcookie("carrera", $_POST['idcarrera'], time()+(3600*24*30), "/", $_SERVER['SERVER_NAME'], 0, true);
-            $success2 = setcookie("itinerario", $_POST['iditinerario'], time()+(3600*24*30), "/", $_SERVER['SERVER_NAME'], 0, true);
+            $_SESSION['carrera'] = $_POST['idcarrera'];
+            $_SESSION['itinerario'] = $_POST['iditinerario'];
             echo json_encode("OK");
          }
       break;
+
+      // Consultar las asignaturas pertenecientes a la carrera y al curso indicado
+      case 4:
+         consultaAsignaturas($_POST['curso']);
+      break;
+
+      // Consultar si la asignatura pertenece a la carrera y al curso indicado
+      case 5:
+         existe_asignatura($_POST['curso'], $_POST['idasignatura']);
+      break;
       
       default:
-         
+         die("Error");
          break;
    }   
 }
 else{
-   die();
+   header("Location: /");
+   die("Error");
 }
+
+//INDEX
 
 function muestra_itinerarios($id_carrera){
    if(is_numeric($id_carrera)){
@@ -68,6 +89,7 @@ function muestra_itinerarios($id_carrera){
       // Esto solo saltará si el usuario cambia los datos del formulario
       echo json_encode("Error. Manipulacion de datos detectada.");
    }
+   die();
 }
 
 function existe_itinerario($id_carrera, $id_itinerario){
@@ -87,8 +109,36 @@ function existe_itinerario($id_carrera, $id_itinerario){
    else{
       return false;
    }
+   die();
 }
 
 
+// ASISTENTE
+
+function consultaAsignaturas($curso){
+   $adao = new Asignatura_dao();
+   $cursos = $adao->getByCarreraCurso($_SESSION['carrera'], $curso);
+   echo json_encode($cursos);
+   die();
+}
+
+function existe_asignatura($curso, $id_asignatura){
+   if(is_numeric($curso) && is_numeric($id_asignatura)){
+      $adao = new Asignatura_dao();
+
+      $asignaturas = $adao->checkAsignatura($_SESSION['carrera'], $_SESSION['itinerario'], $curso,$id_asignatura);
+
+      if(count($asignaturas) > 0){
+         echo json_encode("OK");
+      }
+      else{
+         echo json_encode("Error");
+      }
+   }
+   else{
+      return false;
+   }
+   die();
+}
 
 ?>

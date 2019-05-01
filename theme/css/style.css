@@ -4,6 +4,35 @@
     height: 100vh;  
 }
 
+#asignaturas-container::-webkit-scrollbar {
+    width: 0.5em;
+    margin-right: 2em;
+    border-radius: 2px;
+}
+
+#asignaturas-container::-webkit-scrollbar:hover{
+    background-color: #555;  
+}
+ 
+#asignaturas-container::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+}
+ 
+#asignaturas-container::-webkit-scrollbar-thumb {
+    background-color: darkgrey;
+    outline: 1px solid slategrey;
+}
+
+#asignaturas-container::-webkit-scrollbar-thumb:hover{
+    background-color: #eaeaea;
+}
+
+.custom-select{
+    -moz-appearance: none;
+    -webkit-appearance: none;
+    appearance: none;
+}
+
 /* CSS portada */
 
 .section {
@@ -48,11 +77,14 @@ body{
     width: 250px;
     min-width: 250px;
     height: 100%;
+    padding-bottom: 8px;
+    display: flex;
+    flex-direction: column;
 }
 
-#contador{
-    height: var(--bh);
-    padding-top: 15px;
+#contador {
+    height: 51px;
+    padding: 16px;
 }
 
 #horario-container {
@@ -63,14 +95,14 @@ body{
 
 .action-button .btn{
     display: block;
-    margin: 8px auto;
+    margin: 8px auto 0;
     width: calc(100% - 16px);
 }
 
-
 #horario{
     width: 100%;
-    height: var(--bh);
+    display: flex;
+    flex-direction: column;
 }
 
 #cuatrimestres{
@@ -85,5 +117,103 @@ body{
 }
 
 #asignaturas-container {
-    height: calc(100% - var(--bh)*5 - var(--hh) + 9px);
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+}
+
+.asignatura{
+    --ancho-asignatura: calc(100% - 16px);
+    display: flex;
+    flex-direction: row;
+    height: fit-content;
+    margin: 2px auto;
+    width: var(--ancho-asignatura);
+}
+
+.asignatura,
+.asignatura span,
+.asignatura div,
+.asignatura i{
+    cursor: move;
+}
+
+.info-asignatura{
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.rem-asignatura, .sort-asignatura{
+    align-self: center;
+}
+
+.rem-asignatura{
+    margin: 0 4px 0 8px;
+}
+.sort-asignatura{
+    margin: 0 8px 0 4px;
+}
+
+.rem-asignatura i{
+    cursor: pointer !important;
+}
+
+.fas::before, .sort-asignatura{
+    vertical-align: middle;
+}
+
+.asignatura-data{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.asignatura-name{
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    flex-grow: 1;
+    
+    max-width: 135px;
+}
+.abreviatura{
+    margin-left: 4px; 
+}
+
+#semana{
+    display: flex;
+    flex-direction: row;
+    flex-grow: 1;
+    justify-content: space-between;
+}
+
+#horas{
+    display: flex;
+    flex-direction: column;
+    width: 100px;
+}
+
+.hora, .dia{
+    flex-grow: 1;
+    display: flex;
+    
+}
+.hora{
+    flex-direction: row;
+}
+
+.dia{
+    flex-direction: column;
+}
+
+.hora span, .dia span {
+    width: fit-content;
+    margin: auto auto;
+    height: fit-content;
+}
+
+.hora-vacia{
+    padding-top:19px;
 }

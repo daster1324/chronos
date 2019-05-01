@@ -21,8 +21,8 @@ require("dao/clase_dao.php");
 require("dao/departamento_dao.php");
 require("dao/facultad_dao.php");
 require("dao/itinerario_dao.php");
-// Vistas
 
-// Auxiliares
+// Loader
+require("loader.php");
 
 ?>

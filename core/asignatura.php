@@ -113,7 +113,7 @@ class Asignatura implements JsonSerializable {
 
     public function setCreditos($creditos){
         $this->creditos = $creditos;
-    }  
+    }
 
     /**
      *  SERIALIZE
