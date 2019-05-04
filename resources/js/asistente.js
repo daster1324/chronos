@@ -1,29 +1,28 @@
 /*******************************/
 /*          ASISTENTE          */
 /*******************************/
-
-function Asignatura(id, nombre, abreviatura, creditos){
-    this.id = id;
-    this.nombre = nombre;
-    this.abreviatura = abreviatura;
-    this.creditos = creditos;
+class Asignatura {
+    constructor(id, nombre, abreviatura, creditos) {
+        this.id = id;
+        this.nombre = nombre;
+        this.abreviatura = abreviatura;
+        this.creditos = creditos;
+    }
 }
 
-function Clase(dia, hora, abreviatura){
-    this.dia = dia;
-    this.hora = hora;
-    this.abreviatura = abreviatura;
+class Clase {
+    constructor(dia, hora, abreviatura) {
+        this.dia = dia;
+        this.hora = hora;
+        this.abreviatura = abreviatura;
+    }
 }
-
-var aaa = new Asignatura(1234, "Métodos Matemáticos de la Ingeniería", "MMI", 6);
-var bbb = new Asignatura(312, "Tecnología y Organización de los Computadores", "TOC", 9);
-var ccc = new Asignatura(213, "Desarrollo de Videojuegos para Interfaces web", "DVI", 12);
 
 var asignaturas = {};
 
 var user= {
     asignaturas : [],
-    clases      : [],
+    clases      : {},
     creditos    : 0,
     cuatrimestre: 1,
     addAsig     : function(asignatura){
@@ -40,12 +39,27 @@ var user= {
             alert("La asignatura «" + asignatura.nombre + "» ya está insertada.")
         }
     },
+    addClases   : function(clases){
+        //TODO: recibe un array con clases de una asignatura y las almacena
+
+
+    },
     remAsig     : function(id) {
         this.creditos -= this.asignaturas[id].creditos;
         $('#creditos').text(this.creditos);
 
         $(".asignatura-"+id).remove();
         delete this.asignaturas[id]
+    },
+    remAll      : function(){
+        this.creditos = 0;
+        $('#creditos').text(this.creditos);
+
+        $("#asignaturas-container .asignatura").remove();
+        this.asignaturas = [];
+        this.clases = [];
+
+        cuatrimestre = 1;
     }
 };
 
@@ -76,7 +90,7 @@ function curso_seleccionado(curso) {
     let data = "op=4";
     data += "&curso="+curso;
     $.ajax({
-        url: '/async.php',
+        url: '/async',
         dataType: 'json',
         type: 'post',
         data: data,
@@ -125,7 +139,7 @@ function asignatura_seleccionada(idasignatura){
     data += "&idasignatura="+asi;
 
     $.ajax({
-        url: '/async.php',
+        url: '/async',
         dataType: 'json',
         type: 'post',
         data: data,
@@ -265,7 +279,7 @@ function addAsignatura(){
     data += "&idasignatura="+asi;
 
     $.ajax({
-        url: '/async.php',
+        url: '/async',
         dataType: 'json',
         type: 'post',
         data: data,
@@ -289,14 +303,8 @@ function quitarAsignatura(idasignatura){
 }
 
 function vaciarHorario(){
-    //Contador de créditos a 0
-    $('#creditos').text(0);
+    user.remAll();
 
-    // Vaciar selección
-    $("#asignaturas-container .asignatura").remove();
-    user.asignaturas = [];
-
-    // Quitar todos los elementos de la semana
     limpiarSemana();
 }
 

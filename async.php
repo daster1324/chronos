@@ -1,6 +1,7 @@
 <?php
 
-session_set_cookie_params(time()+(3600*24*30), "/", $_SERVER["SERVER_NAME"], 0, true);
+
+session_set_cookie_params((3600*24*30), "/", $_SERVER["SERVER_NAME"], 0, true);
 session_start();
 
 /**
@@ -57,6 +58,11 @@ if(!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQU
       // Consultar si la asignatura pertenece a la carrera y al curso indicado
       case 5:
          existe_asignatura($_POST['curso'], $_POST['idasignatura']);
+      break;
+
+      // Recupera los datos de una facultad
+      case 6:
+         getFacultad($_POST['id']);
       break;
       
       default:
@@ -141,4 +147,13 @@ function existe_asignatura($curso, $id_asignatura){
    die();
 }
 
+// GESTION
+
+function getFacultad($id){
+   $fdao = new Facultad_dao();
+   echo json_encode($fdao->getById($id));
+}
+
+
 ?>
+

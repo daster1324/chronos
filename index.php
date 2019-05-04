@@ -1,5 +1,5 @@
 <?php
-    session_set_cookie_params(time()+(3600*24*30), "/", $_SERVER["SERVER_NAME"], 0, true);
+    session_set_cookie_params((3600*24*30), "/", $_SERVER["SERVER_NAME"], 0, true);
     session_start();
 
     require('common.php');
@@ -10,7 +10,6 @@
     $cdao = new Carrera_dao();
     $idao = new Itinerario_dao();
 ?>
-<body>
     <div class="main-content bg-dark">
         <div class="section px-2">
             <form id="form-inicial" class="app-form" method="post" onsubmit="return submitForm();">

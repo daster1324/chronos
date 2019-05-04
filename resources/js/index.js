@@ -67,7 +67,7 @@ function disableSend(){ $("#boton-enviar").prop( "disabled", true ); }
  */
 function carrera_seleccionada(id){
     $.ajax({
-        url: '/async.php',
+        url: '/async',
         dataType: 'json',
         type: 'post',
         data: "op=1&idcarrera="+id,
@@ -92,7 +92,7 @@ function carrera_seleccionada(id){
  */
 function itinerario_seleccionado(idcarrera, iditinerario){
     $.ajax({
-        url: '/async.php',
+        url: '/async',
         dataType: 'json',
         type: 'post',
         data: "op=2&idcarrera="+idcarrera+"&iditinerario="+iditinerario,
@@ -172,7 +172,7 @@ function submit(){
     let car = $('#selector-carrera').val();
     let iti = $('#selector-itinerario').val();
     $.ajax({
-        url: '/async.php',
+        url: '/async',
         dataType: 'json',
         type: 'post',
         data: "op=3&idcarrera="+car+"&iditinerario="+iti,
@@ -184,10 +184,11 @@ function submit(){
             }
             else{
                 reset_form();
-                window.location.href = "/asistente.php";
+                window.location.href = "/asistente";
             }
         },
         error: function( jqXhr, textStatus, errorThrown ){
+            console.log(jqXhr)
         }
     });
     return false;

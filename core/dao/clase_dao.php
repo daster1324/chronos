@@ -152,6 +152,28 @@ class Clase_dao implements iDAO{
         $sentencia->close();
         $conn->close();
     }
+
+    public function count(){        
+        $conn = Connection::connect();
+    
+        if (!($sentencia = $conn->prepare("SELECT count(`id`) AS `cuenta` FROM `clases`;"))) {
+            echo "Falló la preparación: (" . $conn->errno . ") " . $conn->error;
+        }
+
+        $sentencia->execute();
+
+        $result = $sentencia->get_result();
+
+        $sentencia->close();
+        $conn->close();
+
+        if($result->num_rows === 0)
+            return 0;
+
+        $r = $result->fetch_assoc();
+
+        return $r['cuenta'];
+    }
 }
 
 ?>

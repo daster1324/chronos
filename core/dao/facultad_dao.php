@@ -43,6 +43,30 @@ class Facultad_dao implements iDAO{
         return $facultad;
     }
 
+    public function busca($nombre, $campus){
+        $conn = Connection::connect();
+
+        if (!($sentencia = $conn->prepare("SELECT * FROM `facultades` WHERE nombre = ? AND campus = ?;"))) {
+            echo "Falló la preparación: (" . $conn->errno . ") " . $conn->error;
+        }
+
+        if (!$sentencia->bind_param("ss", $nombre, $campus)) {
+            echo "Falló la vinculación de parámetros: (" . $sentencia->errno . ") " . $sentencia->error;
+        }
+
+        $sentencia->execute();
+
+        $result = $sentencia->get_result();
+        
+        $sentencia->close();
+        $conn->close();
+
+        if($result->num_rows === 0)
+            return false;
+
+        return true;
+    }
+
     /**
      * Guarda en la base de datos la facultad proporcionada
      * En caso de que ya exista, se actualizan los datos
@@ -106,6 +130,56 @@ class Facultad_dao implements iDAO{
         $conn->close();
     }
     
+    public function count(){        
+        $conn = Connection::connect();
+    
+        if (!($sentencia = $conn->prepare("SELECT count(`id`) AS `cuenta` FROM `facultades`;"))) {
+            echo "Falló la preparación: (" . $conn->errno . ") " . $conn->error;
+        }
+
+        $sentencia->execute();
+
+        $result = $sentencia->get_result();
+
+        $sentencia->close();
+        $conn->close();
+
+        if($result->num_rows === 0)
+            return 0;
+
+        $r = $result->fetch_assoc();
+
+        return $r['cuenta'];
+    }
+
+    public function getList(){
+        $conn = Connection::connect();
+
+        $stmt = "SELECT * FROM `facultades`;";       
+
+        if (!($sentencia = $conn->prepare($stmt))) {
+            echo "Falló la preparación: (" . $conn->errno . ") " . $conn->error;
+        }
+
+        $sentencia->execute();
+
+        $result = $sentencia->get_result();
+
+        $sentencia->close();
+        $conn->close();
+
+        if($result->num_rows === 0)
+            return NULL;
+
+        $facultades = array();
+
+        while($r = $result->fetch_assoc())
+        {
+            $facultades[$r["id"]] = new Facultad($r["id"], $r["nombre"], $r["campus"]);
+        }
+
+        return $facultades;
+    }
 }
 
 

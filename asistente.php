@@ -1,5 +1,5 @@
 <?php
-    session_set_cookie_params(time()+(3600*24*30), "/", $_SERVER["SERVER_NAME"], 0, true);
+    session_set_cookie_params((3600*24*30), "/", $_SERVER["SERVER_NAME"], 0, true);
     session_start();
 
     require('common.php');
@@ -19,7 +19,7 @@
 
     if($car == NULL || $iti == NULL){ header("Location: /"); die(); }        
 ?>
-<body class="bg-dark">
+
     <!-- Main Content -->
     <div class="main-content bg-dark text-light">
         <div id="header" class="text-center border border-bottom-0 border-light py-1">

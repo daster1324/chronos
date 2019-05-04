@@ -1,8 +1,16 @@
 <?php
 
+define("SALT", "7a96d15502f3bf22fb619916778abaf9a4fd37a926c273834458e85c1b5b2e1d");
+
 function get_head(){
+    $re = '/^(\/\w+).*$/m';
     $cur = $_SERVER['REQUEST_URI'];
-    $title = "";
+
+    if($cur != "/"){
+        preg_match_all($re, $_SERVER['REQUEST_URI'], $matches, PREG_SET_ORDER, 0);   
+        $cur = $matches[0][1];
+    }
+
     switch ($cur) {
         case '/':
             $title = "Chronos | Inicio";
@@ -13,9 +21,9 @@ function get_head(){
             $title = "Chronos | Asistente";
             break;
     
-        case '/profesores':
-        case '/profesores.php':
-            $title = "Chronos | Profesores";
+        case '/docentes':
+        case '/docentes.php':
+            $title = "Chronos | Docentes";
             break;
     
         case '/gestion':
@@ -44,7 +52,7 @@ function get_head(){
 
         <title><?= $title ?></title>
     </head>
-
+    <body class="bg-dark">
     <?php
 }
 
@@ -57,8 +65,14 @@ function get_scriptsAndFooter(){
     <script src="resources/js/chronoscript.js"></script>
     
     <?php
+    $re = '/^(\/\w+).*$/m';
     $cur = $_SERVER['REQUEST_URI'];
-    $title = "";
+
+    if($cur != "/"){
+        preg_match_all($re, $_SERVER['REQUEST_URI'], $matches, PREG_SET_ORDER, 0);   
+        $cur = $matches[0][1];
+    }
+
     switch ($cur) {
         case '/':
             echo '    <script src="resources/js/index.js"></script>';
@@ -69,9 +83,9 @@ function get_scriptsAndFooter(){
             echo '    <script src="resources/js/asistente.js"></script>';
             break;
     
-        case '/profesores':
-        case '/profesores.php':
-            echo '    <script src="resources/js/profesores.js"></script>';
+        case '/docentes':
+        case '/docentes.php':
+            echo '    <script src="resources/js/docentes.js"></script>';
             break;
     
         case '/gestion':

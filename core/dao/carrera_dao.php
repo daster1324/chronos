@@ -75,6 +75,30 @@ class Carrera_dao implements iDAO{
     }
 
 
+    public function busca($nombre, $id_facultad, $id_facultad_dg){
+        $conn = Connection::connect();
+
+        if (!($sentencia = $conn->prepare("SELECT * FROM `carreras`, `facultades` WHERE nombre = ? AND id_facultad = ? AND id_facultad_dg = ?;"))) {
+            echo "Falló la preparación: (" . $conn->errno . ") " . $conn->error;
+        }
+
+        if (!$sentencia->bind_param("sii", $nombre, $id_facultad, $id_facultad_dg)) {
+            echo "Falló la vinculación de parámetros: (" . $sentencia->errno . ") " . $sentencia->error;
+        }
+
+        $sentencia->execute();
+
+        $result = $sentencia->get_result();
+        
+        $sentencia->close();
+        $conn->close();
+
+        if($result->num_rows === 0)
+            return false;
+
+        return true;
+    }
+
     /**
      * Guarda en la base de datos la carrera proporcionada
      * En caso de que ya exista, se actualizan los datos
@@ -137,6 +161,28 @@ class Carrera_dao implements iDAO{
 
         $sentencia->close();
         $conn->close();
+    }
+
+    public function count(){        
+        $conn = Connection::connect();
+    
+        if (!($sentencia = $conn->prepare("SELECT count(`id`) AS `cuenta` FROM `carreras`;"))) {
+            echo "Falló la preparación: (" . $conn->errno . ") " . $conn->error;
+        }
+
+        $sentencia->execute();
+
+        $result = $sentencia->get_result();
+
+        $sentencia->close();
+        $conn->close();
+
+        if($result->num_rows === 0)
+            return 0;
+
+        $r = $result->fetch_assoc();
+
+        return $r['cuenta'];
     }
 }
 

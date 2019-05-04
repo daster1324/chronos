@@ -64,6 +64,9 @@ class Itinerario_dao implements iDAO{
 
         $result = $sentencia->get_result();
 
+        $sentencia->close();
+        $conn->close();
+
         if($result->num_rows === 0)
             return NULL;
 
@@ -72,8 +75,7 @@ class Itinerario_dao implements iDAO{
             $itinerarios[] = new Itinerario($r["id"], $r["id_carrera"], $r["nombre"]);
         }
 
-        $sentencia->close();
-        $conn->close();
+        
 
         return $itinerarios;
     }
@@ -176,6 +178,27 @@ class Itinerario_dao implements iDAO{
         $conn->close();
     }
     
+    public function count(){        
+        $conn = Connection::connect();
+    
+        if (!($sentencia = $conn->prepare("SELECT count(`id`) AS `cuenta` FROM `itinerarios`;"))) {
+            echo "Falló la preparación: (" . $conn->errno . ") " . $conn->error;
+        }
+
+        $sentencia->execute();
+
+        $result = $sentencia->get_result();
+
+        $sentencia->close();
+        $conn->close();
+
+        if($result->num_rows === 0)
+            return 0;
+
+        $r = $result->fetch_assoc();
+
+        return $r['cuenta'];
+    }
 }
 
 

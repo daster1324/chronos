@@ -217,3 +217,34 @@ body{
 .hora-vacia{
     padding-top:19px;
 }
+
+/*  GESTION  */
+#horario-load-container {
+    max-width: 500px;
+    width: 90%;
+    margin: 2em auto;
+    border: 1px solid #eaeaea;
+    padding: 2em;
+}
+
+#listado, #formulario{
+    max-height: 80vh;
+}
+
+#listado fieldset {
+    overflow-y: auto;
+    max-height: 72vh;
+}
+
+.editar-button{
+    display: none;
+    float: right;
+}
+
+.editar-button:hover{
+    cursor: pointer;
+}
+
+.gestion-list-element:hover .editar-button{
+    display: inline;
+}
