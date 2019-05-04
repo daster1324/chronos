@@ -78,7 +78,7 @@ class Carrera_dao implements iDAO{
     public function busca($nombre, $id_facultad, $id_facultad_dg){
         $conn = Connection::connect();
 
-        if (!($sentencia = $conn->prepare("SELECT * FROM `carreras`, `facultades` WHERE nombre = ? AND id_facultad = ? AND id_facultad_dg = ?;"))) {
+        if (!($sentencia = $conn->prepare("SELECT * FROM `carreras` WHERE nombre = ? AND id_facultad = ? AND id_facultad_dg = ?;"))) {
             echo "Falló la preparación: (" . $conn->errno . ") " . $conn->error;
         }
 

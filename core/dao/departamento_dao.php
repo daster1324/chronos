@@ -11,7 +11,7 @@ class Departamento_dao implements iDAO{
 
     /**
      * Devuelve un objeto con los datos de la departamento correspondiente al $id.
-     * Devuelve NULL si no hay ninguna departamento con ese $id 
+     * Devuelve NULL si no hay ningun departamento con ese $id 
      * 
      * @param $id - id del departamento a buscar
      */
@@ -41,6 +41,60 @@ class Departamento_dao implements iDAO{
         $conn->close();
 
         return $departamento;
+    }
+
+    /**
+     * Devuelve un objeto con los datos de todos los departamentos.
+     * Devuelve un array vacío si no hay ningun departamento
+     */
+    public function getListado(){
+        $conn = Connection::connect();
+
+        $stmt = "SELECT * FROM `departamentos`;";       
+
+        if (!($sentencia = $conn->prepare($stmt))) {
+            echo "Falló la preparación: (" . $conn->errno . ") " . $conn->error;
+        }
+
+        $sentencia->execute();
+
+        $result = $sentencia->get_result();
+
+        $sentencia->close();
+        $conn->close();
+
+        $departamentos = array();
+
+        while($r = $result->fetch_assoc())
+        {
+            $departamentos[$r["id"]] = new Departamento($r["id"], $r["nombre"], $r["id_facultad"]);
+        }
+
+        return $departamentos;
+    }
+
+    public function busca($nombre, $if_facultad){
+        $conn = Connection::connect();
+
+        if (!($sentencia = $conn->prepare("SELECT * FROM `departamentos` WHERE nombre = ? AND id_facultad = ?;"))) {
+            echo "Falló la preparación: (" . $conn->errno . ") " . $conn->error;
+        }
+
+        if (!$sentencia->bind_param("si", $nombre, $id_facultad)) {
+            echo "Falló la vinculación de parámetros: (" . $sentencia->errno . ") " . $sentencia->error;
+        }
+
+        $sentencia->execute();
+
+        $result = $sentencia->get_result();
+        
+        $sentencia->close();
+        $conn->close();
+
+        if($result->num_rows === 0)
+            return false;
+
+        return true;
     }
 
     /**

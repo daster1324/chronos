@@ -152,7 +152,7 @@ class Facultad_dao implements iDAO{
         return $r['cuenta'];
     }
 
-    public function getList(){
+    public function getListado(){
         $conn = Connection::connect();
 
         $stmt = "SELECT * FROM `facultades`;";       
@@ -168,8 +168,35 @@ class Facultad_dao implements iDAO{
         $sentencia->close();
         $conn->close();
 
-        if($result->num_rows === 0)
-            return NULL;
+        $facultades = array();
+
+        while($r = $result->fetch_assoc())
+        {
+            $facultades[$r["id"]] = new Facultad($r["id"], $r["nombre"], $r["campus"]);
+        }
+
+        return $facultades;
+    }
+
+    public function getListadoDG($id){
+        $conn = Connection::connect();
+
+        $stmt = "SELECT * FROM `facultades` WHERE id != ?;";       
+
+        if (!($sentencia = $conn->prepare($stmt))) {
+            echo "Falló la preparación: (" . $conn->errno . ") " . $conn->error;
+        }
+
+        if (!$sentencia->bind_param("i", $id)) {
+            echo "Falló la vinculación de parámetros: (" . $sentencia->errno . ") " . $sentencia->error;
+        }
+
+        $sentencia->execute();
+
+        $result = $sentencia->get_result();
+
+        $sentencia->close();
+        $conn->close();
 
         $facultades = array();
 

@@ -64,7 +64,28 @@ if(!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQU
       case 6:
          getFacultad($_POST['id']);
       break;
+
+      // Recupera todas las facultades menos la indicada
+      case 7:
+         listarFacultadesDG($_POST['id']);
+      break;
+
+      // Recupera los datos de una carrera
+      case 8:
+         getCarrera($_POST['id']);
+      break;
+
+      // Recupera los datos de un itinerario
+      case 9:
+         getItinerario($_POST['id']);
+      break;
       
+      // Recupera los datos de un itinerario
+      case 10:
+         getDepartamento($_POST['id']);
+      break;
+
+
       default:
          die("Error");
          break;
@@ -75,34 +96,30 @@ else{
    die("Error");
 }
 
+die();
+
+
 //INDEX
 
 function muestra_itinerarios($id_carrera){
    if(is_numeric($id_carrera)){
-      $i_dao = new Itinerario_dao();
+      $idao = new Itinerario_dao();
 
-      $itinerarios = $i_dao->getByIdCarrera($id_carrera);
-
-      if(count($itinerarios) > 0){
-         echo json_encode($itinerarios);
-      }
-      else{
-         echo json_encode("Error. No se han encontrado itinerarios para la carrera seleccionada.");
-      }
-
+      $itinerarios = $idao->getByIdCarrera($id_carrera);
+      
+      echo json_encode($itinerarios);
    }
    else{
       // Esto solo saltará si el usuario cambia los datos del formulario
       echo json_encode("Error. Manipulacion de datos detectada.");
    }
-   die();
 }
 
 function existe_itinerario($id_carrera, $id_itinerario){
    if(is_numeric($id_carrera) && is_numeric($id_itinerario)){
-      $i_dao = new Itinerario_dao();
+      $idao = new Itinerario_dao();
 
-      $itinerarios = $i_dao->checkItinerario($id_carrera, $id_itinerario);
+      $itinerarios = $idao->checkItinerario($id_carrera, $id_itinerario);
 
       if(count($itinerarios) > 0){
          return true;
@@ -115,7 +132,6 @@ function existe_itinerario($id_carrera, $id_itinerario){
    else{
       return false;
    }
-   die();
 }
 
 
@@ -125,7 +141,6 @@ function consultaAsignaturas($curso){
    $adao = new Asignatura_dao();
    $cursos = $adao->getByCarreraCurso($_SESSION['carrera'], $curso);
    echo json_encode($cursos);
-   die();
 }
 
 function existe_asignatura($curso, $id_asignatura){
@@ -144,7 +159,6 @@ function existe_asignatura($curso, $id_asignatura){
    else{
       return false;
    }
-   die();
 }
 
 // GESTION
@@ -152,8 +166,31 @@ function existe_asignatura($curso, $id_asignatura){
 function getFacultad($id){
    $fdao = new Facultad_dao();
    echo json_encode($fdao->getById($id));
+   unset($fdao);
 }
 
+function listarFacultadesDG($id){
+   $fdao = new Facultad_dao();
+   echo json_encode($fdao->getListadoDG($id));
+   unset($fdao);
+}
+
+function getCarrera($id){
+   $cdao = new Carrera_dao();
+   echo json_encode($cdao->getById($id));
+   unset($cdao);
+}
+
+function getItinerario($id){
+   $idao = new Itinerario_dao();
+   echo json_encode($idao->getById($id));
+   unset($idao);
+}
+
+function getDepartamento($id){
+   $ddao = new Departamento_dao();
+   echo json_encode($ddao->getById($id));
+   unset($ddao);
+}
 
 ?>
-

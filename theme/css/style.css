@@ -236,6 +236,10 @@ body{
     max-height: 72vh;
 }
 
+#accion-title{
+    text-align: center;
+}
+
 .editar-button{
     display: none;
     float: right;
@@ -247,4 +251,22 @@ body{
 
 .gestion-list-element:hover .editar-button{
     display: inline;
+}
+
+.gestion-list-element{
+    transition: all 0.1s ease-in-out;
+}
+
+.gestion-list-element label{
+    margin: 0;
+    width: 85%;
+}
+
+.gestion-list-element:hover{
+    background-color: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 0 5px #eaeaea;
+}
+
+#container-selector-itinerario{
+    display: none;
 }
