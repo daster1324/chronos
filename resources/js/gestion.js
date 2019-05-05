@@ -121,7 +121,6 @@ function facultad_seleccionada(id, facultad_dg = null){
             }
         },
         error: function( jqXhr, textStatus, errorThrown ){
-            alert("Esto ha petao muy ricamente");
         }
     });
 }
@@ -155,7 +154,6 @@ function editar_carrera(id){
                 }
             },
             error: function( jqXhr, textStatus, errorThrown ){
-                alert(jqXhr.textResponse);
             }
         });
     }
@@ -268,27 +266,80 @@ function cancelar_editar_departamento(){
 
 // Asignaturas
 
-$('#container-selector-carrera select').change(function(){ 
+$('#form-asignaturas select').change(function(){ 
     let name = $(this).attr("name");
     let value = $(this).val();
 
     if(name == "carrera" && value != ""){
-        $('#container-selector-itinerario').hide();
-        $("#container-selector-itinerario selec").prop( "disabled", true );
+        $("#selector-itinerario").prop( "disabled", true );
         let $it_selector = $('#selector-itinerario');
         $it_selector.children('option:not(:first)').remove();
         busca_itinerarios(value);
-        // Consultar itinerarios y decidir si mostrar o no
-        // Si no hay itinerarios, mostrar "Itinerario Único" y ya
-        // Dicho "Itinerario Único" no existe, en la BD es un NULL
     }
-    else if(name != "facultad-dg"){
-        $("#selector-facultad-dg").prop( "disabled", true );
-        $('#selector-facultad-dg').children('option:not(:first)').remove();
+    else if(name == "departamento-1" && value != ""){
+        $("#selector-departamento-2").prop( "disabled", true );
+        let $it_selector = $('#selector-departamento-2');
+        $it_selector.children('option:not(:first)').remove();
+        busca_departamentos(value);
     }
+
 });
 
-function busca_itinerarios(id_carrera){
+$('#filtro-asignaturas').change(function(){ 
+    let carrera = $(this).val();
+
+    let $selector = $('#listado form fieldset');
+    $selector.children().remove();
+
+    // poner solo las asignaturas que cumplan el filtro
+    mostrar_listado_filtrado(carrera);
+});
+
+function mostrar_listado_filtrado(carrera){
+    let data = "op=13";
+        data += "&carrera="+carrera;
+    $.ajax({
+        url: '/async',
+        dataType: 'json',
+        type: 'post',
+        data: data,
+        success: function( data, textStatus, jQxhr ){
+            if(jQxhr.responseText.indexOf("Error")>=0){
+                alert(jQxhr.responseText);
+            }
+            else{
+                let $selector = $('#listado form fieldset');
+
+                $.each(data, function (i, item) {
+                    let $box = $('<div>',{ class : 'gestion-list-element p-2 mb-2 border'})
+                    $box.append($('<input>', { 
+                        type  : 'checkbox',
+                        name  : 'asignatura[]',
+                        value : item.id,
+                        id : 'asignatura-' + item.id
+                    }));
+    
+                    $box.append($('<label>', { 
+                        for  : 'asignatura-' + item.id,
+                        text : '[' + item.id + '] ' + item.nombre + ' (' + item.carrera + ') (' + item.itinerario + ')'
+                    }));
+    
+                    $box.append($('<span>', { 
+                        class   : 'editar-button',
+                        onclick : 'editar_asignatura(' + item.id + ')',
+                        text    : 'Editar'
+                    }));
+    
+                    $selector.append($box);
+                });
+            }
+        },
+        error: function( jqXhr, textStatus, errorThrown ){
+        }
+    });
+}
+
+function busca_itinerarios(id_carrera, seleccion = null){
     let data = "op=1";
         data += "&idcarrera="+id_carrera;
     $.ajax({
@@ -314,22 +365,61 @@ function busca_itinerarios(id_carrera){
                     }));
                 });
 
-                if(data.length > 1){
-                    $('#container-selector-itinerario').show();
+                if(data.length > 0){
                     $("#selector-itinerario").prop( "disabled", false );
+                }
+
+                if(seleccion != null){
+                    $("#selector-itinerario").val(seleccion);
                 }
             }
         },
         error: function( jqXhr, textStatus, errorThrown ){
-            alert("ESTO HA PETAO MUY FUERTEMENTE")
         }
     });
 }
 
-//TODO: NO HAY NADA CAMBIADO. ADAPTAR
-function editar_asignaturas(id){
-    if($('#accion-departamento').val() != "edit"){
-        let data = "op=10";
+function busca_departamentos(id_departamento, seleccion = null){
+    let data = "op=11";
+    data += "&id="+id_departamento;
+    $.ajax({
+        url: '/async',
+        dataType: 'json',
+        type: 'post',
+        data: data,
+        success: function( data, textStatus, jQxhr ){
+            if(jQxhr.responseText.indexOf("Error")>=0){
+                alert(data);
+            }
+            else{ 
+                let $dep_selector = $('#selector-departamento-2');
+                $dep_selector.children('option:not(:first)').remove();
+
+                $.each(data, function (i, item) {
+                    last_id = item.id;
+                    $dep_selector.append($('<option>', { 
+                        value: item.id,
+                        text : item.nombre 
+                    }));
+                });
+
+                if(Object.keys(data).length > 1){
+                    $dep_selector.prop( "disabled", false );
+                }
+
+                if(seleccion != null){
+                    $dep_selector.val(seleccion);
+                }
+            }
+        },
+        error: function( jqXhr, textStatus, errorThrown ){
+        }
+    });
+}
+
+function editar_asignatura(id){
+    if($('#accion-asignatura').val() != "edit"){
+        let data = "op=12";
         data += "&id="+id;
         $.ajax({
             url: '/async',
@@ -341,13 +431,37 @@ function editar_asignaturas(id){
                     alert(data);
                 }
                 else{
-                    $('#accion-title').text('Editar departamento');
-                    $("#selector-facultad").val(data.id_facultad);
-                    $('#nombre-departamento').val(data.nombre);
-                    $('#id-departamento').val(data.id);
-                    $('#accion-departamento').val('edit');
-                    $('#submit-departamento').text('Guardar cambios');
-                    $('#formulario form').append('<button type="button" id="cancelar-departamento" class="btn btn-warning w-100 mt-2" onclick="cancelar_editar_departamento()">Cancelar</button>')
+                    $('#accion-title').text('Editar asignatura');
+
+                    $("#selector-carrera").val(data.id_carrera);
+
+                    let itinerario = (data.itinerario == null) ? 0 : data.itinerario;
+                    busca_itinerarios(data.id_carrera, itinerario);
+
+                    $("#nombre-asignatura").val(data.nombre);
+
+                    $("#abreviatura").val(data.abreviatura);
+
+                    $("#selector-curso").val(data.curso);
+
+                    $('#selector-departamento-1').val(data.id_departamento);
+
+                    let dep2 = (data.id_departamento_dos == null) ? "" : data.id_departamento_dos;
+                    busca_departamentos(data.id_departamento, dep2);
+
+                    $("#gea").val(data.id);
+                    $("#gea").prop( "disabled", true );
+                    $("#id-asignatura").val(data.id);
+
+                    $("#creditos").val(data.creditos);
+
+                    $("#docentes").val(data.docentes);
+
+                    $("#accion-asignatura").val('edit');
+
+                    $('#submit-asignatura').text('Guardar cambios');
+
+                    $('#formulario form').append('<button type="button" id="cancelar-asignatura" class="btn btn-warning w-100 mt-2" onclick="cancelar_editar_asignatura()">Cancelar</button>');
                 }
             },
             error: function( jqXhr, textStatus, errorThrown ){
@@ -356,15 +470,33 @@ function editar_asignaturas(id){
     }
     else
         alert("Cancela la edición actual antes de editar otro elemento.")
-
 }
 
-function cancelar_editar_asignaturas(){
-    $('#accion-title').text('Añadir departamento');
-    $('#selector-facultad').val('');
-    $('#nombre-departamento').val('');
-    $('#id-departamento').val(0);
-    $('#accion-departamento').val('add');
-    $('#submit-departamento').text('Añadir');
-    $('#cancelar-departamento').remove();
+function cancelar_editar_asignatura(){
+    $('#accion-title').text('Añadir asignatura');
+
+    $("#selector-carrera").val(0);
+    $('#selector-itinerario').val(0);
+
+    $("#nombre-asignatura").val('');
+
+    $("#abreviatura").val('');
+
+    $("#selector-curso").val(0);
+
+    $('#selector-departamento-1').val('');
+    $('#selector-departamento-2').val('');
+
+    $("#gea").val(0);
+    $("#gea").prop( "disabled", false );
+    $("#id").val(0);
+
+    $("#creditos").val('');
+
+    $("#docentes").val('');
+
+    $("#accion-asignatura").val('add');
+
+    $('#submit-asignatura').text('Añadir');
+    $('#cancelar-asignatura').remove();
 }

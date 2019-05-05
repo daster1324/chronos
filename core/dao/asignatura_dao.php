@@ -43,7 +43,7 @@ class Asignatura_dao implements iDAO{
 
         $asignatura = new Asignatura($r["id"], $r["id_carrera"], $r["itinerario"], $r["nombre"],
         $r["abreviatura"], $r["curso"], $r["id_departamento"],
-        $r["id_departamento_dos"], $r["creditos"]);
+        $r["id_departamento_dos"], $r["creditos"], $r["docentes"]);
 
         $sentencia->close();
         $conn->close();
@@ -95,6 +95,36 @@ class Asignatura_dao implements iDAO{
         return $asignaturas;
     }
 
+    public function getListado(){
+        $conn = Connection::connect();
+
+        $stmt = "SELECT * FROM `asignaturas` ORDER BY `nombre`;";
+
+        if (!($sentencia = $conn->prepare($stmt))) {
+            echo "Falló la preparación: (" . $conn->errno . ") " . $conn->error;
+        }
+
+        $sentencia->execute();
+
+        $result = $sentencia->get_result();
+
+        $sentencia->close();
+        $conn->close();
+
+        $asignaturas = array();
+
+        while($r = $result->fetch_assoc())
+        {
+            $asignaturas[] = new Asignatura($r["id"], $r["id_carrera"], $r["itinerario"], $r["nombre"],
+                                            $r["abreviatura"], $r["curso"], $r["id_departamento"],
+                                            $r["id_departamento_dos"], $r["creditos"], $r["docentes"]);
+        }
+        
+        return $asignaturas;
+    }
+
+
+
     /**
      * Guarda en la base de datos la asignatura proporcionada
      * En caso de que ya exista, se actualizan los datos
@@ -106,22 +136,23 @@ class Asignatura_dao implements iDAO{
 
         $actualizar = ($this->getById($a->getId()) != NULL);
 
-        $id  = $a->getId();
-        $id_carrera  = $a->getId_carrera();
-        $itinerario  = $a->getItinerario();
-        $nombre  = $a->getNombre();
-        $abreviatura  = $a->getAbreviatura();
-        $curso  = $a->getCurso();
-        $id_departamento  = $a->getId_departamento();
-        $id_departamento_dos  = $a->getId_departamento_dos();
-        $creditos  = $a->getCreditos();
-
+        $id = $a->getId();
+        $id_carrera = $a->getId_carrera();
+        $itinerario = $a->getItinerario();
+        $nombre = $a->getNombre();
+        $abreviatura = $a->getAbreviatura();
+        $curso = $a->getCurso();
+        $id_departamento = $a->getId_departamento();
+        $id_departamento_dos = $a->getId_departamento_dos();
+        $creditos = $a->getCreditos();
+        $docentes = $a->getDocentes();
+        
         if($actualizar){
-            if (!($sentencia = $conn->prepare("UPDATE `asignaturas` SET `id_carrera` = ?, `itinerario` = ?, `nombre` = ?, `abreviatura` = ?, `curso` = ?, `id_departamento` = ?, `id_departamento_dos` = ?, `creditos` = ? WHERE `id` = ?"))) {
+            if (!($sentencia = $conn->prepare("UPDATE `asignaturas` SET `id_carrera` = ?, `itinerario` = ?, `nombre` = ?, `abreviatura` = ?, `curso` = ?, `id_departamento` = ?, `id_departamento_dos` = ?, `creditos` = ?, `docentes` = ? WHERE `id`= ?;"))) {
                 echo "Falló la preparación: (" . $conn->errno . ") " . $conn->error;
             }
 
-            if (!$sentencia->bind_param("iissssiiii", $id_carrera, $itinerario, $nombre, $abreviatura, $curso, $id_departamento, $id_departamento_dos, $creditos, $id)) {
+            if (!$sentencia->bind_param("iisssiidii", $id_carrera, $itinerario, $nombre, $abreviatura, $curso, $id_departamento, $id_departamento_dos, $creditos, $docentes, $id)) {
                 echo "Falló la vinculación de parámetros: (" . $sentencia->errno . ") " . $sentencia->error;
             }
             
@@ -131,11 +162,11 @@ class Asignatura_dao implements iDAO{
             $conn->close();
         }
         else{
-            if (!($sentencia = $conn->prepare("INSERT INTO `asignaturas` (`id`, `id_carrera`, `itinerario`, `nombre`, `abreviatura`, `curso`, `id_departamento`, `id_departamento_dos`, `creditos`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);"))) {
+            if (!($sentencia = $conn->prepare("INSERT INTO `asignaturas` (`id`, `id_carrera`, `itinerario`, `nombre`, `abreviatura`, `curso`, `id_departamento`, `id_departamento_dos`, `creditos`, `docentes`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);"))) {
                 echo "Falló la preparación: (" . $conn->errno . ") " . $conn->error;
             }
     
-            if (!$sentencia->bind_param("iiisssiisi", $id, $id_carrera, $itinerario, $nombre, $abreviatura, $curso, $id_departamento, $id_departamento_dos, $creditos)) {
+            if (!$sentencia->bind_param("iiisssiidi", $id, $id_carrera, $itinerario, $nombre, $abreviatura, $curso, $id_departamento, $id_departamento_dos, $creditos, $docentes)) {
                 echo "Falló la vinculación de parámetros: (" . $sentencia->errno . ") " . $sentencia->error;
             }
             
@@ -171,7 +202,7 @@ class Asignatura_dao implements iDAO{
     }
 
     /**
-     * Devielve los cursos disponibles en la carrera dada
+     * Devuelve los cursos disponibles en la carrera dada
      * 
      * @param $id_carrera - ID de la carrera a consultar
      */
@@ -261,6 +292,62 @@ class Asignatura_dao implements iDAO{
 
         return $r['cuenta'];
     }
+
+
+    // Se salta un poco la encapsulación, pero acelera las búsquedas y quita carga de trabajo al usuario
+    public function getListadoFiltrado($idcarrera = null){
+        /**
+         *   asignatura.id
+         *   asignatura.nombre
+         *   carrera.nombre
+         *   itinerario.nombre 
+         */
+
+        $conn = Connection::connect();
+        $idao = new Itinerario_dao();
+
+        if($idcarrera == null){
+            $stmt = "SELECT `asignaturas`.`id` as 'id' , `asignaturas`.`nombre` as 'nombre', `carreras`.`nombre` as 'carrera', `asignaturas`.`itinerario` as 'itinerario'
+                FROM `asignaturas`, `carreras`
+                WHERE `carreras`.`id` = `asignaturas`.`id_carrera`
+                ORDER BY `asignaturas`.`nombre`;";
+        }
+        else{
+            $stmt = "SELECT `asignaturas`.`id` as 'id' , `asignaturas`.`nombre` as 'nombre', `carreras`.`nombre` as 'carrera', `asignaturas`.`itinerario` as 'itinerario'
+                FROM `asignaturas`, `carreras`
+                WHERE `carreras`.`id` = `asignaturas`.`id_carrera` 
+                AND `asignaturas`.`id_carrera` = ?
+                ORDER BY `asignaturas`.`nombre`;";
+        }
+
+        if (!($sentencia = $conn->prepare($stmt))) {
+            echo "Falló la preparación: (" . $conn->errno . ") " . $conn->error;
+        }
+
+        if($idcarrera != null){
+            if (!$sentencia->bind_param("i", $idcarrera)) {
+                echo "Falló la vinculación de parámetros: (" . $sentencia->errno . ") " . $sentencia->error;
+            }
+        }
+
+        $sentencia->execute();
+
+        $result = $sentencia->get_result();
+
+        $sentencia->close();
+        $conn->close();
+
+        $asignaturas = array();
+
+        while($r = $result->fetch_assoc())
+        {
+            $it = ($r['itinerario'] == NULL) ? "Común" : $idao->getById($r['itinerario'])->getNombre();
+            $asignaturas[] = array('id' => $r['id'], 'nombre' => $r['nombre'], 'carrera' => $r['carrera'], 'itinerario' => $it);
+        }
+        
+        return $asignaturas;
+    }
 }
+
 
 ?>

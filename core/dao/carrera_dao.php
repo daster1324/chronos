@@ -52,7 +52,7 @@ class Carrera_dao implements iDAO{
     public function getListado(){
         $conn = Connection::connect();
 
-        if (!($sentencia = $conn->prepare("SELECT * FROM `carreras`;"))) {
+        if (!($sentencia = $conn->prepare("SELECT * FROM `carreras` ORDER BY `nombre`;"))) {
             echo "Falló la preparación: (" . $conn->errno . ") " . $conn->error;
         }
 

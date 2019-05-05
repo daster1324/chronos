@@ -18,6 +18,9 @@ class Itinerario_dao implements iDAO{
     public function getById($id){
         $conn = Connection::connect();
 
+        if($id == 'o')
+            return "Común";
+
         if (!($sentencia = $conn->prepare("SELECT * FROM `itinerarios` WHERE id = ?;"))) {
             echo "Falló la preparación: (" . $conn->errno . ") " . $conn->error;
         }
@@ -224,7 +227,7 @@ class Itinerario_dao implements iDAO{
     public function getListado(){
         $conn = Connection::connect();
 
-        if (!($sentencia = $conn->prepare("SELECT * FROM `itinerarios`;"))) {
+        if (!($sentencia = $conn->prepare("SELECT * FROM `itinerarios` ORDER BY `id_carrera`, `nombre`;"))) {
             echo "Falló la preparación: (" . $conn->errno . ") " . $conn->error;
         }
 

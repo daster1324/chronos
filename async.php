@@ -85,6 +85,20 @@ if(!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQU
          getDepartamento($_POST['id']);
       break;
 
+      // Recupera todos los departamentos menos el indicado
+      case 11:
+         getDepartamentoDos($_POST['id']);
+      break;
+
+      // Recupera los datos de una asignatura
+      case 12:
+         getAsignatura($_POST['id']);
+      break;
+
+      // Recupera las asignaturas de una carrera
+      case 13:
+         getAsignaturasCarrera($_POST['carrera']);
+      break;
 
       default:
          die("Error");
@@ -106,7 +120,7 @@ function muestra_itinerarios($id_carrera){
       $idao = new Itinerario_dao();
 
       $itinerarios = $idao->getByIdCarrera($id_carrera);
-      
+
       echo json_encode($itinerarios);
    }
    else{
@@ -191,6 +205,24 @@ function getDepartamento($id){
    $ddao = new Departamento_dao();
    echo json_encode($ddao->getById($id));
    unset($ddao);
+}
+
+function getDepartamentoDos($id){
+   $ddao = new Departamento_dao();
+   echo json_encode($ddao->getListadoSin($id));
+   unset($ddao);
+}
+
+function getAsignatura($id){
+   $adao = new Asignatura_dao();
+   echo json_encode($adao->getById($id));
+   unset($adao);
+}
+
+function getAsignaturasCarrera($carrera){
+   $adao = new Asignatura_dao();
+   echo json_encode($adao->getListadoFiltrado($carrera));
+   unset($adao);
 }
 
 ?>

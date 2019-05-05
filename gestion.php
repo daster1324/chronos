@@ -100,6 +100,34 @@
                         header("Location: /gestion?gestionar=departamentos&message=".$mensaje);
                     }
                 break;
+
+                case 'asignatura':
+                    $gea = $_POST['gea'];
+                    $carrera = $_POST['carrera'];
+                    $itinerario = (!isset($_POST['itinerario']) || $_POST['itinerario'] == 0) ? NULL : $_POST['itinerario'];
+                    $nombre = $_POST['nombre-asignatura'];
+                    $abreviatura = ($_POST['abreviatura'] != "") ? $_POST['abreviatura'] : NULL;
+                    $curso = $_POST['curso'];
+                    $dep1 = $_POST['departamento-1'];
+                    $dep2 = ($_POST['departamento-2'] != "") ? $_POST['departamento-2'] : NULL;
+                    $creditos = $_POST['creditos'];
+                    $docentes = $_POST['docentes'];
+
+                    $adao = new Asignatura_dao();
+                    $existe = $adao->getById($gea);
+                    $mensaje = 1;
+
+                    if($existe == NULL){
+                        $adao->store(new Asignatura($gea, $carrera, $itinerario, $nombre, $abreviatura, $curso, $dep1, $dep2, $creditos, $docentes));
+                    }
+                    else{
+                        $mensaje = 4;
+                    }
+
+                    unset($adao);
+                    header("HTTP/1.1 301 Moved Permanently"); 
+                    header("Location: /gestion?gestionar=asignaturas&message=".$mensaje);
+                break;
                 
                 default:
                     # code...
@@ -166,6 +194,25 @@
                     }
                 break;
                 
+                case 'asignatura':
+                    $gea = $_POST['id'];
+                    $carrera = $_POST['carrera'];
+                    $itinerario = (!isset($_POST['itinerario']) || $_POST['itinerario'] == 0) ? NULL : $_POST['itinerario'];
+                    $nombre = $_POST['nombre-asignatura'];
+                    $abreviatura = ($_POST['abreviatura'] != "") ? $_POST['abreviatura'] : NULL;
+                    $curso = $_POST['curso'];
+                    $dep1 = $_POST['departamento-1'];
+                    $dep2 = ($_POST['departamento-2'] != "") ? $_POST['departamento-2'] : NULL;
+                    $creditos = $_POST['creditos'];
+                    $docentes = $_POST['docentes'];
+
+                    $adao = new Asignatura_dao();
+                    $adao->store(new Asignatura($gea, $carrera, $itinerario, $nombre, $abreviatura, $curso, $dep1, $dep2, $creditos, $docentes));
+
+                    unset($adao);
+                    header("HTTP/1.1 301 Moved Permanently"); 
+                    header("Location: /gestion?gestionar=asignaturas&message=2");
+                break;
                 
                 default:
                     # code...
@@ -230,6 +277,21 @@
                         header("Location: /gestion?gestionar=departamentos&message=3");
                     }
                 break;
+
+                case 'asignatura':
+                    if(isset($_POST['asignatura'])){
+                        $adao = new Asignatura_dao();
+
+                        foreach ($_POST['asignatura'] as $id) {
+                            $adao->remove($id);
+                        }
+
+                        unset($adao);
+                        header("HTTP/1.1 301 Moved Permanently"); 
+                        header("Location: /gestion?gestionar=asignaturas&message=3");
+                    }
+                break;
+
                 default:
                     # code...
                     break;
@@ -751,7 +813,7 @@
                 break;
 
                 case 4:
-                    echo "Ya existe una asignatura con esos datos";
+                    echo "Ya existe una asignatura con ese código GEA";
                 break;
 
                 default: break;
@@ -768,24 +830,8 @@
         $ddao = new Departamento_dao();
         $departamentos = $ddao->getListado();
 
-        // Si dos líneas están seguidas, es porque hay dependencia
-
-        //x Carrera      -> Dropdown (obligatorio)
-        //x Itinerario   -> Dropdown (opcional) | Puede no haber itinerarios (itinerario único)
-
-        //x Nombre       -> Texto    (obligatorio)
-
-        //x Abreviatura  -> Texto    (opcional, pero muy recomendable)
-
-        //x Curso        -> Dropdown (obligatorio)
-
-        // Departamento -> Dropdown (obligatorio)
-        // Departamento2-> Dropdown (opcional) | Ofrecerá todas las posiblidades salvo la seleccionada arriba
-
-        // Créditos     -> Número   (obligatorio)
-
-        // Docentes     -> Número   (opcional) | Habrá que establecer un valor antes del reparto docente
-        
+        $adao = new Asignatura_dao();
+        $asignaturas = $adao->getListado();
         ?>
         
         <div class="row justify-content-between">
@@ -793,59 +839,110 @@
             <div id="formulario" class="col-md-5 mr-md-3 mb-3 mb-md-0 p-2 border">
                 <h4 id="accion-title">Añadir Asignatura</h4>
                 <form id="form-asignaturas" action="?gestionar=asignaturas" method="post">
-                    <!-- Selector carrera -->
-                    <div id="container-selector-carrera">
-                        <label for="selector-carrera" class="my-1">Carrera</label>
-                        <select id="selector-carrera" name="carrera" class="custom-select text-dark" required>
-                            <option disabled="disabled" selected="selected" value="">Selecciona una carrera</option>
-                            <?php
-                            foreach ($carreras as $carrera) {
-                                echo '<option value="'.$carrera->getId().'">'.$carrera->getNombre().'</option>';
-                            }
-                            ?>
-                        </select>
-                    </div>
-                    <!-- /Selector carrera -->
-                    <!-- Selector itinerario -->
-                    <div id="container-selector-itinerario">
-                        <label for="selector-itinerario" class="my-1">Itinerario</label>
-                        <select id="selector-itinerario" name="itinerario" class="custom-select text-dark" disabled required>
-                            <option selected="selected" value="0">Común</option>
-                        </select>
-                    </div>
-                    <!-- /Selector itinerario -->
-                    <!-- Nombre Asignatura -->
-                    <div class="form-group my-1">
-                        <label for="nombre-asignatura" class="my-1">Nombre de la asignatura</label>
-                        <input type="text" class="form-control" name="nombre-asignatura" id="nombre-asignatura" placeholder="Nombre de la asignatura" required>
-                    </div>
-                    <!-- /Nombre Asignatura -->
-                    <div class="row">
-                        <!-- Abreviatura Asignatura -->
-                        <div class="form-group col-md my-1">
-                            <label for="abreviatura" class="my-1">Abreviatura de la asignatura</label>
-                            <input type="text" class="form-control" name="abreviatura" id="abreviatura" placeholder="Abreviatura">
-                        </div>
-                        <!-- /Abreviatura Asignatura -->
-                        <!-- Selector curso -->
-                        <div class="form-group col-md my-1" id="container-selector-curso">
-                            <label for="selector-curso" class="my-1">Curso</label>
-                            <select id="selector-curso" name="curso" class="custom-select text-dark" required>
-                                <option selected="selected" value="0">Optativa</option>
-                                <option value="1">1º</option>
-                                <option value="2">2º</option>
-                                <option value="3">3º</option>
-                                <option value="4">4º</option>
-                                <option value="5">5º</option>
-                                <option value="6">6º</option>
-                            </select>
-                        </div>
-                        <!-- /Selector curso -->
-                    </div>
+                    <fieldset class="pr-2">
+                        <!-- Selector carrera -->
+                            <div id="container-selector-carrera">
+                                <label for="selector-carrera" class="my-1">Carrera*</label>
+                                <select id="selector-carrera" name="carrera" class="custom-select text-dark" required>
+                                    <option disabled="disabled" selected="selected" value="">Selecciona una carrera</option>
+                                    <?php
+                                    foreach ($carreras as $carrera) {
+                                        echo '<option value="'.$carrera->getId().'">'.$carrera->getNombre().'</option>';
+                                    }
+                                    ?>
+                                </select>
+                            </div>
+                        <!-- /Selector carrera -->
 
-                    <input type="hidden" name="page" value="asignatura">
-                    <input type="hidden" id="id-asignatura" name="id-asignatura" value="0">
-                    <input type="hidden" id="accion-asignatura" name="accion" value="add">
+                        <!-- Selector itinerario -->
+                            <div id="container-selector-itinerario">
+                                <label for="selector-itinerario" class="my-1">Itinerario*</label>
+                                <select id="selector-itinerario" name="itinerario" class="custom-select text-dark" disabled required>
+                                    <option selected="selected" value="0">Común</option>
+                                </select>
+                            </div>
+                        <!-- /Selector itinerario -->
+
+                        <!-- Nombre Asignatura -->
+                            <div class="form-group my-1">
+                                <label for="nombre-asignatura" class="my-1">Nombre de la asignatura*</label>
+                                <input type="text" class="form-control" name="nombre-asignatura" id="nombre-asignatura" placeholder="Nombre de la asignatura" required>
+                            </div>
+                        <!-- /Nombre Asignatura -->
+                        
+                        <div class="row align-items-end">
+                            <!-- Abreviatura Asignatura -->
+                                <div class="form-group col-md my-1">
+                                    <label for="abreviatura" class="my-1">Abreviatura de la asignatura</label>
+                                    <input type="text" class="form-control" name="abreviatura" id="abreviatura" placeholder="Abreviatura">
+                                </div>
+                            <!-- /Abreviatura Asignatura -->
+
+                            <!-- Selector curso -->
+                                <div class="form-group col-md my-1" id="container-selector-curso">
+                                    <label for="selector-curso" class="my-1">Curso*</label>
+                                    <select id="selector-curso" name="curso" class="custom-select text-dark" required>
+                                        <option selected="selected" value="0">Optativa</option>
+                                        <option value="1">1º</option>
+                                        <option value="2">2º</option>
+                                        <option value="3">3º</option>
+                                        <option value="4">4º</option>
+                                        <option value="5">5º</option>
+                                        <option value="6">6º</option>
+                                    </select>
+                                </div>
+                            <!-- /Selector curso -->
+                        </div>
+
+                        <!-- Selector Departamento 1 -->
+                            <div id="container-selector-departamento-1">
+                                <label for="selector-departamento-1" class="my-1">Departamento*</label>
+                                <select id="selector-departamento-1" name="departamento-1" class="custom-select text-dark" required>
+                                    <option selected="selected" value="">Selecciona un departamento</option>
+                                    <?php
+                                    foreach ($departamentos as $departamento) {
+                                        echo '<option value="'.$departamento->getId().'">'.$departamento->getNombre().'</option>';
+                                    }
+                                    ?>
+                                </select>
+                            </div>
+                        <!-- /Selector Departamento 1 -->
+
+                        <!-- Selector Departamento 2 -->
+                            <div id="container-selector-departamento-2">
+                                <label for="selector-departamento-2" class="my-1">Departamento 2</label>
+                                <select id="selector-departamento-2" name="departamento-2" class="custom-select text-dark" disabled>
+                                    <option selected="selected" value="">Selecciona un departamento</option>
+                                </select>
+                            </div>
+                        <!-- /Selector Departamento 2 -->
+
+                        <div class="row align-items-end">
+                            <!-- Cod. GEA -->
+                                <div class="form-group col-md my-1">
+                                    <label for="gea" class="my-1" title="Código GEA de la asignatura">Cód. GEA*</label>
+                                    <input type="number" min="0" max="999999999" class="form-control" name="gea" id="gea" placeholder="803270" required>
+                                </div>
+                            <!-- /Cod. GEA -->
+
+                            <!-- Creditos -->
+                                <div class="form-group col-md my-1">
+                                    <label for="creditos" class="my-1">Créditos</label>
+                                    <input type="number" min="0" step=".5" class="form-control" name="creditos" id="creditos" placeholder="6" required>
+                                </div>
+                            <!-- /Creditos -->
+
+                            <!-- Docentes -->
+                                <div class="form-group col-md my-1">
+                                    <label for="docentes" class="my-1" title="¿Cuántos docentes impartirán la asignatura?">Nº de docentes</label>
+                                    <input type="number" min="0" class="form-control" name="docentes" id="docentes" placeholder="6" required>
+                                </div>
+                            <!-- /Docentes -->
+                        </div>
+                        <input type="hidden" name="page" value="asignatura">
+                        <input type="hidden" id="id-asignatura" name="id" value="0">
+                        <input type="hidden" id="accion-asignatura" name="accion" value="add">
+                    </fieldset>
                     <button type="submit" id="submit-asignatura" name="submit-asignatura" class="btn btn-primary w-100 mt-2">Añadir</button>
                 </form>
             </div>
@@ -853,28 +950,51 @@
             <!-- listado -->
             <div id="listado" class="col-md p-2 border">
                 <?php
-                if(count($listado) == 0) {
-                    echo "No hay itinerarios";
+                if(count($asignaturas) == 0) {
+                    echo "No hay asignaturas";
                 }
                 else{
                     ?>
-                    <form action="?gestionar=itinerarios" method="post">
+                    <div id="container-filtro-asignaturas" class="row align-items-center mb-2">
+                        <div class="col-auto">
+                            <label for="filtro-asignaturas" class="my-1">Filtrar por carrera</label>
+                        </div>
+                        <div class="col">
+                        <select id="filtro-asignaturas" name="filtro-carrera" class="custom-select text-dark col" required>
+                            <option selected="selected" value="">Todas</option>
+                            <?php
+                            foreach ($carreras as $carrera) {
+                                echo '<option value="'.$carrera->getId().'">'.$carrera->getNombre().'</option>';
+                            }
+                            ?>
+                        </select>
+                        </div>
+                    </div>
+                    <form action="?gestionar=asignaturas" method="post">
                         <fieldset>
                         <?php
-                        foreach ($listado as $itinerario) {
-                            $c = $cdao->getById($itinerario->getIdCarrera());
+                        foreach ($asignaturas as $asignatura) {
+                            $c = $cdao->getById($asignatura->getId_carrera());
                             $c = $c->getNombre();
+
+                            if($asignatura->getItinerario() != NULL){
+                                $i = $idao->getById($asignatura->getItinerario());
+                                $i = $i->getNombre();
+                            }
+                            else{
+                                $i = "Común";
+                            }
                             ?>
                             <div class="gestion-list-element p-2 mb-2 border">
-                                <input type="checkbox" name="itinerario[]" value="<?php echo $itinerario->getId(); ?>" id="itinerario-<?php echo $itinerario->getId(); ?>">
-                                <label for="itinerario-<?php echo $itinerario->getId(); ?>"><?php echo $itinerario->getNombre() . ' ('. $c .')'; ?></label>
-                                <span class="editar-button" onclick="editar_itinerario(<?php echo $itinerario->getId(); ?>)">Editar</span>
-                                <input type="hidden" name="page" value="itinerario">
-                                <input type="hidden" id="accion-itinerario-listado" name="accion" value="remove">
+                                <input type="checkbox" name="asignatura[]" value="<?php echo $asignatura->getId(); ?>" id="asignatura-<?php echo $asignatura->getId(); ?>">
+                                <label for="asignatura-<?php echo $asignatura->getId(); ?>">[<?php echo $asignatura->getId(); ?>] <?php echo $asignatura->getNombre() . ' ('. $c .')  ('. $i .')'; ?></label>
+                                <span class="editar-button" onclick="editar_asignatura(<?php echo $asignatura->getId(); ?>)">Editar</span>
                             </div>
                             <?php  
                         }
                         ?>
+                            <input type="hidden" name="page" value="asignatura">
+                            <input type="hidden" id="accion-asignatura-listado" name="accion" value="remove">
                         </fieldset>
                         <button id="borrar-seleccion" type="button" class="btn btn-primary" onclick="borrar()">Borrar</button>
                     </form>

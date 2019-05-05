@@ -155,7 +155,7 @@ class Facultad_dao implements iDAO{
     public function getListado(){
         $conn = Connection::connect();
 
-        $stmt = "SELECT * FROM `facultades`;";       
+        $stmt = "SELECT * FROM `facultades` ORDER BY `nombre`;";       
 
         if (!($sentencia = $conn->prepare($stmt))) {
             echo "Falló la preparación: (" . $conn->errno . ") " . $conn->error;

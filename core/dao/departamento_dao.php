@@ -97,6 +97,37 @@ class Departamento_dao implements iDAO{
         return true;
     }
 
+    public function getListadoSin($id){
+        $conn = Connection::connect();
+
+        $stmt = "SELECT * FROM `departamentos` WHERE id != ?;";       
+
+        if (!($sentencia = $conn->prepare($stmt))) {
+            echo "Falló la preparación: (" . $conn->errno . ") " . $conn->error;
+        }
+
+        if (!$sentencia->bind_param("i", $id)) {
+            echo "Falló la vinculación de parámetros: (" . $sentencia->errno . ") " . $sentencia->error;
+        }
+
+        $sentencia->execute();
+
+        $result = $sentencia->get_result();
+
+        $sentencia->close();
+        $conn->close();
+
+        $departamentos = array();
+
+        while($r = $result->fetch_assoc())
+        {
+            $departamentos[$r["id"]] = new Departamento($r["id"], $r["nombre"], $r["id_facultad"]);
+        }
+
+        return $departamentos;
+    }
+
+
     /**
      * Guarda en la base de datos la departamento proporcionada
      * En caso de que ya exista, se actualizan los datos

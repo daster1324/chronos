@@ -20,10 +20,12 @@ class Asignatura implements JsonSerializable {
     private $id_departamento;       // Integer 2 digitos    - Obligatorio
     private $id_departamento_dos;   // Integer 2 digitos    - Opcional
     private $creditos;              // Integer 2 digitos    - Obligatorio
+    private $docentes;              // Integer 2 digitos    - Obligatorio
 
-    public function __construct($id, $id_carrera, $itinerario = NULL, $nombre,
-                                 $abreviatura = NULL, $curso, $id_departamento,
-                                 $id_departamento_dos = NULL, $creditos){
+
+    public function __construct($id, $id_carrera, $itinerario, $nombre,
+                                 $abreviatura, $curso, $id_departamento,
+                                 $id_departamento_dos, $creditos, $docentes){
         $this->id = $id;
         $this->id_carrera = $id_carrera;
         $this->itinerario = $itinerario;
@@ -33,6 +35,7 @@ class Asignatura implements JsonSerializable {
         $this->id_departamento = $id_departamento;
         $this->id_departamento_dos = $id_departamento_dos;
         $this->creditos = $creditos;
+        $this->docentes = $docentes;
     }
 
     /**
@@ -75,6 +78,10 @@ class Asignatura implements JsonSerializable {
         return $this->creditos;
     }
 
+    public function getDocentes(){
+        return $this->docentes;
+    }
+
 
     /**
      *  SETTERS
@@ -115,6 +122,10 @@ class Asignatura implements JsonSerializable {
         $this->creditos = $creditos;
     }
 
+    public function setDocentes($docentes){
+        $this->docentes = $docentes;
+    }
+
     /**
      *  SERIALIZE
      */
@@ -128,7 +139,8 @@ class Asignatura implements JsonSerializable {
             'curso' => $this->curso,
             'id_departamento' => $this->id_departamento,
             'id_departamento_dos' => $this->id_departamento_dos,
-            'creditos' => $this->creditos
+            'creditos' => $this->creditos,
+            'docentes' => $this->docentes,
         ];
     }
 }
