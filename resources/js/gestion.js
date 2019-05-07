@@ -352,8 +352,6 @@ function busca_itinerarios(id_carrera, seleccion = null){
                 alert(jQxhr.responseText);
             }
             else{
-                let last_id;
-
                 let $it_selector = $('#selector-itinerario');
                 $it_selector.children('option:not(:first)').remove();
 
@@ -499,4 +497,129 @@ function cancelar_editar_asignatura(){
 
     $('#submit-asignatura').text('Añadir');
     $('#cancelar-asignatura').remove();
+}
+
+
+// Clases
+
+
+
+// Docentes
+
+$('#selector-facultad-docente').change(function(){ 
+    let facultad = $(this).val();
+    docente_editar_departamento(facultad);
+});
+
+function docente_editar_departamento(facultad, seleccion = null){
+    if(facultad != ""){
+        let data = "op=14";
+        data += "&idfacultad="+facultad;
+        $.ajax({
+            url: '/async',
+            dataType: 'json',
+            type: 'post',
+            data: data,
+            success: function( data, textStatus, jQxhr ){
+                if(jQxhr.responseText.indexOf("Error")>=0){
+                    alert(data);
+                }
+                else{ 
+                    let $dep_selector = $('#selector-departamento-docente');
+                    $dep_selector.children('option:not(:first)').remove();
+    
+                    $.each(data, function (i, item) {
+                        last_id = item.id;
+                        $dep_selector.append($('<option>', { 
+                            value: item.id,
+                            text : item.nombre 
+                        }));
+                    });
+    
+                    if(Object.keys(data).length > 1){
+                        $dep_selector.prop( "disabled", false );
+                    }
+
+                    if(seleccion != null){
+                        $dep_selector.val(seleccion);
+                    }
+                }
+            },
+            error: function( jqXhr, textStatus, errorThrown ){
+                alert('');
+            }
+        });
+    }
+}
+
+function editar_docente(id){
+    if($('#accion-docente').val() != "edit"){
+        $('#accion-docente').val('edit');
+
+        let data = "op=15";
+        data += "&id="+id;
+        $.ajax({
+            url: '/async',
+            dataType: 'json',
+            type: 'post',
+            data: data,
+            success: function( data, textStatus, jQxhr ){
+                if(jQxhr.responseText.indexOf("Error")>=0){
+                    alert(data);
+                }
+                else{
+                    //$docentes[] = array('id' => $r['id'], 'nombre' => $r['nombre'], 'departamento' => $r['departamento']);
+                    $('#accion-title').text('Editar Docente');
+
+                    $('#selector-facultad-docente').val(data.facultad);
+                    
+                    docente_editar_departamento(data.facultad, data.departamento);
+
+                    $('#id-docente').val(data.id);
+
+                    $('#nombre-docente').val(data.nombre);
+
+                    $('#usuario-docente').val(data.usuario);
+                    $('#user-docente').val(data.usuario);
+                    $('#usuario-docente').prop( "disabled", true );
+                    
+                    $('#password-docente').val("¿Te crees hacker o qué?");
+
+                    $('#submit-docente').text('Guardar cambios');
+
+                    $('#formulario form').append('<button type="button" id="cancelar-docente" class="btn btn-warning w-100 mt-2" onclick="cancelar_editar_docente()">Cancelar</button>');
+                }
+            },
+            error: function( jqXhr, textStatus, errorThrown ){
+            }
+        });
+    }
+    else
+        alert("Cancela la edición actual antes de editar otro elemento.")
+}
+
+function cancelar_editar_docente(){
+    $('#accion-title').text('Añadir Docente');
+    $('#accion-docente').val('add');
+
+    $('#selector-facultad-docente').val('');
+
+    $('#selector-departamento-docente').val('');
+    $('#selector-departamento-docente').children('option:not(:first)').remove();
+    $('#selector-departamento-docente').prop( "disabled", true );
+
+    $('#id-docente').val(0);
+
+    $('#nombre-docente').val('');
+
+    $('#usuario-docente').val('');
+    $('#user-docente').val('');
+    
+    $('#password-docente').val('');
+
+    $('#password-docente').prop( "disabled", false );
+
+    $('#submit-docente').text('Añadir');
+
+    $('#cancelar-docente').remove();
 }

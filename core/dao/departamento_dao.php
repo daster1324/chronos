@@ -73,6 +73,36 @@ class Departamento_dao implements iDAO{
         return $departamentos;
     }
 
+    public function getDepartamentosFacultad($idfacultad){
+        $conn = Connection::connect();
+
+        $stmt = "SELECT * FROM `departamentos` WHERE id_facultad = ?;";       
+
+        if (!($sentencia = $conn->prepare($stmt))) {
+            echo "Falló la preparación: (" . $conn->errno . ") " . $conn->error;
+        }
+
+        if (!$sentencia->bind_param("s", $idfacultad)) {
+            echo "Falló la vinculación de parámetros: (" . $sentencia->errno . ") " . $sentencia->error;
+        }
+
+        $sentencia->execute();
+
+        $result = $sentencia->get_result();
+
+        $sentencia->close();
+        $conn->close();
+
+        $departamentos = array();
+
+        while($r = $result->fetch_assoc())
+        {
+            $departamentos[$r["id"]] = new Departamento($r["id"], $r["nombre"], $r["id_facultad"]);
+        }
+
+        return $departamentos;
+    }
+
     public function busca($nombre, $if_facultad){
         $conn = Connection::connect();
 

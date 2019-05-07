@@ -100,6 +100,16 @@ if(!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQU
          getAsignaturasCarrera($_POST['carrera']);
       break;
 
+      // Recupera los departamentos de una facultad
+      case 14:
+         getDepartamentosFacultad($_POST['idfacultad']);
+      break;
+
+      // Recupera todos los datos del docente para mostrarlos
+      case 15:
+         getDocente($_POST['id']);
+      break;
+
       default:
          die("Error");
          break;
@@ -223,6 +233,18 @@ function getAsignaturasCarrera($carrera){
    $adao = new Asignatura_dao();
    echo json_encode($adao->getListadoFiltrado($carrera));
    unset($adao);
+}
+
+function getDepartamentosFacultad($idfacultad){
+   $ddao = new Departamento_dao();
+   echo json_encode($ddao->getDepartamentosFacultad($idfacultad));
+   unset($ddao);
+}
+
+function getDocente($id){
+   $dodao = new Docente_dao();
+   echo json_encode($dodao->getDocente($id));
+   unset($dodao);
 }
 
 ?>

@@ -7,7 +7,9 @@
 
     // Se capturan los POSTs (salvo el de login)
     if(isset($_POST['accion']) && !empty($_POST['accion'])){ 
+        echo '<div class="bg-light">';
         var_dump($_POST); 
+        echo '</div>';
     
         if($_POST['accion'] == "add"){
             switch ($_POST['page']) {
@@ -129,12 +131,41 @@
                     header("Location: /gestion?gestionar=asignaturas&message=".$mensaje);
                 break;
                 
+                case 'clase':
+
+                break;
+
+                case 'docente':
+                    $facultad = $_POST['facultad'];
+                    $departamento = $_POST['departamento'];
+                    $nombre = $_POST['nombre-docente'];
+                    $usuario = $_POST['usuario-docente'];
+                    $pass = $usuario . SALT . $_POST['password-docente'];
+                    $pass = hash("sha256", $pass);
+
+                    $dodao = new Docente_dao();
+
+                    $existe = $dodao->getByUsuario($usuario);
+                    $mensaje = 1;
+
+                    if($existe == NULL){
+                        $dodao->store(new Docente(NULL, $nombre, $departamento, "", 0, $usuario, $pass));
+                    }
+                    else{
+                        $mensaje = 4;
+                    }
+
+                    unset($dodao);
+                    header("HTTP/1.1 301 Moved Permanently"); 
+                    header("Location: /gestion?gestionar=docentes&message=".$mensaje);
+                break;
+
                 default:
                     # code...
                     break;
             }
         }
-
+        
         if($_POST['accion'] == "edit"){
             switch ($_POST['page']) {
                 case 'facultad':
@@ -213,6 +244,24 @@
                     header("HTTP/1.1 301 Moved Permanently"); 
                     header("Location: /gestion?gestionar=asignaturas&message=2");
                 break;
+
+                case 'clase':
+
+                break;
+
+                case 'docente':
+                    $id = $_POST['id-docente'];
+                    $nombre = $_POST['nombre-docente'];
+                    $departamento = $_POST['departamento'];
+                    $pass = ($_POST['password-docente'] == "¿Te crees hacker o qué?") ? NULL : hash("sha256", $_POST['user-docente'] . SALT . $_POST['password-docente']);
+
+                    $dodao = new Docente_dao();
+                    $dodao->store(new Docente($id, $nombre, $departamento, "", 0, "", $pass));
+
+                    unset($dodao);
+                    header("HTTP/1.1 301 Moved Permanently"); 
+                    header("Location: /gestion?gestionar=docentes&message=2");
+                break;
                 
                 default:
                     # code...
@@ -290,6 +339,24 @@
                         header("HTTP/1.1 301 Moved Permanently"); 
                         header("Location: /gestion?gestionar=asignaturas&message=3");
                     }
+                break;
+
+                case 'clase':
+
+                break;
+
+                case 'docente':
+                    if(isset($_POST['docente'])){
+                        $dodao = new Docente_dao();
+
+                        foreach ($_POST['docente'] as $id) {
+                            $dodao->remove($id);
+                    }
+
+                    unset($dodao);
+                    header("HTTP/1.1 301 Moved Permanently"); 
+                    header("Location: /gestion?gestionar=docentes&message=3");
+                }
                 break;
 
                 default:
@@ -484,7 +551,7 @@
                             <label for="facultad-<?php echo $facultad->getId(); ?>"><?php echo $facultad->getNombre() . ' ('. $facultad->getCampus() .')'; ?></label>
                             <span class="editar-button" onclick="editar_facultad(<?php echo $facultad->getId(); ?>)">Editar</span>
                             <input type="hidden" name="page" value="facultad">
-                            <input type="hidden" id="accion-facultad-listado" name="accion" value="remove">
+                            <input type="hidden" name="accion" value="remove">
                         </div>
                         <?php  
                         }
@@ -587,7 +654,7 @@
                             <label for="carrera-<?php echo $carrera->getId(); ?>"><?php echo $carrera->getNombre() . ' ('. $f . $fdg .')'; ?></label>
                             <span class="editar-button" onclick="editar_carrera(<?php echo $carrera->getId(); ?>)">Editar</span>
                             <input type="hidden" name="page" value="carrera">
-                            <input type="hidden" id="accion-carrera-listado" name="accion" value="remove">
+                            <input type="hidden" name="accion" value="remove">
                         </div>
                         <?php  
                         }
@@ -683,7 +750,7 @@
                                 <label for="itinerario-<?php echo $itinerario->getId(); ?>"><?php echo $itinerario->getNombre() . ' ('. $c .')'; ?></label>
                                 <span class="editar-button" onclick="editar_itinerario(<?php echo $itinerario->getId(); ?>)">Editar</span>
                                 <input type="hidden" name="page" value="itinerario">
-                                <input type="hidden" id="accion-itinerario-listado" name="accion" value="remove">
+                                <input type="hidden" name="accion" value="remove">
                             </div>
                             <?php  
                         }
@@ -778,7 +845,7 @@
                                 <label for="departamento-<?php echo $departamento->getId(); ?>"><?php echo $departamento->getNombre() . ' ('. $f .')'; ?></label>
                                 <span class="editar-button" onclick="editar_departamento(<?php echo $departamento->getId(); ?>)">Editar</span>
                                 <input type="hidden" name="page" value="departamento">
-                                <input type="hidden" id="accion-departamento-listado" name="accion" value="remove">
+                                <input type="hidden" name="accion" value="remove">
                             </div>
                             <?php  
                         }
@@ -795,7 +862,7 @@
         <?php
     }
 
-    //TODO: Falta por hacer
+    //
     function show_asignaturas(){
         if(isset($_GET['message'])){
             ?> <div class="alert alert-success" role="alert"> <?php
@@ -994,7 +1061,7 @@
                         }
                         ?>
                             <input type="hidden" name="page" value="asignatura">
-                            <input type="hidden" id="accion-asignatura-listado" name="accion" value="remove">
+                            <input type="hidden" name="accion" value="remove">
                         </fieldset>
                         <button id="borrar-seleccion" type="button" class="btn btn-primary" onclick="borrar()">Borrar</button>
                     </form>
@@ -1009,15 +1076,228 @@
 
     //TODO: Falta por hacer
     function show_clases(){
-        ?>
+        $fdao = new Facultad_dao();
+        //$cdao = new Carrera_dao();
+        //$idao = new Itinerario_dao();
+        //$adao = new Asignatura_dao();
+        //$cldao = new Clase_dao();
+
+        $facultades = $fdao->getListado();
         
+
+        if(isset($_GET['message'])){
+            ?> <div class="alert alert-success" role="alert"> <?php
+            switch ($_GET['message']) {
+                case 1:
+                    echo "Clase añadida";
+                break;
+
+                case 2:
+                    echo "Clase(s) eliminada(s)";
+                break;
+                
+                case 3:
+                    echo "Clase(s) eliminada(s)";
+                break;
+
+                case 4:
+                    echo "Ya existe una clase con esos datos";
+                break;
+
+                default: break;
+            }
+            ?> </div> <?php
+            unset($_GET['message']);
+        }
+        ?>
+
+        <div class="row justify-content-between">
+            <!-- formulario -->
+                <div id="formulario" class="col-md-5 mr-md-3 mb-3 mb-md-0 p-2 border">
+                    <h4 id="accion-title">Añadir facultad</h4>
+                    <form action="?gestionar=clases" method="post">
+                        <fieldset>
+                            <label for="selector-facultad" class="my-1">Facultad</label>
+                            <select id="selector-facultad" name="facultad" class="custom-select text-dark" required>
+                                <option disabled="disabled" selected="selected" value="">Selecciona una facultad</option>
+                                <?php
+                                    foreach ($facultades as $facultad) {
+                                        echo '<option value="'.$facultad->getId().'">'.$facultad->getNombre().'</option>';
+                                    }
+                                ?>
+                        </select>
+                            <div class="form-group">
+                                <input type="text" class="form-control" name="nombre-facultad" id="nombre-facultad" placeholder="Nombre" required>
+                            </div>
+                            <div class="form-group">
+                                <input type="text" class="form-control" name="campus-facultad" id="campus-facultad" placeholder="Campus" required>
+                            </div>
+                            <input type="hidden" name="page" value="facultad">
+                            <input type="hidden" id="id-facultad" name="id-facultad" value="0">
+                            <input type="hidden" id="accion-facultad" name="accion" value="add">
+                        </fieldset>
+                        <button type="submit" id="submit-facultad" name="submit-facultad" class="btn btn-primary w-100">Añadir</button>
+                    </form>
+                </div>
+            <!-- /formulario -->
+            <!-- listado -->
+                <div id="listado" class="col-md p-2 border">
+                    <?php
+                    if(count($listado) == 0) {
+                        echo "No hay clases";
+                    }
+                    else{
+                        ?>
+                        <form action="?gestionar=facultades" method="post">
+                            <fieldset>
+                            <?php
+                            foreach ($listado as $facultad) {
+                            ?>
+                            <div class="gestion-list-element p-2 mb-2 border">
+                                <input class="align-middle" type="checkbox" name="facultad[]" value="<?php echo $facultad->getId(); ?>" id="facultad-<?php echo $facultad->getId(); ?>">
+                                <label for="facultad-<?php echo $facultad->getId(); ?>"><?php echo $facultad->getNombre() . ' ('. $facultad->getCampus() .')'; ?></label>
+                                <span class="editar-button" onclick="editar_facultad(<?php echo $facultad->getId(); ?>)">Editar</span>
+                                <input type="hidden" name="page" value="facultad">
+                                <input type="hidden" name="accion" value="remove">
+                            </div>
+                            <?php  
+                            }
+                            ?>
+                            </fieldset>
+                            <button type="button" class="btn btn-primary" onclick="borrar()">Borrar</button>
+                        </form>
+                    <?php 
+                    } 
+                    ?>
+                </div>
+            <!-- /listado -->
+        </div>
         <?php
+        unset($fdao);
     }
 
-    //TODO: Falta por hacer
     function show_docentes(){
+        if(isset($_GET['message'])){
+            ?> <div class="alert alert-success" role="alert"> <?php
+            switch ($_GET['message']) {
+                case 1:
+                    echo "Docente añadido";
+                break;
+
+                case 2:
+                    echo "Docente modificado";
+                break;
+                
+                case 3:
+                    echo "Docente(s) eliminado(s)";
+                break;
+
+                case 4:
+                    echo "Ya existe un docente con esos datos";
+                break;
+
+                default: break;
+            }
+            ?> </div> <?php
+            unset($_GET['message']);
+        }
+
+        $fdao = new Facultad_dao();
+        $facultades = $fdao->getListado();
+
+        $ddao = new Departamento_dao();
+        $departamentos = $ddao->getListado();
+
+        $dodao = new Docente_dao();
+        $docentes = $dodao->getListadoPublico();
+
         ?>
-        
+
+        <div class="row justify-content-between">
+            <!-- formulario -->
+            <div id="formulario" class="col-md-5 mr-md-3 mb-3 mb-md-0 p-2 border">
+                <h4 id="accion-title">Añadir Docente</h4>
+                <form action="?gestionar=docentes" method="post">
+                    <!-- Selector Facultad -->
+                        <label for="selector-facultad-docente" class="my-1">Facultad</label>
+                        <select id="selector-facultad-docente" name="facultad" class="custom-select text-dark" required>
+                            <option disabled="disabled" selected="selected" value="">Selecciona una facultad</option>
+                            <?php
+                            foreach ($facultades as $facultad) {
+                                echo '<option value="'.$facultad->getId().'">'.$facultad->getNombre().'</option>';
+                            }
+                            ?>
+                        </select>
+                    <!-- /Selector Facultad -->
+                    <!-- Selector Departamento -->
+                        <label for="selector-departamento-docente" class="my-1">Departamento</label>
+                        <select id="selector-departamento-docente" name="departamento" class="custom-select text-dark" required>
+                            <option disabled="disabled" selected="selected" value="">Selecciona un departamento</option>
+                        </select>
+                    <!-- /Selector Departamento -->   
+                    <!-- Nombre Docente -->
+                        <div class="form-group my-1">
+                            <label for="nombre-docente" class="my-1">Nombre del docente</label>
+                            <input type="text" class="form-control" name="nombre-docente" id="nombre-docente" placeholder="Nombre" required>
+                        </div>
+                    <!-- /Nombre Docente -->
+
+                    <!-- Usuario Docente -->
+                        <div class="form-group my-1">
+                            <label for="usuario-docente" class="my-1">Usuario</label>
+                            <input type="text" class="form-control" name="usuario-docente" id="usuario-docente" placeholder="Usuario" autocomplete="nope" required>
+                        </div>
+                    <!-- /Usuario Docente -->
+                    <!-- Password Docente -->
+                        <div class="form-group my-1">
+                            <label for="password-docente" class="my-1">Contraseña</label>
+                            <input type="password" class="form-control" name="password-docente" id="password-docente" placeholder="Contraseña" autocomplete="nope" required>
+                        </div>
+                    <!-- /Password Docente -->
+
+                    <input type="hidden" name="page" value="docente">
+                    <input type="hidden" id="id-docente" name="id-docente" value="0">
+                    <input type="hidden" id="user-docente" name="user-docente" value="0">
+                    <input type="hidden" id="accion-docente" name="accion" value="add">
+                    <button type="submit" id="submit-docente" name="submit-docente" class="btn btn-primary w-100 mt-1">Añadir</button>
+                </form>
+            </div>
+            <!-- /formulario -->
+            <!-- listado -->
+            <div id="listado" class="col-md p-2 border">
+                <?php
+                if(count($docentes) == 0) {
+                    echo "No hay docentes";
+                }
+                else{
+                    ?>
+                    <form action="?gestionar=docentes" method="post">
+                        <fieldset>
+                        <?php
+                        foreach ($docentes as $docente) {
+                            $f = $ddao->getById($docente['departamento']);
+                            $f = $fdao->getById($f->getId_facultad());
+                            $f = $f->getNombre();
+                            ?>
+                            <div class="gestion-list-element p-2 mb-2 border">
+                                <input type="checkbox" name="docente[]" value="<?php echo $docente['id']; ?>" id="docente-<?php echo $docente['id']; ?>">
+                                <label for="docente-<?php echo $docente['id']; ?>"><?php echo $docente['nombre'] . ' ('. $f .')'; ?></label>
+                                <span class="editar-button" onclick="editar_docente(<?php echo $docente['id']; ?>)">Editar</span>
+                                <input type="hidden" name="page" value="docente">
+                                <input type="hidden" name="accion" value="remove">
+                            </div>
+                            <?php  
+                        }
+                        ?>
+                        </fieldset>
+                        <button id="borrar-seleccion" type="button" class="btn btn-primary" onclick="borrar()">Borrar</button>
+                    </form>
+                <?php 
+                } 
+                ?>
+            </div>
+            <!-- /listado -->
+        </div>
         <?php
     }
 
@@ -1034,7 +1314,7 @@
                 $gdao = new Gestor_dao();
 
                 $id = $_SESSION['gestor-id'];
-                $pass = hash("sha256", $_SESSION['gestor-usuario'] + SALT + $_POST['new-pass-1']);
+                $pass = hash("sha256", $_SESSION['gestor-usuario'] . SALT . $_POST['new-pass-1']);
             }
         }
         ?>
@@ -1187,7 +1467,7 @@
         $gdao = new Gestor_dao();
 
         $user = $_POST['usuario'];
-        $pass = hash("sha256", $user + SALT + $_POST['password']);
+        $pass = hash("sha256", $user . SALT . $_POST['password']);
 
         if($gdao->login($user, $pass)){
             showDashboard();

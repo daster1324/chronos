@@ -37,11 +37,103 @@ class Docente_dao implements iDAO{
             return NULL;
 
         $r = $result->fetch_assoc();
-
-        $docente = new Docente($r["id"], $r["nombre"], $r["campus"], $r['preferencias']);
+                    
+        $docente = new Docente($r['id'], $r['nombre'], $r['departamento'], $r['preferencias'], $r['orden'], $r['usuario']);
 
         $sentencia->close();
         $conn->close();
+
+        return $docente;
+    }
+
+    public function getAllDataById($id){
+        $conn = Connection::connect();
+
+        if (!($sentencia = $conn->prepare("SELECT * FROM `docentes` WHERE id = ?;"))) {
+            echo "Falló la preparación: (" . $conn->errno . ") " . $conn->error;
+        }
+
+        if (!$sentencia->bind_param("i", $id)) {
+            echo "Falló la vinculación de parámetros: (" . $sentencia->errno . ") " . $sentencia->error;
+        }
+
+        $sentencia->execute();
+
+        $result = $sentencia->get_result();
+
+        if($result->num_rows === 0)
+            return NULL;
+
+        $r = $result->fetch_assoc();
+                    
+        $docente = new Docente($r['id'], $r['nombre'], $r['departamento'], $r['preferencias'], $r['orden'], $r['usuario'], $r['pass']);
+
+        $sentencia->close();
+        $conn->close();
+
+        return $docente;
+    }
+
+    public function getDocente($id){
+        $conn = Connection::connect();
+
+        $ddao = new Departamento_dao();
+
+        $stmt = "SELECT id, nombre, departamento, usuario FROM `docentes` WHERE `id` = ?;";       
+
+        if (!($sentencia = $conn->prepare($stmt))) {
+            echo "Falló la preparación: (" . $conn->errno . ") " . $conn->error;
+        }
+
+        if (!$sentencia->bind_param("i", $id)) {
+            echo "Falló la vinculación de parámetros: (" . $sentencia->errno . ") " . $sentencia->error;
+        }
+
+        $sentencia->execute();
+
+        $result = $sentencia->get_result();
+
+        $sentencia->close();
+        $conn->close();
+
+        $docentes = array();
+
+        while($r = $result->fetch_assoc())
+        {
+            $facultad = $ddao->getById($r['departamento'])->getId_facultad();
+            $docentes = array('id' => $r['id'], 'nombre' => $r['nombre'], 'facultad' => $facultad,  'departamento' => $r['departamento'], 'usuario' => $r['usuario']);
+        }
+
+        unset($ddao);
+        unset($fdao);
+
+        return $docentes;
+    }
+
+    public function getByUsuario($usuario){
+        $conn = Connection::connect();
+
+        if (!($sentencia = $conn->prepare("SELECT * FROM `docentes` WHERE usuario = ?;"))) {
+            echo "Falló la preparación: (" . $conn->errno . ") " . $conn->error;
+        }
+
+        if (!$sentencia->bind_param("s", $usuario)) {
+            echo "Falló la vinculación de parámetros: (" . $sentencia->errno . ") " . $sentencia->error;
+        }
+
+        $sentencia->execute();
+
+        $result = $sentencia->get_result();
+        
+        $sentencia->close();
+        $conn->close();
+
+        if($result->num_rows === 0)
+            return NULL;
+
+        $r = $result->fetch_assoc();
+
+        $docente = new Docente($r['id'], $r['nombre'], $r['departamento']);
 
         return $docente;
     }
@@ -56,18 +148,37 @@ class Docente_dao implements iDAO{
         $conn = Connection::connect();
 
         $id  = $d->getId();
-        $usuario  = $d->getUsuario();
+        $docente = $this->getAllDataById($id);
+        $actualizar = $docente != NULL;
+        
+        $nombre = $d->getNombre();
         $departamento  = $d->getDepartamento();
         $preferencias  = $d->getPreferencias();
+        $orden = $d->getOrden();
+        $usuario  = $d->getUsuario();
         $pass  = $d->getPassword();
+        
+        
 
-        $actualizar = ($this->getById($d->getId()) != NULL);
+        // Escenarios posibles en ACTUALIZAR
+        // - cambiar todos los datos posibles en GESTOR: nombre, departamento, contraseña
+        // - cambiar todos los datos posibles en DOCENTE: nombre, departamento, contraseña, preferencias
 
         if($actualizar){
-            if (!($sentencia = $conn->prepare("UPDATE `docentes` SET `departamento` = ?, `preferencias` = ? WHERE `id` = ?;"))) {
+            $pass = ($docente->getPassword() == $pass || $pass == "")  ? $docente->getPassword() : $pass;
+
+            $nombre = ($docente->getNombre() == $nombre) ? $docente->getNombre() : $nombre;
+
+            $departamento = ($docente->getDepartamento() == $departamento) ? $docente->getDepartamento() : $departamento;
+
+            $preferencias = ($docente->getPreferencias() == $preferencias) ? $docente->getPreferencias() : $preferencias;
+
+            $orden = ($docente->getOrden() == $orden) ? $docente->getOrden() : $orden;
+
+            if (!($sentencia = $conn->prepare("UPDATE `docentes` SET `pass` = ?, `nombre` = ?, `departamento` = ?, `preferencias` = ?, `orden` = ? WHERE `id` = ?;"))) {
                 echo "Falló la preparación: (" . $conn->errno . ") " . $conn->error;
             }
-            if (!$sentencia->bind_param("isi", $departamento, $preferencias, $id)) {
+            if (!$sentencia->bind_param("ssisii", $pass, $nombre, $departamento, $preferencias, $orden, $id)) {
                 echo "Falló la vinculación de parámetros: (" . $sentencia->errno . ") " . $sentencia->error;
             }
             $sentencia->execute();
@@ -75,10 +186,17 @@ class Docente_dao implements iDAO{
             $conn->close();
         }
         else{
-            if (!($sentencia = $conn->prepare("INSERT INTO `docentes` (`id`, `usuario`, `password`, `departamento`, `preferencias`) VALUES (NULL, ?, ?, ?, ?);"))) {
+            $usuario  = $d->getUsuario();
+            $pass  = $d->getPassword();
+            $nombre = $d->getNombre();
+            $departamento  = $d->getDepartamento();
+            $preferencias  = $d->getPreferencias();
+            $orden = $d->getOrden();            
+
+            if (!($sentencia = $conn->prepare("INSERT INTO `docentes` (`id`, `usuario`, `pass`, `nombre`, `departamento`, `preferencias`, `orden`) VALUES (?, ?, ?, ?, ?, ?, ?);"))) {
                 echo "Falló la preparación: (" . $conn->errno . ") " . $conn->error;
             }
-            if (!$sentencia->bind_param("ssis", $usuario, $pass, $departamento, $preferencias)) {
+            if (!$sentencia->bind_param("isssisi", $id, $usuario, $pass, $nombre, $departamento, $preferencias, $orden)) {
                 echo "Falló la vinculación de parámetros: (" . $sentencia->errno . ") " . $sentencia->error;
             }
             $sentencia->execute();
@@ -164,6 +282,59 @@ class Docente_dao implements iDAO{
 
         return $r['cuenta'];
     }
+
+    public function getListado(){
+        $conn = Connection::connect();
+
+        $stmt = "SELECT * FROM `docentes` ORDER BY `nombre`;";       
+
+        if (!($sentencia = $conn->prepare($stmt))) {
+            echo "Falló la preparación: (" . $conn->errno . ") " . $conn->error;
+        }
+
+        $sentencia->execute();
+
+        $result = $sentencia->get_result();
+
+        $sentencia->close();
+        $conn->close();
+
+        $docentes = array();
+
+        while($r = $result->fetch_assoc())
+        {
+            $docentes[] = new Docente($r['id'], $r['nombre'], $r['departamento'], $r['preferencias'], $r['orden'], $r['usuario']);
+        }
+
+        return $docentes;
+    }
+
+    public function getListadoPublico(){
+        $conn = Connection::connect();
+
+        $stmt = "SELECT id, nombre, departamento FROM `docentes` ORDER BY `nombre`;";       
+
+        if (!($sentencia = $conn->prepare($stmt))) {
+            echo "Falló la preparación: (" . $conn->errno . ") " . $conn->error;
+        }
+
+        $sentencia->execute();
+
+        $result = $sentencia->get_result();
+
+        $sentencia->close();
+        $conn->close();
+
+        $docentes = array();
+
+        while($r = $result->fetch_assoc())
+        {
+            $docentes[] = array('id' => $r['id'], 'nombre' => $r['nombre'], 'departamento' => $r['departamento']);
+        }
+
+        return $docentes;
+    }
+
 }
 
 
