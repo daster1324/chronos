@@ -174,6 +174,36 @@ class Clase_dao implements iDAO{
 
         return $r['cuenta'];
     }
+
+    public function getListado(){
+        $conn = Connection::connect();
+
+        if (!($sentencia = $conn->prepare("SELECT * FROM `clases` WHERE id_asignatura = ?;"))) {
+            echo "Falló la preparación: (" . $conn->errno . ") " . $conn->error;
+        }
+
+        if (!$sentencia->bind_param("i", $id)) {
+            echo "Falló la vinculación de parámetros: (" . $sentencia->errno . ") " . $sentencia->error;
+        }
+
+        $sentencia->execute();
+
+        $result = $sentencia->get_result();
+
+        if($result->num_rows === 0)
+            return NULL;
+
+        while($r = $result->fetch_assoc())
+        {
+            $clases[] = new Clase($r["id"], $r["id_asignatura"], $r["cuatrimestre"], $r["dia"],
+            $r["hora"], $r["grupo"], $r["edificio"]);
+        }
+
+        $sentencia->close();
+        $conn->close();
+
+        return $clases;
+    }
 }
 
 ?>

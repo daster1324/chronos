@@ -502,6 +502,166 @@ function cancelar_editar_asignatura(){
 
 // Clases
 
+class Clase{
+    constructor(inicio, duracion){
+        this.inicio   = inicio;
+        this.duracion = duracion;
+    }
+}
+
+var semana = {
+    lunes : [],
+    martes : [],
+    miercoles : [],
+    jueves : [],
+    viernes:  [],
+    sabado : [],
+    add: function(dia, clase){
+        switch (dia) {
+            case "lunes":
+                if(this.lunes[clase.inicio] != undefined){
+                    $('#item-' + dia + '-' + clase.inicio).remove();
+                }
+                this.lunes[clase.inicio] = clase.duracion; 
+            break;
+
+            case "martes":
+                if(this.martes[clase.inicio] != undefined){
+                    $('#item-' + dia + '-' + clase.inicio).remove();
+                }
+                this.martes[clase.inicio] = clase.duracion; 
+            break;
+
+            case "miercoles":
+                if(this.miercoles[clase.inicio] != undefined){
+                    $('#item-' + dia + '-' + clase.inicio).remove();
+                }
+                this.miercoles[clase.inicio] = clase.duracion; 
+            break;
+
+            case "jueves":
+                if(this.jueves[clase.inicio] != undefined){
+                    $('#item-' + dia + '-' + clase.inicio).remove();
+                }
+                this.jueves[clase.inicio] = clase.duracion; 
+            break;
+
+            case "viernes":
+                if(this.viernes[clase.inicio] != undefined){
+                    $('#item-' + dia + '-' + clase.inicio).remove();
+                }
+                this.viernes[clase.inicio] = clase.duracion; 
+            break;
+
+            case "sabado":
+                if(this.sabado[clase.inicio] != undefined){
+                    $('#item-' + dia + '-' + clase.inicio).remove();
+                }
+                this.sabado[clase.inicio] = clase.duracion; 
+            break;
+
+
+            default: return null;
+        }
+    },
+    rem: function(dia, inicio){
+        switch (dia) {
+            case "lunes":
+                delete this.lunes[inicio];
+            break;
+
+            case "martes":
+                delete this.martes[inicio];
+            break;
+
+            case "miercoles":
+                delete this.miercoles[inicio];
+            break;
+
+            case "jueves":
+                delete this.jueves[inicio];
+            break;
+
+            case "viernes":
+                delete this.viernes[inicio];
+            break;
+
+            case "sabado":
+                delete this.sabado[inicio];
+            break;
+
+
+            default: return null;
+        }
+        $('#item-' + dia + '-' + inicio).remove();
+    }
+};
+
+function addClase(dia){
+    let inicio_val = $('#hora-inicio-'+dia).val(); 
+    let inicio_txt = $('#hora-inicio-' + dia + ' option:selected').text();
+
+    let dura_val = $('#duracion-'+dia).val();
+    let dura_txt = $('#duracion-' + dia + ' option:selected').text();
+
+    if(inicio_val == "" || dura_val == "" || inicio_val == null || dura_val == null || inicio_val == undefined || dura_val == undefined){
+        alert("Selecciones 'Hora de Inicio' y 'Duración'")
+        return;
+    }
+
+    let clase = new Clase(inicio_val, dura_val);
+    semana.add(dia, clase);
+
+    $('#clases-added-'+dia).append('<span id="item-'+dia+'-'+inicio_val+'" class="clases-added-item">' + inicio_txt + ' - ' + dura_txt + '<i onclick="semana.rem(\'' + dia + '\', ' + clase.inicio + ')" class="fas fa-times ml-2"></i></span>');
+
+    $('#hora-inicio-'+dia).val('');
+    $('#duracion-'+dia).val('');
+}
+
+$('#form-add-clase select').change(function(){
+    let name = $(this).attr("name");
+    let value = $(this).val();
+    
+    if(name == "facultad" && value != ""){
+        
+    }
+})
+
+$('#form-carreras select').change(function(){ 
+    let name = $(this).attr("name");
+    let value = $(this).val();
+
+    if(name == "facultad" && value != "none"){
+        facultad_seleccionada(value);
+    }
+    else if(name != "facultad-dg"){
+        $("#selector-facultad-dg").prop( "disabled", true );
+        $('#selector-facultad-dg').children('option:not(:first)').remove();
+    }
+}); 
+
+
+function commit(){
+    // Object.keys(obj) https://developer.mozilla.org/es/docs/Web/JavaScript/Referencia/Objetos_globales/Object/keys
+
+
+    let lunes = Object.keys(semana.lunes);
+    let martes = Object.keys(semana.martes);
+    let miercoles = Object.keys(semana.miercoles);
+    let jueves = Object.keys(semana.jueves);
+    let viernes = Object.keys(semana.viernes);
+    let sabado = Object.keys(semana.sabado);
+
+    let count = lunes.length + martes.length + miercoles.length + jueves.length + viernes.length + sabado.length;
+
+    if(count > 0){
+        $('#list-elements').text("HAY CLASES!!! Pero aun no las he podido rescatar");
+
+        //TODO: Terminar de rescatar qué asignaturas están guardadas y mostrarlas
+        //IDEA: hacerle al form principal un preventDefault y mandar las cosas a traves de jquery post
+    }
+    
+}
 
 
 // Docentes

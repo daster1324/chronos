@@ -708,7 +708,7 @@
         <div class="row justify-content-between">
             <!-- formulario -->
             <div id="formulario" class="col-md-5 mr-md-3 mb-3 mb-md-0 p-2 border">
-                <h4 id="accion-title">Añadir Itinerario</h4>
+                <h4 id="accion-title">Añadir itinerario</h4>
                 <form action="?gestionar=itinerarios" method="post">
                     <label for="selector-carrera" class="my-1">Carrera</label>
                     <select id="selector-carrera" name="carrera" class="custom-select text-dark" required>
@@ -862,7 +862,7 @@
         <?php
     }
 
-    //
+
     function show_asignaturas(){
         if(isset($_GET['message'])){
             ?> <div class="alert alert-success" role="alert"> <?php
@@ -904,7 +904,7 @@
         <div class="row justify-content-between">
             <!-- formulario -->
             <div id="formulario" class="col-md-5 mr-md-3 mb-3 mb-md-0 p-2 border">
-                <h4 id="accion-title">Añadir Asignatura</h4>
+                <h4 id="accion-title">Añadir asignatura</h4>
                 <form id="form-asignaturas" action="?gestionar=asignaturas" method="post">
                     <fieldset class="pr-2">
                         <!-- Selector carrera -->
@@ -1076,13 +1076,17 @@
 
     //TODO: Falta por hacer
     function show_clases(){
+        //Filtrado para añadir
         $fdao = new Facultad_dao();
-        //$cdao = new Carrera_dao();
-        //$idao = new Itinerario_dao();
-        //$adao = new Asignatura_dao();
-        //$cldao = new Clase_dao();
+        $adao = new Asignatura_dao();
+
+        // Listado de la derecha
+        $cldao = new Clase_dao();
 
         $facultades = $fdao->getListado();
+        $asignaturas = $adao->getListado();
+
+        $clases = $cldao->getListado();
         
 
         if(isset($_GET['message'])){
@@ -1114,53 +1118,92 @@
         <div class="row justify-content-between">
             <!-- formulario -->
                 <div id="formulario" class="col-md-5 mr-md-3 mb-3 mb-md-0 p-2 border">
-                    <h4 id="accion-title">Añadir facultad</h4>
-                    <form action="?gestionar=clases" method="post">
+                    <h4 id="accion-title">Añadir Clases</h4>
+                    <form id="form-add-clase" action="?gestionar=clases" method="post">
                         <fieldset>
-                            <label for="selector-facultad" class="my-1">Facultad</label>
-                            <select id="selector-facultad" name="facultad" class="custom-select text-dark" required>
-                                <option disabled="disabled" selected="selected" value="">Selecciona una facultad</option>
-                                <?php
-                                    foreach ($facultades as $facultad) {
-                                        echo '<option value="'.$facultad->getId().'">'.$facultad->getNombre().'</option>';
-                                    }
-                                ?>
-                        </select>
-                            <div class="form-group">
-                                <input type="text" class="form-control" name="nombre-facultad" id="nombre-facultad" placeholder="Nombre" required>
+                            <!-- Selector Facultad -->
+                                <div id="container-selector-facultad">
+                                    <label for="selector-facultad" class="my-1">Facultad*</label>
+                                    <select id="selector-facultad" name="facultad" class="custom-select text-dark" required>
+                                        <option disabled="disabled" selected="selected" value="">Selecciona una facultad</option>
+                                        <?php
+                                            foreach ($facultades as $facultad) {
+                                                echo '<option value="'.$facultad->getId().'">'.$facultad->getNombre().'</option>';
+                                            }
+                                        ?>
+                                    </select>
+                                </div>
+                            <!-- /Selector Facultad -->
+                            <!-- Selector Carrera -->
+                                <div id="container-selector-carrera">
+                                    <label for="selector-carrera" class="my-1">Carrera*</label>
+                                    <select id="selector-carrera" name="carrera" class="custom-select text-dark" disabled required>
+                                        <option disabled="disabled" selected="selected" value="">Selecciona una carrera</option>
+                                    </select>
+                                </div>
+                            <!-- /Selector Carrera -->
+                            <!-- Selector Itinerario -->
+                                <div id="container-selector-itinerario">
+                                    <label for="selector-itinerario" class="my-1">Itinerario</label>
+                                    <select id="selector-itinerario" name="itinerario" class="custom-select text-dark" disabled>
+                                        <option disabled="disabled" selected="selected" value="">Selecciona una itinerario</option>
+                                    </select>
+                                </div>
+                            <!-- Selector Itinerario -->
+                            <!-- Selector Asignatura -->
+                                <div id="container-selector-asignatura">
+                                    <label for="selector-asignatura" class="my-1">Asignatura*</label>
+                                    <select id="selector-asignatura" name="asignatura" class="custom-select text-dark" required>
+                                        <option disabled="disabled" selected="selected" value="">Selecciona una asignatura</option>
+                                        <?php
+                                            foreach ($asignaturas as $a) {
+                                                echo '<option value="'.$a->getId().'">'.$a->getNombre().' ('.$a->getId().')</option>';
+                                            }
+                                        ?>
+                                    </select>
+                                </div>
+                            <!-- Selector Asignatura -->
+                            
+                            <label for="btn-add-clase" id="label-btn-add-clase" class="mt-2">Clases*</label>
+                            <div id="class-list-container" class="p-2 pt-0 mt-2 border">
+                                <div id="list-elements">
+                                    <div class="list-clase mb-2 text-center">
+                                        Aun no hay clases añadidas.<br>▼ Pulsa el botón para añadir ▼
+                                    </div>
+                                </div>
+                                <button type="button" id="btn-add-clase" class="btn btn-info w-100" data-toggle="modal" data-target="#add-clase-modal" disabled>Añadir clase</button>
                             </div>
-                            <div class="form-group">
-                                <input type="text" class="form-control" name="campus-facultad" id="campus-facultad" placeholder="Campus" required>
-                            </div>
+                            
+
                             <input type="hidden" name="page" value="facultad">
                             <input type="hidden" id="id-facultad" name="id-facultad" value="0">
                             <input type="hidden" id="accion-facultad" name="accion" value="add">
                         </fieldset>
-                        <button type="submit" id="submit-facultad" name="submit-facultad" class="btn btn-primary w-100">Añadir</button>
+                        <button type="submit" id="submit-facultad" name="submit-facultad" class="btn btn-primary mt-4 w-100" disabled>Terminar</button>
                     </form>
                 </div>
             <!-- /formulario -->
             <!-- listado -->
                 <div id="listado" class="col-md p-2 border">
                     <?php
-                    if(count($listado) == 0) {
+                    if(count($clases) == 0) {
                         echo "No hay clases";
                     }
                     else{
                         ?>
-                        <form action="?gestionar=facultades" method="post">
+                        <form action="?gestionar=clases" method="post">
                             <fieldset>
                             <?php
-                            foreach ($listado as $facultad) {
-                            ?>
-                            <div class="gestion-list-element p-2 mb-2 border">
-                                <input class="align-middle" type="checkbox" name="facultad[]" value="<?php echo $facultad->getId(); ?>" id="facultad-<?php echo $facultad->getId(); ?>">
-                                <label for="facultad-<?php echo $facultad->getId(); ?>"><?php echo $facultad->getNombre() . ' ('. $facultad->getCampus() .')'; ?></label>
-                                <span class="editar-button" onclick="editar_facultad(<?php echo $facultad->getId(); ?>)">Editar</span>
-                                <input type="hidden" name="page" value="facultad">
-                                <input type="hidden" name="accion" value="remove">
-                            </div>
-                            <?php  
+                            foreach ($facultades as $facultad) {
+                                ?>
+                                <div class="gestion-list-element p-2 mb-2 border">
+                                    <input class="align-middle" type="checkbox" name="facultad[]" value="<?php echo $facultad->getId(); ?>" id="facultad-<?php echo $facultad->getId(); ?>">
+                                    <label for="facultad-<?php echo $facultad->getId(); ?>"><?php echo $facultad->getNombre() . ' ('. $facultad->getCampus() .')'; ?></label>
+                                    <span class="editar-button" onclick="editar_facultad(<?php echo $facultad->getId(); ?>)">Editar</span>
+                                    <input type="hidden" name="page" value="facultad">
+                                    <input type="hidden" name="accion" value="remove">
+                                </div>
+                                <?php  
                             }
                             ?>
                             </fieldset>
@@ -1172,9 +1215,100 @@
                 </div>
             <!-- /listado -->
         </div>
+
+        <!-- Modal -->
+            <div class="modal fade" id="add-clase-modal" tabindex="-1" role="dialog" aria-labelledby="add-clase-modal-title" aria-hidden="true">
+                <div class="modal-dialog modal-lg" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title text-dark" id="add-clase-modal-title">Añadir clase</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Volver">
+                            <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body text-dark">
+                            <div class="dia-add-clase odd py-3">
+                                <span>Lunes</span>
+                                <?php print_dia("lunes"); ?>
+                                <div class="clases-added mt-3 pt-3 border-top border-dark" id="clases-added-lunes"></div>
+                            </div>
+                            <div class="dia-add-clase even py-3">
+                                <span>Martes</span>
+                                <?php print_dia("martes"); ?>
+                                <div class="clases-added mt-3 pt-3 border-top border-dark" id="clases-added-martes"></div>
+                            </div>
+                            <div class="dia-add-clase odd py-3">
+                                <span>Miércoles</span>
+                                <?php print_dia("miercoles"); ?>
+                                <div class="clases-added mt-3 pt-3 border-top border-dark" id="clases-added-miercoles"></div>
+                            </div>
+                            <div class="dia-add-clase even py-3">
+                                <span>Jueves</span>
+                                <?php print_dia("jueves"); ?>
+                                <div class="clases-added mt-3 pt-3 border-top border-dark" id="clases-added-jueves"></div>
+                            </div>
+                            <div class="dia-add-clase odd py-3">
+                                <span>Viernes</span>
+                                <?php print_dia("viernes"); ?>
+                                <div class="clases-added mt-3 pt-3 border-top border-dark" id="clases-added-viernes"></div>
+                            </div>
+                            <div class="dia-add-clase even py-3">
+                                <span>Sábado</span>
+                                <?php print_dia("sabado"); ?>
+                                <div class="clases-added mt-3 pt-3 border-top border-dark" id="clases-added-sabado"></div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="commit()">Confirmar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        <!-- Modal -->
         <?php
         unset($fdao);
     }
+
+    function print_dia($dia){
+        ?>
+                                <select name="horas[]" id="hora-inicio-<?= $dia ?>" class="form-control mt-2" required>
+                                    <option value="" selected disabled>Hora Inicio</option>
+                                    <option value="0">08:00</option>
+                                    <option value="1">08:30</option>
+                                    <option value="2">09:00</option>
+                                    <option value="3">09:30</option>
+                                    <option value="4">10:00</option>
+                                    <option value="5">10:30</option>
+                                    <option value="6">11:00</option>
+                                    <option value="7">11:30</option>
+                                    <option value="8">12:00</option>
+                                    <option value="9">12:30</option>
+                                    <option value="10">13:00</option>
+                                    <option value="11">13:30</option>
+                                    <option value="12">14:00</option>
+                                    <option value="13">14:30</option>
+                                    <option value="14">15:00</option>
+                                    <option value="15">15:30</option>
+                                    <option value="16">16:00</option>
+                                    <option value="17">16:30</option>
+                                    <option value="18">17:00</option>
+                                    <option value="19">17:30</option>
+                                    <option value="20">18:00</option>
+                                    <option value="21">18:30</option>
+                                    <option value="22">19:00</option>
+                                    <option value="23">19:30</option>
+                                </select>
+                                <select name="duración" id="duracion-<?= $dia ?>"class="form-control mt-2" required>
+                                    <option value="" selected disabled>Duración</option>
+                                    <option value="1">1 hora</option>
+                                    <option value="2">2 horas</option>
+                                    <option value="3">3 horas</option>
+                                    <option value="4">4 horas</option>
+                                </select>
+                                <button type="button" class="btn btn-primary mt-2" onclick="addClase('<?= $dia ?>')">Añadir</button>
+        <?php
+    }
+
 
     function show_docentes(){
         if(isset($_GET['message'])){
@@ -1216,7 +1350,7 @@
         <div class="row justify-content-between">
             <!-- formulario -->
             <div id="formulario" class="col-md-5 mr-md-3 mb-3 mb-md-0 p-2 border">
-                <h4 id="accion-title">Añadir Docente</h4>
+                <h4 id="accion-title">Añadir docente</h4>
                 <form action="?gestionar=docentes" method="post">
                     <!-- Selector Facultad -->
                         <label for="selector-facultad-docente" class="my-1">Facultad</label>
@@ -1499,3 +1633,6 @@
     
     die();
 ?>
+
+
+<div class="popover bg-dark text-light" role="tooltip"><div class="arrow"></div><h3 class="popover-header"></h3><div class="popover-body"></div></div>
