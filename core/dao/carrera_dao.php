@@ -74,6 +74,34 @@ class Carrera_dao implements iDAO{
         return $carreras;
     }
 
+    public function getListadoByFacultad($facultad){
+        $conn = Connection::connect();
+
+        if (!($sentencia = $conn->prepare("SELECT * FROM `carreras` WHERE `id_facultad` = ? ORDER BY `nombre`;"))) {
+            echo "Falló la preparación: (" . $conn->errno . ") " . $conn->error;
+        }
+
+        if (!$sentencia->bind_param("i", $facultad)) {
+            echo "Falló la vinculación de parámetros: (" . $sentencia->errno . ") " . $sentencia->error;
+        }
+
+        $sentencia->execute();
+
+        $result = $sentencia->get_result();
+
+        $carreras = array();
+
+        while($r = $result->fetch_assoc())
+        {
+            $carreras[] = new Carrera($r["id"], $r["nombre"], $r["id_facultad"], $r["id_facultad_dg"]);
+        }
+
+        $sentencia->close();
+        $conn->close();
+
+        return $carreras;
+    }
+
 
     public function busca($nombre, $id_facultad, $id_facultad_dg){
         $conn = Connection::connect();

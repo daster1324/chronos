@@ -110,6 +110,20 @@ if(!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQU
          getDocente($_POST['id']);
       break;
 
+      // Filtra las asignaturas según facultad, carrera (opcional) e itinerario (opcional)
+      case 16:
+
+         $facultad   = (isset($_POST['facultad']))    ? $_POST['facultad']    : -1;
+         $carrera    = (isset($_POST['carrera']))     ? $_POST['carrera']     : -1;
+         $itinerario = (isset($_POST['itinerario']))  ? $_POST['itinerario']  : -1;
+         
+         getAsignaturasFiltradas($facultad, $carrera, $itinerario);
+       break;
+
+      case 17:
+         getCarrerasByFacultad($_POST['facultad']);
+      break;
+
       default:
          die("Error");
          break;
@@ -245,6 +259,18 @@ function getDocente($id){
    $dodao = new Docente_dao();
    echo json_encode($dodao->getDocente($id));
    unset($dodao);
+}
+
+function getAsignaturasFiltradas($facultad, $carrera, $itinerario){
+   $adao = new Asignatura_dao();
+   echo json_encode($adao->filtrarAsignaturas($facultad, $carrera, $itinerario));
+   unset($adao);
+}
+
+function getCarrerasByFacultad($facultad){
+   $cdao = new Carrera_dao();
+   echo json_encode($cdao->getListadoByFacultad($facultad));
+   unset($cdao);
 }
 
 ?>

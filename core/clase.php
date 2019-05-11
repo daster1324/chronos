@@ -8,16 +8,14 @@ class Clase implements JsonSerializable {
     private $dia;           // String 1 char            - Obligatorio
     private $hora;          // Integer 1 digito         - Obligatorio
     private $grupo;         // String 10 chars          - Obligatorio
-    private $edificio;      // Integer 1 digito         - Obligatorio
 
-    public function __construct($id, $id_asignatura, $cuatrimestre, $dia, $hora, $grupo, $edificio){
+    public function __construct($id, $id_asignatura, $cuatrimestre, $dia, $hora, $grupo){
         $this->id = $id;
         $this->id_asignatura = $id_asignatura;
         $this->cuatrimestre = $cuatrimestre;
         $this->dia = $dia;
         $this->hora = $hora;
         $this->grupo = $grupo;
-        $this->edificio = $edificio;
     }
 
 
@@ -43,9 +41,6 @@ class Clase implements JsonSerializable {
     public function getGrupo(){
         return $this->grupo;
     }
-    public function getEdificio(){
-        return $this->edificio;
-    }
 
 
     /**
@@ -70,9 +65,6 @@ class Clase implements JsonSerializable {
     public function setGrupo    ($grupo){
         $this->grupo = $grupo;
     }
-    public function setEdificio($edificio){
-        $this->edificio = $edificio;
-    }  
 
     /**
      *  SERIALIZE
@@ -84,8 +76,7 @@ class Clase implements JsonSerializable {
             'cuatrimestre' => $this->cuatrimestre,
             'dia' => $this->dia,
             'hora' => $this->hora,
-            'grupo' => $this->grupo,
-            'edificio' => $this->edificio
+            'grupo' => $this->grupo
         ];
     }
 

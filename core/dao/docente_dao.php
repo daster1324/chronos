@@ -74,12 +74,13 @@ class Docente_dao implements iDAO{
         return $docente;
     }
 
+    // Recupera todo los datos del docente salvo 'preferencias' y 'password'
     public function getDocente($id){
         $conn = Connection::connect();
 
         $ddao = new Departamento_dao();
 
-        $stmt = "SELECT id, nombre, departamento, usuario FROM `docentes` WHERE `id` = ?;";       
+        $stmt = "SELECT id, nombre, departamento, usuario, orden FROM `docentes` WHERE `id` = ?;";       
 
         if (!($sentencia = $conn->prepare($stmt))) {
             echo "Falló la preparación: (" . $conn->errno . ") " . $conn->error;
@@ -101,7 +102,7 @@ class Docente_dao implements iDAO{
         while($r = $result->fetch_assoc())
         {
             $facultad = $ddao->getById($r['departamento'])->getId_facultad();
-            $docentes = array('id' => $r['id'], 'nombre' => $r['nombre'], 'facultad' => $facultad,  'departamento' => $r['departamento'], 'usuario' => $r['usuario']);
+            $docentes = array('id' => $r['id'], 'nombre' => $r['nombre'], 'facultad' => $facultad,  'departamento' => $r['departamento'], 'usuario' => $r['usuario'], 'orden' => $r['orden']);
         }
 
         unset($ddao);

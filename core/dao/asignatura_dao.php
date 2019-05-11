@@ -296,12 +296,6 @@ class Asignatura_dao implements iDAO{
 
     // Se salta un poco la encapsulación, pero acelera las búsquedas y quita carga de trabajo al usuario
     public function getListadoFiltrado($idcarrera = null){
-        /**
-         *   asignatura.id
-         *   asignatura.nombre
-         *   carrera.nombre
-         *   itinerario.nombre 
-         */
 
         $conn = Connection::connect();
         $idao = new Itinerario_dao();
@@ -347,7 +341,100 @@ class Asignatura_dao implements iDAO{
         
         return $asignaturas;
     }
-}
 
+
+    // Filtrado para la gestión de Clases
+    public function filtrarAsignaturas($facultad = -1, $carrera = -1, $itinerario = -1){
+        $conn = Connection::connect();
+
+        if($facultad > -1 && $carrera == -1 && $itinerario == -1){            
+            $stmt = "SELECT `asignaturas`.`id`, `asignaturas`.`nombre`
+            FROM  `asignaturas`, `carreras`, `facultades`
+            WHERE `asignaturas`.`id_carrera` = `carreras`.`id`
+            AND	  (`carreras`.`id_facultad` = `facultades`.`id` 
+                  OR `carreras`.`id_facultad_dg` = `facultades`.`id`)
+            AND   `facultades`.`id` = ?;";
+
+            if (!($sentencia = $conn->prepare($stmt))) {
+                echo "Falló la preparación: (" . $conn->errno . ") " . $conn->error;
+            }
+            
+            if (!$sentencia->bind_param("i", $facultad)) {
+                echo "Falló la vinculación de parámetros: (" . $sentencia->errno . ") " . $sentencia->error;
+            }
+        }
+        else if($facultad > -1 && $carrera > -1 && $itinerario == -1){
+            $stmt = "SELECT `asignaturas`.`id`, `asignaturas`.`nombre`
+            FROM  `asignaturas`, `carreras`, `facultades`
+            WHERE `asignaturas`.`id_carrera` = `carreras`.`id`
+            AND	  (`carreras`.`id_facultad` = `facultades`.`id` 
+                  OR `carreras`.`id_facultad_dg` = `facultades`.`id`)
+            AND   `facultades`.`id` = ?
+            AND   `asignaturas`.`id_carrera` = ?;";
+            
+            if (!($sentencia = $conn->prepare($stmt))) {
+                echo "Falló la preparación: (" . $conn->errno . ") " . $conn->error;
+            }
+            
+            if (!$sentencia->bind_param("ii", $facultad, $carrera)) {
+                echo "Falló la vinculación de parámetros: (" . $sentencia->errno . ") " . $sentencia->error;
+            }
+        }
+        else if($facultad > -1 && $carrera > -1){
+            if($itinerario == 'c'){
+                $stmt = "SELECT `asignaturas`.`id`, `asignaturas`.`nombre`
+                        FROM  `asignaturas`, `carreras`, `facultades`
+                        WHERE `asignaturas`.`id_carrera` = `carreras`.`id`
+                        AND	  (`carreras`.`id_facultad` = `facultades`.`id` 
+                            OR `carreras`.`id_facultad_dg` = `facultades`.`id`)
+                        AND   `facultades`.`id` = ?
+                        AND   `asignaturas`.`id_carrera` = ?
+                        AND   `asignaturas`.`itinerario` IS NULL;";
+
+                if (!($sentencia = $conn->prepare($stmt))) {
+                    echo "Falló la preparación: (" . $conn->errno . ") " . $conn->error;
+                }
+                
+                if (!$sentencia->bind_param("ii", $facultad, $carrera)) {
+                    echo "Falló la vinculación de parámetros: (" . $sentencia->errno . ") " . $sentencia->error;
+                }
+            }
+            else{
+                $stmt = "SELECT `asignaturas`.`id`, `asignaturas`.`nombre`
+                        FROM  `asignaturas`, `carreras`, `facultades`
+                        WHERE `asignaturas`.`id_carrera` = `carreras`.`id`
+                        AND	  (`carreras`.`id_facultad` = `facultades`.`id` 
+                            OR `carreras`.`id_facultad_dg` = `facultades`.`id`)
+                        AND   `facultades`.`id` = ?
+                        AND   `asignaturas`.`id_carrera` = ?
+                        AND   `asignaturas`.`itinerario` = ?;";
+
+                if (!($sentencia = $conn->prepare($stmt))) {
+                    echo "Falló la preparación: (" . $conn->errno . ") " . $conn->error;
+                }
+                
+                if (!$sentencia->bind_param("iii", $facultad, $carrera, $itinerario)) {
+                    echo "Falló la vinculación de parámetros: (" . $sentencia->errno . ") " . $sentencia->error;
+                }
+            }
+        }        
+
+        $sentencia->execute();
+
+        $result = $sentencia->get_result();
+
+        $sentencia->close();
+        $conn->close();
+
+        $asignaturas = array();
+
+        while($r = $result->fetch_assoc())
+        {
+            $asignaturas[] = array('id' => $r['id'], 'nombre' => $r['nombre']);
+        }
+
+        return $asignaturas;
+    }
+}
 
 ?>

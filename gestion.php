@@ -132,7 +132,25 @@
                 break;
                 
                 case 'clase':
+                    $gea = $_POST['asignatura'];
+                    $cuatrimestre = $_POST['cuatrimestre'];
+                    $grupo = $_POST['grupo'];
+                    $horario = $_POST['horario'];
 
+                    $cldao = new Clase_dao();
+                    $existe = $cldao->getById($gea);
+                    $mensaje = 1;
+
+                    if($existe == NULL){
+                        $cldao->procesaHorario($gea, $cuatrimestre, $grupo, $horario);
+                    }
+                    else{
+                        $mensaje = 4;
+                    }
+
+                    unset($cldao);
+                    //header("HTTP/1.1 301 Moved Permanently"); 
+                    //header("Location: /gestion?gestionar=asignaturas&message=".$mensaje);
                 break;
 
                 case 'docente':
@@ -254,9 +272,10 @@
                     $nombre = $_POST['nombre-docente'];
                     $departamento = $_POST['departamento'];
                     $pass = ($_POST['password-docente'] == "¿Te crees hacker o qué?") ? NULL : hash("sha256", $_POST['user-docente'] . SALT . $_POST['password-docente']);
+                    $orden = $_POST['orden'];
 
                     $dodao = new Docente_dao();
-                    $dodao->store(new Docente($id, $nombre, $departamento, "", 0, "", $pass));
+                    $dodao->store(new Docente($id, $nombre, $departamento, "", 0, "", $pass, $orden));
 
                     unset($dodao);
                     header("HTTP/1.1 301 Moved Permanently"); 
@@ -708,7 +727,7 @@
         <div class="row justify-content-between">
             <!-- formulario -->
             <div id="formulario" class="col-md-5 mr-md-3 mb-3 mb-md-0 p-2 border">
-                <h4 id="accion-title">Añadir Itinerario</h4>
+                <h4 id="accion-title">Añadir itinerario</h4>
                 <form action="?gestionar=itinerarios" method="post">
                     <label for="selector-carrera" class="my-1">Carrera</label>
                     <select id="selector-carrera" name="carrera" class="custom-select text-dark" required>
@@ -862,7 +881,6 @@
         <?php
     }
 
-    //
     function show_asignaturas(){
         if(isset($_GET['message'])){
             ?> <div class="alert alert-success" role="alert"> <?php
@@ -904,7 +922,7 @@
         <div class="row justify-content-between">
             <!-- formulario -->
             <div id="formulario" class="col-md-5 mr-md-3 mb-3 mb-md-0 p-2 border">
-                <h4 id="accion-title">Añadir Asignatura</h4>
+                <h4 id="accion-title">Añadir asignatura</h4>
                 <form id="form-asignaturas" action="?gestionar=asignaturas" method="post">
                     <fieldset class="pr-2">
                         <!-- Selector carrera -->
@@ -1076,13 +1094,17 @@
 
     //TODO: Falta por hacer
     function show_clases(){
+        //Filtrado para añadir
         $fdao = new Facultad_dao();
-        //$cdao = new Carrera_dao();
-        //$idao = new Itinerario_dao();
-        //$adao = new Asignatura_dao();
-        //$cldao = new Clase_dao();
+        $adao = new Asignatura_dao();
+
+        // Listado de la derecha
+        $cldao = new Clase_dao();
 
         $facultades = $fdao->getListado();
+        $asignaturas = $adao->getListado();
+
+        $clases = $cldao->getListado();
         
 
         if(isset($_GET['message'])){
@@ -1114,53 +1136,113 @@
         <div class="row justify-content-between">
             <!-- formulario -->
                 <div id="formulario" class="col-md-5 mr-md-3 mb-3 mb-md-0 p-2 border">
-                    <h4 id="accion-title">Añadir facultad</h4>
-                    <form action="?gestionar=clases" method="post">
+                    <h4 id="accion-title">Añadir Clases</h4>
+                    <form id="form-add-clase" action="?gestionar=clases" method="post">
                         <fieldset>
-                            <label for="selector-facultad" class="my-1">Facultad</label>
-                            <select id="selector-facultad" name="facultad" class="custom-select text-dark" required>
-                                <option disabled="disabled" selected="selected" value="">Selecciona una facultad</option>
-                                <?php
-                                    foreach ($facultades as $facultad) {
-                                        echo '<option value="'.$facultad->getId().'">'.$facultad->getNombre().'</option>';
-                                    }
-                                ?>
-                        </select>
-                            <div class="form-group">
-                                <input type="text" class="form-control" name="nombre-facultad" id="nombre-facultad" placeholder="Nombre" required>
+                            <!-- Selector Facultad -->
+                                <div id="container-selector-facultad">
+                                    <label for="selector-facultad" class="my-1">Facultad*</label>
+                                    <select id="selector-facultad" name="facultad" class="custom-select text-dark">
+                                        <option disabled="disabled" selected="selected" value="">Selecciona una facultad</option>
+                                        <?php
+                                            foreach ($facultades as $facultad) {
+                                                echo '<option value="'.$facultad->getId().'">'.$facultad->getNombre().'</option>';
+                                            }
+                                        ?>
+                                    </select>
+                                </div>
+                            <!-- /Selector Facultad -->
+                            <!-- Selector Carrera -->
+                                <div id="container-selector-carrera">
+                                    <label for="selector-carrera" class="my-1">Carrera*</label>
+                                    <select id="selector-carrera" name="carrera" class="custom-select text-dark" disabled>
+                                        <option disabled="disabled" selected="selected" value="">Selecciona una carrera</option>
+                                    </select>
+                                </div>
+                            <!-- /Selector Carrera -->
+                            <!-- Selector Itinerario -->
+                                <div id="container-selector-itinerario">
+                                    <label for="selector-itinerario" class="my-1">Itinerario</label>
+                                    <select id="selector-itinerario" name="itinerario" class="custom-select text-dark" disabled>
+                                        <option disabled="disabled" selected="selected" value="">Selecciona una itinerario</option>
+                                    </select>
+                                </div>
+                            <!-- Selector Itinerario -->
+
+                            <div class="row align-items-end mr-0">
+                                <!-- Selector Cuatrimestre -->
+                                    <div class="form-group col-md my-1">
+                                        <label for="selector-cuatrimestre" class="my-1">Cuatrimestre</label>
+                                        <select id="selector-cuatrimestre" name="cuatrimestre" class="custom-select text-dark">
+                                            <option disabled="disabled" selected="selected" value="">Selecciona un cuatrimestre</option>
+                                            <option value="1">1º</option>
+                                            <option value="2">2º</option>
+                                        </select>
+                                    </div>
+                                <!-- /Selector Cuatrimestre -->
+
+                                <!-- Grupo -->
+                                    <div class="form-group my-1">
+                                        <label for="add-clase-grupo" class="my-1">Grupo</label>
+                                        <input type="text" maxlength="1" class="form-control" name="grupo" id="add-clase-grupo" placeholder="A" pattern="[A-Za-z]" required>
+                                    </div>
+                                <!-- /Grupo -->
                             </div>
-                            <div class="form-group">
-                                <input type="text" class="form-control" name="campus-facultad" id="campus-facultad" placeholder="Campus" required>
+
+                            <!-- Selector Asignatura -->
+                                <div id="container-selector-asignatura">
+                                    <label for="selector-asignatura" class="my-1">Asignatura*</label>
+                                    <select id="selector-asignatura" name="asignatura" class="custom-select text-dark" required>
+                                        <option disabled="disabled" selected="selected" value="">Selecciona una asignatura</option>
+                                        <?php
+                                            foreach ($asignaturas as $a) {
+                                                echo '<option value="'.$a->getId().'">'.$a->getNombre().' ('.$a->getId().')</option>';
+                                            }
+                                        ?>
+                                    </select>
+                                </div>
+                            <!-- Selector Asignatura -->
+                            
+                            <label for="btn-add-clase" id="label-btn-add-clase" class="mt-2">Clases*</label>
+                            <div id="class-list-container" class="p-2 pt-0 mt-2 border">
+                                <div class="mb-2" id="list-elements">
+                                    <div class="list-clase mb-2 text-center">
+                                        Aun no hay clases añadidas.<br>▼ Pulsa el botón para añadir ▼
+                                    </div>
+                                </div>
+                                <button type="button" id="btn-add-clase" class="btn btn-info w-100" data-toggle="modal" data-target="#add-clase-modal" disabled>Añadir clase</button>
                             </div>
-                            <input type="hidden" name="page" value="facultad">
-                            <input type="hidden" id="id-facultad" name="id-facultad" value="0">
-                            <input type="hidden" id="accion-facultad" name="accion" value="add">
+                            
+
+                            <input type="hidden" name="page" value="clase">
+                            <input type="hidden" id="id-clase" name="id-clase" value="0">
+                            <input type="hidden" id="horario-clase" name="horario" value="0">
+                            <input type="hidden" id="accion-clase" name="accion" value="add">
                         </fieldset>
-                        <button type="submit" id="submit-facultad" name="submit-facultad" class="btn btn-primary w-100">Añadir</button>
+                        <button type="submit" id="submit-clase" name="submit-clase" class="btn btn-primary mt-4 w-100" disabled>Terminar</button>
                     </form>
                 </div>
             <!-- /formulario -->
             <!-- listado -->
                 <div id="listado" class="col-md p-2 border">
                     <?php
-                    if(count($listado) == 0) {
+                    if(count($clases) == 0) {
                         echo "No hay clases";
                     }
                     else{
                         ?>
-                        <form action="?gestionar=facultades" method="post">
+                        <form action="?gestionar=clases" method="post">
                             <fieldset>
                             <?php
-                            foreach ($listado as $facultad) {
-                            ?>
-                            <div class="gestion-list-element p-2 mb-2 border">
-                                <input class="align-middle" type="checkbox" name="facultad[]" value="<?php echo $facultad->getId(); ?>" id="facultad-<?php echo $facultad->getId(); ?>">
-                                <label for="facultad-<?php echo $facultad->getId(); ?>"><?php echo $facultad->getNombre() . ' ('. $facultad->getCampus() .')'; ?></label>
-                                <span class="editar-button" onclick="editar_facultad(<?php echo $facultad->getId(); ?>)">Editar</span>
-                                <input type="hidden" name="page" value="facultad">
-                                <input type="hidden" name="accion" value="remove">
-                            </div>
-                            <?php  
+                            foreach ($clases as $clase) {
+                                ?>
+                                <div class="gestion-list-element p-2 mb-2 border">
+                                    <input class="align-middle" type="checkbox" name="clase[]" value="<?php echo $clase->getId(); ?>" id="clase-<?php echo $clase->getId(); ?>">
+                                    <label for="clase-<?php echo $clase->getId(); ?>"><?php echo $clase->getNombre() . ' ('. $clase->getCampus() .')'; ?></label>
+                                    <input type="hidden" name="page" value="clase">
+                                    <input type="hidden" name="accion" value="remove">
+                                </div>
+                                <?php  
                             }
                             ?>
                             </fieldset>
@@ -1172,8 +1254,97 @@
                 </div>
             <!-- /listado -->
         </div>
+
+        <!-- Modal -->
+            <div class="modal fade" id="add-clase-modal" tabindex="-1" role="dialog" aria-labelledby="add-clase-modal-title" aria-hidden="true">
+                <div class="modal-dialog modal-lg" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title text-dark" id="add-clase-modal-title">Añadir clase</h5>
+                            <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body text-dark">
+                            <div class="dia-add-clase odd py-3">
+                                <span>Lunes</span>
+                                <?php print_dia("lunes"); ?>
+                                <div class="clases-added mt-3 pt-3 border-top border-dark" id="clases-added-lunes"></div>
+                            </div>
+                            <div class="dia-add-clase even py-3">
+                                <span>Martes</span>
+                                <?php print_dia("martes"); ?>
+                                <div class="clases-added mt-3 pt-3 border-top border-dark" id="clases-added-martes"></div>
+                            </div>
+                            <div class="dia-add-clase odd py-3">
+                                <span>Miércoles</span>
+                                <?php print_dia("miercoles"); ?>
+                                <div class="clases-added mt-3 pt-3 border-top border-dark" id="clases-added-miercoles"></div>
+                            </div>
+                            <div class="dia-add-clase even py-3">
+                                <span>Jueves</span>
+                                <?php print_dia("jueves"); ?>
+                                <div class="clases-added mt-3 pt-3 border-top border-dark" id="clases-added-jueves"></div>
+                            </div>
+                            <div class="dia-add-clase odd py-3">
+                                <span>Viernes</span>
+                                <?php print_dia("viernes"); ?>
+                                <div class="clases-added mt-3 pt-3 border-top border-dark" id="clases-added-viernes"></div>
+                            </div>
+                            <div class="dia-add-clase even py-3">
+                                <span>Sábado</span>
+                                <?php print_dia("sabado"); ?>
+                                <div class="clases-added mt-3 pt-3 border-top border-dark" id="clases-added-sabado"></div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="commit()">Confirmar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        <!-- Modal -->
         <?php
         unset($fdao);
+    }
+
+    function print_dia($dia){
+        ?>
+                                <select name="horas[]" id="hora-inicio-<?= $dia ?>" class="form-control mt-2" required>
+                                    <option value="" selected disabled>Hora Inicio</option>
+                                    <option value="0">08:00</option>
+                                    <option value="1">08:30</option>
+                                    <option value="2">09:00</option>
+                                    <option value="3">09:30</option>
+                                    <option value="4">10:00</option>
+                                    <option value="5">10:30</option>
+                                    <option value="6">11:00</option>
+                                    <option value="7">11:30</option>
+                                    <option value="8">12:00</option>
+                                    <option value="9">12:30</option>
+                                    <option value="10">13:00</option>
+                                    <option value="11">13:30</option>
+                                    <option value="12">14:00</option>
+                                    <option value="13">14:30</option>
+                                    <option value="14">15:00</option>
+                                    <option value="15">15:30</option>
+                                    <option value="16">16:00</option>
+                                    <option value="17">16:30</option>
+                                    <option value="18">17:00</option>
+                                    <option value="19">17:30</option>
+                                    <option value="20">18:00</option>
+                                    <option value="21">18:30</option>
+                                    <option value="22">19:00</option>
+                                    <option value="23">19:30</option>
+                                </select>
+                                <select name="duración" id="duracion-<?= $dia ?>"class="form-control mt-2" required>
+                                    <option value="" selected disabled>Duración</option>
+                                    <option value="1">1 hora</option>
+                                    <option value="2">2 horas</option>
+                                    <option value="3">3 horas</option>
+                                    <option value="4">4 horas</option>
+                                </select>
+                                <button type="button" class="btn btn-primary mt-2" onclick="addClase('<?= $dia ?>')">Añadir</button>
+        <?php
     }
 
     function show_docentes(){
@@ -1216,7 +1387,7 @@
         <div class="row justify-content-between">
             <!-- formulario -->
             <div id="formulario" class="col-md-5 mr-md-3 mb-3 mb-md-0 p-2 border">
-                <h4 id="accion-title">Añadir Docente</h4>
+                <h4 id="accion-title">Añadir docente</h4>
                 <form action="?gestionar=docentes" method="post">
                     <!-- Selector Facultad -->
                         <label for="selector-facultad-docente" class="my-1">Facultad</label>
@@ -1241,17 +1412,22 @@
                             <input type="text" class="form-control" name="nombre-docente" id="nombre-docente" placeholder="Nombre" required>
                         </div>
                     <!-- /Nombre Docente -->
-
+                    <!-- Orden Docente -->
+                        <div class="form-group my-1">
+                            <label for="orden-docente" class="my-1">Orden</label>
+                            <input type="number" min="0" class="form-control" name="orden-docente" id="orden-docente" placeholder="Orden" required>
+                        </div>
+                    <!-- /Orden Docente -->
                     <!-- Usuario Docente -->
                         <div class="form-group my-1">
                             <label for="usuario-docente" class="my-1">Usuario</label>
-                            <input type="text" class="form-control" name="usuario-docente" id="usuario-docente" placeholder="Usuario" autocomplete="nope" required>
+                            <input type="text" class="form-control" name="usuario-docente" id="usuario-docente" placeholder="Usuario" required>
                         </div>
                     <!-- /Usuario Docente -->
                     <!-- Password Docente -->
                         <div class="form-group my-1">
                             <label for="password-docente" class="my-1">Contraseña</label>
-                            <input type="password" class="form-control" name="password-docente" id="password-docente" placeholder="Contraseña" autocomplete="nope" required>
+                            <input type="password" class="form-control" name="password-docente" id="password-docente" placeholder="Contraseña" required>
                         </div>
                     <!-- /Password Docente -->
 

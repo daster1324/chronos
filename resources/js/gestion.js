@@ -502,7 +502,397 @@ function cancelar_editar_asignatura(){
 
 // Clases
 
+class Clase{
+    constructor(inicio, duracion){
+        this.inicio   = inicio;
+        this.duracion = duracion;
+    }
+}
 
+var semana = {
+    lunes : [],
+    martes : [],
+    miercoles : [],
+    jueves : [],
+    viernes:  [],
+    sabado : [],
+    add: function(dia, clase){
+        switch (dia) {
+            case "lunes":
+                if(this.lunes[clase.inicio] != undefined){
+                    $('#item-' + dia + '-' + clase.inicio).remove();
+                }
+                this.lunes[clase.inicio] = clase.duracion; 
+            break;
+
+            case "martes":
+                if(this.martes[clase.inicio] != undefined){
+                    $('#item-' + dia + '-' + clase.inicio).remove();
+                }
+                this.martes[clase.inicio] = clase.duracion; 
+            break;
+
+            case "miercoles":
+                if(this.miercoles[clase.inicio] != undefined){
+                    $('#item-' + dia + '-' + clase.inicio).remove();
+                }
+                this.miercoles[clase.inicio] = clase.duracion; 
+            break;
+
+            case "jueves":
+                if(this.jueves[clase.inicio] != undefined){
+                    $('#item-' + dia + '-' + clase.inicio).remove();
+                }
+                this.jueves[clase.inicio] = clase.duracion; 
+            break;
+
+            case "viernes":
+                if(this.viernes[clase.inicio] != undefined){
+                    $('#item-' + dia + '-' + clase.inicio).remove();
+                }
+                this.viernes[clase.inicio] = clase.duracion; 
+            break;
+
+            case "sabado":
+                if(this.sabado[clase.inicio] != undefined){
+                    $('#item-' + dia + '-' + clase.inicio).remove();
+                }
+                this.sabado[clase.inicio] = clase.duracion; 
+            break;
+
+
+            default: return null;
+        }
+    },
+    rem: function(dia, inicio){
+        switch (dia) {
+            case "lunes":
+                delete this.lunes[inicio];
+            break;
+
+            case "martes":
+                delete this.martes[inicio];
+            break;
+
+            case "miercoles":
+                delete this.miercoles[inicio];
+            break;
+
+            case "jueves":
+                delete this.jueves[inicio];
+            break;
+
+            case "viernes":
+                delete this.viernes[inicio];
+            break;
+
+            case "sabado":
+                delete this.sabado[inicio];
+            break;
+
+
+            default: return null;
+        }
+        $('#item-' + dia + '-' + inicio).remove();
+    }
+};
+
+function addClase(dia){
+    let inicio_val = $('#hora-inicio-'+dia).val(); 
+    let inicio_txt = $('#hora-inicio-' + dia + ' option:selected').text();
+
+    let dura_val = $('#duracion-'+dia).val();
+    let dura_txt = $('#duracion-' + dia + ' option:selected').text();
+
+    if(inicio_val == "" || dura_val == "" || inicio_val == null || dura_val == null || inicio_val == undefined || dura_val == undefined){
+        alert("Selecciones 'Hora de Inicio' y 'Duración'")
+        return;
+    }
+
+    let clase = new Clase(inicio_val, dura_val);
+    semana.add(dia, clase);
+
+    $('#clases-added-'+dia).append('<span id="item-'+dia+'-'+inicio_val+'" class="clases-added-item">' + inicio_txt + ' - ' + dura_txt + '<i onclick="semana.rem(\'' + dia + '\', ' + clase.inicio + ')" class="fas fa-times ml-2"></i></span>');
+
+    $('#hora-inicio-'+dia).val('');
+    $('#duracion-'+dia).val('');
+}
+
+$('#form-add-clase select').change(function(){
+    let name = $(this).attr("name");
+    let value = $(this).val();
+
+    let filtrar = false;
+    
+    if(name == "facultad" && value != ""){
+        $("#selector-carrera").prop( "disabled", true );
+        $("#selector-itinerario").prop( "disabled", true );
+        
+        add_clase_filtro_carreras(value);
+        filtrar = true;
+
+        $('#selector-carrera').val("");
+        $('#selector-itinerario').val("");
+        $('#selector-asignatura').val("");
+    }
+    else if(name == "carrera" && value != ""){
+        $("#selector-itinerario").prop( "disabled", true );
+
+        filtrar = true;
+        add_clase_filtro_itinerarios(value);
+
+        $('#selector-itinerario').val("");
+        $('#selector-asignatura').val("");
+    }
+    else if(name == "itinerario" && value != ""){
+        filtrar = true;
+
+        $('#selector-asignatura').val("");
+    }
+    else if(name == "asignatura" && value != ""){
+        $("#btn-add-clase").prop( "disabled", false );
+    }
+
+    if(filtrar){
+        filtrar_asignaturas();
+    }
+})
+
+function add_clase_filtro_carreras(facultad){
+    let data = "op=17";
+    data += "&facultad=" + facultad;
+
+    $.ajax({
+        url: '/async',
+        dataType: 'json',
+        type: 'post',
+        data: data,
+        success: function( data, textStatus, jQxhr ){
+            let $dep_selector = $('#selector-carrera');
+            $dep_selector.children('option:not(:first)').remove();
+
+            $.each(data, function (i, item) {
+                last_id = item.id;
+                $dep_selector.append($('<option>', { 
+                    value: item.id,
+                    text : item.nombre
+                }));
+            });
+
+            if(Object.keys(data).length > 0){
+                $dep_selector.prop( "disabled", false );
+            }
+            else{
+                $dep_selector.prop( "disabled", true );
+            }
+        },
+        error: function( jqXhr, textStatus, errorThrown ){
+            $('body').text(jqXhr.responseText);
+        }
+    });
+}
+
+function add_clase_filtro_itinerarios(carrera){
+    let data = "op=1";
+        data += "&idcarrera=" + carrera;
+    $.ajax({
+        url: '/async',
+        dataType: 'json',
+        type: 'post',
+        data: data,
+        success: function( data, textStatus, jQxhr ){
+            if(jQxhr.responseText.indexOf("Error")>=0){
+                alert(jQxhr.responseText);
+            }
+            else{
+                let $it_selector = $('#selector-itinerario');
+                $it_selector.children('option:not(:first)').remove();
+
+                $it_selector.append($('<option>', { 
+                    value: 'c',
+                    text : 'Común' 
+                }));
+
+                $.each(data, function (i, item) {
+                    last_id = item.id;
+                    $it_selector.append($('<option>', { 
+                        value: item.id,
+                        text : item.nombre 
+                    }));
+                });
+                $("#selector-itinerario").prop( "disabled", false );
+            }
+        },
+        error: function( jqXhr, textStatus, errorThrown ){
+        }
+    });
+}
+
+function filtrar_asignaturas(){
+    let data = "op=16";
+
+    data += ($('#selector-facultad').val() != null) ? "&facultad=" + $('#selector-facultad').val()  : "";
+    data += ($('#selector-carrera').val() != null) ? "&carrera=" + $('#selector-carrera').val() : "";
+    data += ($('#selector-itinerario').val()  != null) ? "&itinerario=" + $('#selector-itinerario').val()  : "";
+
+    $.ajax({
+        url: '/async',
+        dataType: 'json',
+        type: 'post',
+        data: data,
+        success: function( data, textStatus, jQxhr ){
+            let $dep_selector = $('#selector-asignatura');
+            $dep_selector.children('option:not(:first)').remove();
+
+            $.each(data, function (i, item) {
+                last_id = item.id;
+                $dep_selector.append($('<option>', { 
+                    value: item.id,
+                    text : item.nombre + ' (' + item.id + ')'
+                }));
+            });
+
+            if(Object.keys(data).length > 0){
+                $dep_selector.prop( "disabled", false );
+            }
+            else{
+                $dep_selector.prop( "disabled", true );
+            }
+        },
+        error: function( jqXhr, textStatus, errorThrown ){
+            $('body').text(jqXhr.responseText);
+        }
+    });
+}
+
+function commit(){
+    let count = semana.lunes.length + semana.martes.length + semana.miercoles.length + semana.jueves.length + semana.viernes.length + semana.sabado.length;
+
+    if(count > 0){
+        $('#list-elements').text("HAY CLASES!!! Pero aun no las he podido rescatar");
+
+        let text = "";
+
+        if(semana.lunes.length > 0){
+            text += "L: ";
+
+            for (let i = 0; i < semana.lunes.length; i++) {
+                if(semana.lunes[i] != undefined){
+                    text += parseHoras(i, semana.lunes[i]);
+
+                    if(i < semana.lunes.length - 1)
+                        text += ", ";
+                }
+            }
+        }
+
+        if(semana.martes.length > 0){
+            text += "<br />";
+            text += "M: ";
+
+            for (let i = 0; i < semana.martes.length; i++) {
+                if(semana.martes[i] != undefined){
+                    text += parseHoras(i, semana.martes[i]);
+
+                    if(i < semana.martes.length - 1)
+                        text += ", ";
+                }
+            }
+        }
+
+        if(semana.miercoles.length > 0){
+            text += "<br />";
+            text += "X: ";
+
+            for (let i = 0; i < semana.miercoles.length; i++) {
+                if(semana.miercoles[i] != undefined){
+                    text += parseHoras(i, semana.miercoles[i]);
+
+                    if(i < semana.miercoles.length - 1)
+                        text += ", ";
+                }
+            }
+        }
+
+        if(semana.jueves.length > 0){
+            text += "<br />";
+            text += "J: ";
+
+            for (let i = 0; i < semana.jueves.length; i++) {
+                if(semana.jueves[i] != undefined){
+                    text += parseHoras(i, semana.jueves[i]);
+
+                    if(i < semana.jueves.length - 1)
+                        text += ", ";
+                }
+            }
+        }
+
+        if(semana.viernes.length > 0){
+            text += "<br />";
+            text += "V: ";
+
+            for (let i = 0; i < semana.viernes.length; i++) {
+                if(semana.viernes[i] != undefined){
+                    text += parseHoras(i, semana.viernes[i]);
+
+                    if(i < semana.viernes.length - 1)
+                        text += ", ";
+                }
+            }
+        }
+
+        if(semana.sabado.length > 0){
+            text += "<br />";
+            text += "S: ";
+
+            for (let i = 0; i < semana.sabado.length; i++) {
+                if(semana.sabado[i] != undefined){
+                    text += parseHoras(i, semana.sabado[i]);
+
+                    if(i < semana.sabado.length - 1)
+                        text += ", ";
+                }
+            }
+        }
+
+        $('#list-elements').html(text);
+
+        $('#submit-clase').prop( "disabled", false );
+    }
+
+    $('#horario-clase').val(JSON.stringify(semana));
+    console.log(JSON.stringify(semana));
+}
+
+function parseHoras(inicio, duracion){
+    let inicio_real = 8 + parseInt(inicio/2);
+
+    let text = "";
+    text += inicio_real +":00 ~ ";
+
+    switch (duracion) {
+        case "1":
+            text += inicio_real + ":50"
+        break;
+        case "2":
+            inicio_real++;
+            text += inicio_real + ":40"
+        break;
+        case "3":
+            inicio_real += 2;
+            text += inicio_real + ":30"
+        break;
+        case "4":
+            inicio_real += 3;
+            text += inicio_real + ":20"
+        break;
+        
+        default: break;
+    }
+
+    return text;
+}
 
 // Docentes
 
@@ -578,6 +968,8 @@ function editar_docente(id){
                     $('#id-docente').val(data.id);
 
                     $('#nombre-docente').val(data.nombre);
+
+                    $('#orden-docente').val(data.orden);
 
                     $('#usuario-docente').val(data.usuario);
                     $('#user-docente').val(data.usuario);

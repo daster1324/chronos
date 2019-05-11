@@ -9,7 +9,6 @@ class Clase_dao implements iDAO{
     private $dia;           // String 1 char            - Obligatorio
     private $hora;          // Integer 1 digito         - Obligatorio
     private $grupo;         // String 10 chars          - Obligatorio
-    private $edificio;      // Integer 1 digito         - Obligatorio
 */
     private $clase;
 
@@ -44,7 +43,7 @@ class Clase_dao implements iDAO{
         $r = $result->fetch_assoc();
 
         $asignatura = new Clase($r["id"], $r["id_asignatura"], $r["cuatrimestre"], $r["dia"],
-        $r["hora"], $r["grupo"], $r["edificio"]);
+        $r["hora"], $r["grupo"]);
 
         $sentencia->close();
         $conn->close();
@@ -79,7 +78,7 @@ class Clase_dao implements iDAO{
         while($r = $result->fetch_assoc())
         {
             $clases[] = new Clase($r["id"], $r["id_asignatura"], $r["cuatrimestre"], $r["dia"],
-            $r["hora"], $r["grupo"], $r["edificio"]);
+            $r["hora"], $r["grupo"]);
         }
 
         $sentencia->close();
@@ -103,15 +102,14 @@ class Clase_dao implements iDAO{
         $dia = $clase->getDia();
         $hora = $clase->getHora();
         $grupo = $clase->getGrupo();
-        $edificio = $clase->getEdificio();
 
         $actualizar = ($this->getById($clase->getId()) != NULL);
 
         if($actualizar){
-            if (!($sentencia = $conn->prepare("UPDATE `clases` SET `id_asignatura` = ?, `cuatrimestre` = ?, `dia` = ?, `hora` = ?, `grupo` = ?, `edificio` = ? WHERE `id` = ?"))) {
+            if (!($sentencia = $conn->prepare("UPDATE `clases` SET `id_asignatura` = ?, `cuatrimestre` = ?, `dia` = ?, `hora` = ?, `grupo` = ? WHERE `id` = ?"))) {
                 echo "Falló la preparación: (" . $conn->errno . ") " . $conn->error;
             }
-            if (!$sentencia->bind_param("iisisii", $id_asignatura, $cuatrimestre, $dia, $hora, $grupo, $edificio, $id)) {
+            if (!$sentencia->bind_param("iisisi", $id_asignatura, $cuatrimestre, $dia, $hora, $grupo, $id)) {
                 echo "Falló la vinculación de parámetros: (" . $sentencia->errno . ") " . $sentencia->error;
             }
             $sentencia->execute();
@@ -119,16 +117,43 @@ class Clase_dao implements iDAO{
             $conn->close();
         }
         else{
-            if (!($sentencia = $conn->prepare("INSERT INTO `clases` (`id`, `id_asignatura`, `cuatrimestre`, `dia`, `hora`, `grupo`, `edificio`) VALUES (?, ?, ?, ?, ?, ?, ?);"))) {
+            if (!($sentencia = $conn->prepare("INSERT INTO `clases` (`id`, `id_asignatura`, `cuatrimestre`, `dia`, `hora`, `grupo`) VALUES (?, ?, ?, ?, ?, ?);"))) {
                 echo "Falló la preparación: (" . $conn->errno . ") " . $conn->error;
             }
-            if (!$sentencia->bind_param("iiisisi", $id, $id_asignatura, $cuatrimestre, $dia, $hora, $grupo, $edificio)) {
+            if (!$sentencia->bind_param("iiisis", $id, $id_asignatura, $cuatrimestre, $dia, $hora, $grupo)) {
                 echo "Falló la vinculación de parámetros: (" . $sentencia->errno . ") " . $sentencia->error;
             }
             $sentencia->execute();
             $sentencia->close();
             $conn->close();
         }
+    }
+
+    /**
+     * Recibe un conjunto de días y horas que corresponden a las clases del grupo indicado
+     * en el cuatrimestre indicado, de la clase indicada
+     * 
+     * @param $gea - Código GEA de la asignatura
+     * @param $cuatrimestre - Cuatrimestre al que pertenece el horario
+     * @param $grupo - Grupo al que pertenece el horario
+     * @param $horario - JSON con los días, horas y duraciones de las clases
+     */
+    public function procesaHorario($gea, $cuatrimestre, $grupo, $horario){
+
+        $dec_horario = json_decode($horario);
+
+        var_dump($dec_horario);
+
+        foreach ($dec_horario as $propName => $propValue) {
+            echo '-'. $propName . ': <br>';
+            foreach ($propValue as $clase) {
+                echo '----'. $clase . ': <br>';
+            }
+        }
+        // NOTE: Hay que tener en cuenta que
+        // n horas son 2n entradas en la base de datos
+
+        //$clase = new Clase(NULL, $gea, $cuatrimestre, $dia, $hora, $grupo);
     }
 
     /**
@@ -173,6 +198,36 @@ class Clase_dao implements iDAO{
         $r = $result->fetch_assoc();
 
         return $r['cuenta'];
+    }
+
+    public function getListado(){
+        $conn = Connection::connect();
+
+        if (!($sentencia = $conn->prepare("SELECT * FROM `clases` WHERE id_asignatura = ?;"))) {
+            echo "Falló la preparación: (" . $conn->errno . ") " . $conn->error;
+        }
+
+        if (!$sentencia->bind_param("i", $id)) {
+            echo "Falló la vinculación de parámetros: (" . $sentencia->errno . ") " . $sentencia->error;
+        }
+
+        $sentencia->execute();
+
+        $result = $sentencia->get_result();
+
+        if($result->num_rows === 0)
+            return NULL;
+
+        while($r = $result->fetch_assoc())
+        {
+            $clases[] = new Clase($r["id"], $r["id_asignatura"], $r["cuatrimestre"], $r["dia"],
+            $r["hora"], $r["grupo"]);
+        }
+
+        $sentencia->close();
+        $conn->close();
+
+        return $clases;
     }
 }
 
