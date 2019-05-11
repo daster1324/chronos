@@ -128,6 +128,7 @@ class Facultad_dao implements iDAO{
 
         $sentencia->close();
         $conn->close();
+        
     }
     
     public function count(){        

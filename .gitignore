@@ -1,4 +1,5 @@
 .vscode/
 test*
+ex_*
 *.log
 SyncToy*

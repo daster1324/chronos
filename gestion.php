@@ -1173,7 +1173,7 @@
                                 <!-- Selector Cuatrimestre -->
                                     <div class="form-group col-md my-1">
                                         <label for="selector-cuatrimestre" class="my-1">Cuatrimestre</label>
-                                        <select id="selector-cuatrimestre" name="cuatrimestre" class="custom-select text-dark">
+                                        <select id="selector-cuatrimestre" name="cuatrimestre" class="custom-select text-dark" required>
                                             <option disabled="disabled" selected="selected" value="">Selecciona un cuatrimestre</option>
                                             <option value="1">1º</option>
                                             <option value="2">2º</option>

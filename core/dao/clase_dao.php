@@ -139,21 +139,43 @@ class Clase_dao implements iDAO{
      * @param $horario - JSON con los días, horas y duraciones de las clases
      */
     public function procesaHorario($gea, $cuatrimestre, $grupo, $horario){
-
         $dec_horario = json_decode($horario);
 
-        var_dump($dec_horario);
+        foreach ($dec_horario as $nombre_dia => $duraciones) {
+            $dia = $this->parse_dia($nombre_dia);
 
-        foreach ($dec_horario as $propName => $propValue) {
-            echo '-'. $propName . ': <br>';
-            foreach ($propValue as $clase) {
-                echo '----'. $clase . ': <br>';
+            $clase_hora = 0;
+            foreach ($duraciones as $duracion) {
+                if($duracion != null){
+                    $this->add_multiple(new Clase(NULL, $gea, $cuatrimestre, $dia, $clase_hora, $grupo), $duracion);
+                }
+                $clase_hora++;
             }
         }
-        // NOTE: Hay que tener en cuenta que
-        // n horas son 2n entradas en la base de datos
+    }
 
-        //$clase = new Clase(NULL, $gea, $cuatrimestre, $dia, $hora, $grupo);
+    private function add_multiple($clase, $duracion){
+        $cldao = new Clase_dao();
+
+        for ($i=0; $i < $duracion*2; $i++) { 
+            $cldao->store($clase);
+            $clase->add_una_hora();
+        }
+
+        unset($cldao);
+    }
+
+    private function parse_dia($dia){
+        switch ($dia) {
+            case 'lunes':       return 'l';
+            case 'martes':      return 'm';
+            case 'miercoles':   return 'x';
+            case 'jueves':      return 'j';
+            case 'viernes':     return 'v';
+            case 'sabado':      return 's';
+                
+            default: break;
+        }
     }
 
     /**
@@ -169,6 +191,23 @@ class Clase_dao implements iDAO{
         }
 
         if (!$sentencia->bind_param("i", $id)) {
+            echo "Falló la vinculación de parámetros: (" . $sentencia->errno . ") " . $sentencia->error;
+        }
+
+        $sentencia->execute();
+
+        $sentencia->close();
+        $conn->close();
+    }
+
+    public function removeUsingGea($gea){
+        $conn = Connection::connect();
+
+        if (!($sentencia = $conn->prepare("DELETE FROM `clases` WHERE `id_asignatura` = ?;"))) {
+            echo "Falló la preparación: (" . $conn->errno . ") " . $conn->error;
+        }
+
+        if (!$sentencia->bind_param("i", $gea)) {
             echo "Falló la vinculación de parámetros: (" . $sentencia->errno . ") " . $sentencia->error;
         }
 

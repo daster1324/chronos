@@ -66,6 +66,10 @@ class Clase implements JsonSerializable {
         $this->grupo = $grupo;
     }
 
+    public function add_una_hora(){
+        $this->hora++;
+    }
+
     /**
      *  SERIALIZE
      */

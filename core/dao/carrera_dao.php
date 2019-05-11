@@ -102,7 +102,6 @@ class Carrera_dao implements iDAO{
         return $carreras;
     }
 
-
     public function busca($nombre, $id_facultad, $id_facultad_dg){
         $conn = Connection::connect();
 
