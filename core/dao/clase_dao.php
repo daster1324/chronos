@@ -166,13 +166,20 @@ class Clase_dao implements iDAO{
     }
 
     private function parse_dia($dia){
-        switch ($dia) {
+        switch (strtolower($dia)) {
             case 'lunes':       return 'l';
             case 'martes':      return 'm';
             case 'miercoles':   return 'x';
             case 'jueves':      return 'j';
             case 'viernes':     return 'v';
             case 'sabado':      return 's';
+
+            case 'l':           return 'lunes';
+            case 'm':           return 'martes';
+            case 'x':           return 'miercoles';
+            case 'j':           return 'jueves';
+            case 'v':           return 'viernes';
+            case 's':           return 'sabado';
                 
             default: break;
         }
@@ -200,14 +207,14 @@ class Clase_dao implements iDAO{
         $conn->close();
     }
 
-    public function removeUsingGea($gea){
+    public function removeByAsignatura($id_asignatura){
         $conn = Connection::connect();
 
         if (!($sentencia = $conn->prepare("DELETE FROM `clases` WHERE `id_asignatura` = ?;"))) {
             echo "Falló la preparación: (" . $conn->errno . ") " . $conn->error;
         }
 
-        if (!$sentencia->bind_param("i", $gea)) {
+        if (!$sentencia->bind_param("i", $id_asignatura)) {
             echo "Falló la vinculación de parámetros: (" . $sentencia->errno . ") " . $sentencia->error;
         }
 
@@ -239,33 +246,38 @@ class Clase_dao implements iDAO{
         return $r['cuenta'];
     }
 
+    
     public function getListado(){
         $conn = Connection::connect();
 
-        if (!($sentencia = $conn->prepare("SELECT * FROM `clases` WHERE id_asignatura = ?;"))) {
+        $adao = new Asignatura_dao();
+
+        if (!($sentencia = $conn->prepare("SELECT `id_asignatura`, `cuatrimestre`, `grupo` FROM `clases` GROUP BY `id_asignatura` ORDER BY `id_asignatura`, `cuatrimestre`;"))) {
             echo "Falló la preparación: (" . $conn->errno . ") " . $conn->error;
         }
 
-        if (!$sentencia->bind_param("i", $id)) {
-            echo "Falló la vinculación de parámetros: (" . $sentencia->errno . ") " . $sentencia->error;
-        }
 
         $sentencia->execute();
 
         $result = $sentencia->get_result();
+
+        $sentencia->close();
+        $conn->close();
 
         if($result->num_rows === 0)
             return NULL;
 
         while($r = $result->fetch_assoc())
         {
-            $clases[] = new Clase($r["id"], $r["id_asignatura"], $r["cuatrimestre"], $r["dia"],
-            $r["hora"], $r["grupo"]);
+            $clases[] = array('id_asignatura' => $r['id_asignatura'],
+                              'nombre'        => $adao->getById($r['id_asignatura'])->getNombre(),
+                              'grupo'         => strtoupper($r['grupo']),
+                              'cuatrimestre'  => $r['cuatrimestre']
+                            );
+            //$clases[] = new Clase($r["id"], $r["id_asignatura"], $r["cuatrimestre"], $r["dia"], $r["hora"], $r["grupo"]);
         }
 
-        $sentencia->close();
-        $conn->close();
-
+        unset($adao);
         return $clases;
     }
 }

@@ -862,7 +862,6 @@ function commit(){
     }
 
     $('#horario-clase').val(JSON.stringify(semana));
-    console.log(JSON.stringify(semana));
 }
 
 function parseHoras(inicio, duracion){

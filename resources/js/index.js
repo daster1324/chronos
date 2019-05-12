@@ -188,7 +188,6 @@ function submit(){
             }
         },
         error: function( jqXhr, textStatus, errorThrown ){
-            console.log(jqXhr)
         }
     });
     return false;

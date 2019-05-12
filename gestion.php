@@ -7,9 +7,6 @@
 
     // Se capturan los POSTs (salvo el de login)
     if(isset($_POST['accion']) && !empty($_POST['accion'])){ 
-        echo '<div class="bg-light">';
-        var_dump($_POST); 
-        echo '</div>';
     
         if($_POST['accion'] == "add"){
             switch ($_POST['page']) {
@@ -128,7 +125,7 @@
 
                     unset($adao);
                     header("HTTP/1.1 301 Moved Permanently"); 
-                    header("Location: /gestion?gestionar=asignaturas&message=".$mensaje);
+                    header("Location: /gestion?gestionar=clases&message=".$mensaje);
                 break;
                 
                 case 'clase':
@@ -149,8 +146,8 @@
                     }
 
                     unset($cldao);
-                    //header("HTTP/1.1 301 Moved Permanently"); 
-                    //header("Location: /gestion?gestionar=asignaturas&message=".$mensaje);
+                    header("HTTP/1.1 301 Moved Permanently"); 
+                    header("Location: /gestion?gestionar=asignaturas&message=".$mensaje);
                 break;
 
                 case 'docente':
@@ -263,10 +260,6 @@
                     header("Location: /gestion?gestionar=asignaturas&message=2");
                 break;
 
-                case 'clase':
-
-                break;
-
                 case 'docente':
                     $id = $_POST['id-docente'];
                     $nombre = $_POST['nombre-docente'];
@@ -361,7 +354,17 @@
                 break;
 
                 case 'clase':
+                    if(isset($_POST['asignatura'])){
+                        $cldao = new Clase_dao();
 
+                        foreach ($_POST['asignatura'] as $id_asignatura) {
+                            $cldao->removeByAsignatura($id_asignatura);
+                        }
+
+                        unset($cldao);
+                        header("HTTP/1.1 301 Moved Permanently"); 
+                        header("Location: /gestion?gestionar=clases&message=3");
+                    }
                 break;
 
                 case 'docente':
@@ -1237,14 +1240,14 @@
                             foreach ($clases as $clase) {
                                 ?>
                                 <div class="gestion-list-element p-2 mb-2 border">
-                                    <input class="align-middle" type="checkbox" name="clase[]" value="<?php echo $clase->getId(); ?>" id="clase-<?php echo $clase->getId(); ?>">
-                                    <label for="clase-<?php echo $clase->getId(); ?>"><?php echo $clase->getNombre() . ' ('. $clase->getCampus() .')'; ?></label>
-                                    <input type="hidden" name="page" value="clase">
-                                    <input type="hidden" name="accion" value="remove">
+                                    <input class="align-middle" type="checkbox" name="asignatura[]" value="<?php echo $clase['id_asignatura']; ?>" id="clase-<?php echo $clase['id_asignatura']; ?>">
+                                    <label for="clase-<?php echo $clase['id_asignatura']; ?>"><?php echo $clase['nombre'] . ' ('. $clase['cuatrimestre'] .'Q - ' . $clase['grupo'] . ') ('. $clase['id_asignatura'] .')'; ?></label>
                                 </div>
                                 <?php  
                             }
                             ?>
+                            <input type="hidden" name="page" value="clase">
+                            <input type="hidden" name="accion" value="remove">
                             </fieldset>
                             <button type="button" class="btn btn-primary" onclick="borrar()">Borrar</button>
                         </form>
