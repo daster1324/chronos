@@ -91,11 +91,16 @@ function carrera_seleccionada(id){
  * @param {Number} id 
  */
 function itinerario_seleccionado(idcarrera, iditinerario){
+    let data = "op=2&idcarrera="+idcarrera;
+    
+    if(iditinerario != 'null')
+        data += "&iditinerario="+iditinerario;
+
     $.ajax({
         url: '/async',
         dataType: 'json',
         type: 'post',
-        data: "op=2&idcarrera="+idcarrera+"&iditinerario="+iditinerario,
+        data: data,
         success: function( data, textStatus, jQxhr ){
             if(data.indexOf("Error")>=0){
                 reset_form();
@@ -129,6 +134,13 @@ function set_itinerarios(itinerarios){
             text : item.nombre 
         }));
     });
+
+    if(itinerarios.length == 0)
+    $it_selector.append($('<option>', { 
+        value: 'null',
+        text : 'Itinerario Único' 
+    }));
+    
 
     if(itinerarios.length == 1){
         $("#selector-itinerario").val(last_id);
@@ -171,11 +183,17 @@ function checkStatus(){
 function submit(){
     let car = $('#selector-carrera').val();
     let iti = $('#selector-itinerario').val();
+
+    let data = "op=3&idcarrera="+car;
+    
+    if(iti != 'null')
+        data += "&iditinerario="+iti;
+
     $.ajax({
         url: '/async',
         dataType: 'json',
         type: 'post',
-        data: "op=3&idcarrera="+car+"&iditinerario="+iti,
+        data: data,
         success: function( data, textStatus, jQxhr ){
             if(data.indexOf("Error")>=0){
                 reset_form();

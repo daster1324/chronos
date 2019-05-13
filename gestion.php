@@ -125,7 +125,7 @@
 
                     unset($adao);
                     header("HTTP/1.1 301 Moved Permanently"); 
-                    header("Location: /gestion?gestionar=clases&message=".$mensaje);
+                    header("Location: /gestion?gestionar=asignaturas&message=".$mensaje);
                 break;
                 
                 case 'clase':
@@ -147,7 +147,7 @@
 
                     unset($cldao);
                     header("HTTP/1.1 301 Moved Permanently"); 
-                    header("Location: /gestion?gestionar=asignaturas&message=".$mensaje);
+                    header("Location: /gestion?gestionar=clases&message=".$mensaje);
                 break;
 
                 case 'docente':
@@ -385,22 +385,6 @@
                     # code...
                     break;
             }
-        }
-    }
-
-    // Funciones para marcar la sección actual del menú
-    function active($apartado){
-        $cur = (isset($_GET['gestionar'])) ? $_GET['gestionar'] : "/";
-
-        if(($apartado == $cur)){
-            echo "active";
-        }
-    }
-    function sr_only($apartado){
-        $cur = (isset($_GET['gestionar'])) ? $_GET['gestionar'] : "/";
-
-        if($apartado == $cur){
-            echo '<span class="sr-only">(current)</span>';
         }
     }
 
@@ -1095,7 +1079,6 @@
         <?php
     }
 
-    //TODO: Falta por hacer
     function show_clases(){
         //Filtrado para añadir
         $fdao = new Facultad_dao();
@@ -1482,8 +1465,44 @@
 
     //TODO: Falta por hacer
     function show_importar(){
+        if(isset($_POST['submit'])){
+            if(!file_exists($_FILES['file']['tmp_name']) || !is_uploaded_file($_FILES['file']['tmp_name'])) {
+                ?>
+                <div class="alert alert-danger" role="alert">¡ERROR! ¡No se ha recibido ningún fichero!</div>
+                <?php
+            }
+            else{
+                var_dump($_FILES);
+                
+                $fichero = fopen($_FILES['file']['tmp_name'], 'r');
+                load_horario($_POST['facultad'], $fichero);
+                fclose($fichero);
+            }
+        }
+
+        $fdao = new Facultad_dao();
+        $facultades = $fdao->getListado();
+
         ?>
         
+        <div class="row justify-content-between">
+            <!-- Formulario Horario -->
+            <div id="formulario" class="col-md-6 mb-3 mb-md-0 p-1">
+                <div class="border p-3">                    
+                    <h4 class="mb-3" id="accion-title">Cargar Horario</h4>
+                    <?php horarioLoad($facultades); ?>
+                </div>
+            </div>
+            <!-- /Formulario Horario -->
+            <!-- Formulario Docentes -->
+            <div id="listado" class="col-md-6 mb-3 mb-md-0 p-1">
+            <div class="border p-3">                    
+                    <h4 class="mb-3" id="accion-title">Cargar Docentes</h4>
+                    <?php docentesLoad($facultades); ?>
+                </div>
+            </div>
+            <!-- /Formulario Docentes -->
+        </div>
         <?php
     }
 
@@ -1494,8 +1513,43 @@
 
                 $id = $_SESSION['gestor-id'];
                 $pass = hash("sha256", $_SESSION['gestor-usuario'] . SALT . $_POST['new-pass-1']);
+                $oldpass = hash("sha256", $_SESSION['gestor-usuario'] . SALT . $_POST['old-pass']);
+
+                $user = $gdao->login($_SESSION['gestor-usuario'], $oldpass, true);
+
+                if($user != false){
+                    $gdao->change_password($id, $pass);
+                    $message = 1;
+                }
+                else{
+                    $message = 2;
+                }
             }
+            else{
+                $message = 2;
+            }
+
+            header("HTTP/1.1 301 Moved Permanently"); 
+            header("Location: /gestion?gestionar=password&message=".$message);
         }
+
+        if(isset($_GET['message'])){
+            ?> <div class="alert alert-success" role="alert"> <?php
+            switch ($_GET['message']) {
+                case 1:
+                    echo "Contraseña cambiada con éxito";
+                break;
+
+                case 2:
+                    echo "Error al cambiar la contraseña. Comprueba que has introducido bien los datos.";
+                break;
+                
+                default: break;
+            }
+            ?> </div> <?php
+            unset($_GET['message']);
+        }
+
         ?>
         <div class="row justify-content-center text-light">
             <div class="col-md-6">
@@ -1564,7 +1618,7 @@
                             <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
                                 <a class="dropdown-item" href="?gestionar=password">Cambiar contraseña</a>
                                 <div class="dropdown-divider"></div>
-                                <a class="dropdown-item" href="/logout">Cerrar sesión</a>
+                                <a class="dropdown-item" href="/logout?redirect=gestion">Cerrar sesión</a>
                             </div>
                         </li>
                         
@@ -1623,19 +1677,47 @@
         <?php 
     }
 
-    function horarioLoad(){
+    function horarioLoad($facultades){
         ?>
-                <div id="horario-load-container">
-                    <div class="col-12">
-                    <form action="" method="post" id="horario-load-form" enctype="multipart/form-data">
-                        <div class="form-group">
-                            <label for="horario-load-input">Seleccione el fichero o arrástrelo sobre el botón. (.csv)</label>
-                            <input type="file" name="file" class="form-control-file" id="horario-load-input" accept=".csv">
-                        </div>
-                        <button type="submit" name="submit" class="btn btn-secondary mb-2">Subir fichero</button>
-                    </form>
+                <form action="" method="post" id="horario-load-form" enctype="multipart/form-data">
+                    <label for="selector-facultad" class="my-1">Facultad</label>
+                    <select id="selector-facultad" name="facultad" class="custom-select text-dark mb-4" required>
+                        <option disabled="disabled" selected="selected" value="">Selecciona una facultad</option>
+                        <?php
+                        foreach ($facultades as $facultad) {
+                            echo '<option value="'.$facultad->getId().'">'.$facultad->getNombre().'</option>';
+                        }
+                        ?>
+                    </select>
+                    <div class="form-group">
+                        <label class="mb-2" for="horario-load-input">Seleccione el fichero o arrástrelo sobre el botón. (.csv)</label>
+                        <input type="file" name="file" class="form-control-file" id="horario-load-input" accept=".csv">
+                        <input type="hidden" name="load-horario">
                     </div>
-                </div>
+                    <button type="submit" name="submit" class="btn btn-secondary mb-2">Subir fichero</button>
+                </form>
+        <?php
+    }
+
+    function docentesLoad($facultades){
+        ?>
+                <form action="" method="post" id="docentes-load-form" enctype="multipart/form-data">
+                    <label for="selector-facultad" class="my-1">Facultad</label>
+                    <select id="selector-facultad" name="facultad" class="custom-select text-dark mb-4" required>
+                        <option disabled="disabled" selected="selected" value="">Selecciona una facultad</option>
+                        <?php
+                        foreach ($facultades as $facultad) {
+                            echo '<option value="'.$facultad->getId().'">'.$facultad->getNombre().'</option>';
+                        }
+                        ?>
+                    </select>
+                    <div class="form-group">
+                        <label class="mb-2" for="docentes-load-input">Seleccione el fichero o arrástrelo sobre el botón. (.csv)</label>
+                        <input type="file" name="file" class="form-control-file" id="docentes-load-input" accept=".csv">
+                        <input type="hidden" name="load-docentes">
+                    </div>
+                    <button type="submit" name="submit" class="btn btn-secondary mb-2">Subir fichero</button>
+                </form>    
         <?php
     }
 
@@ -1659,18 +1741,6 @@
         showLogin();
     }
     else{
-        if(isset($_POST['submit'])){
-            if(isset($_FILES['file'])){
-                var_dump($_FILES);
-                $fichero = fopen($_FILES['file']['tmp_name'], 'r');
-                while (!feof($fichero) ) {
-                    $lineas[] = fgetcsv($fichero, 400, $delimiter=";");
-                }
-                fclose($fichero);
-                var_dump($lineas);
-            }
-        }
-        else
             showDashboard();
     }
 
@@ -1678,6 +1748,3 @@
     
     die();
 ?>
-
-
-<div class="popover bg-dark text-light" role="tooltip"><div class="arrow"></div><h3 class="popover-header"></h3><div class="popover-body"></div></div>

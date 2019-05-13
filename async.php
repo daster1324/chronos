@@ -29,7 +29,9 @@ if(!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQU
       // Primera comprobación (antes del envío)
       // Comprobar que el itinerario seleccionado está en la carrera seleccionada
       case 2:
-         if(!existe_itinerario($_POST['idcarrera'], $_POST['iditinerario'])){
+         $itinerario = (isset($_POST['iditinerario'])) ? $_POST['iditinerario'] : NULL;
+
+         if(!existe_itinerario($_POST['idcarrera'], $itinerario)){
             echo json_encode("Error. Manipulación de datos detectada.");
          }
          else{
@@ -40,12 +42,14 @@ if(!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQU
       // Segunda comprobación (tras el envío)
       // Comprobar que el itinerario enviado está en la carrera enviada
       case 3:
-         if(!existe_itinerario($_POST['idcarrera'], $_POST['iditinerario'])){
+         $itinerario = (isset($_POST['iditinerario'])) ? $_POST['iditinerario'] : NULL;
+
+         if(!existe_itinerario($_POST['idcarrera'], $itinerario)){
             echo json_encode("Error. Manipulación de datos detectada.");
          }
          else{
             $_SESSION['carrera'] = $_POST['idcarrera'];
-            $_SESSION['itinerario'] = $_POST['iditinerario'];
+            $_SESSION['itinerario'] = $itinerario;
             echo json_encode("OK");
          }
       break;
@@ -118,15 +122,26 @@ if(!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQU
          $itinerario = (isset($_POST['itinerario']))  ? $_POST['itinerario']  : -1;
          
          getAsignaturasFiltradas($facultad, $carrera, $itinerario);
-       break;
+      break;
 
+      // Recupera todas las carreras que están asociadas a una facultad
       case 17:
          getCarrerasByFacultad($_POST['facultad']);
       break;
 
+      // Recupera el listado de asignaturas excluyendo las seleccionadas
+      case 18:
+         getListadoAsignaturasExcepto(json_decode($_POST['seleccion']));
+      break;
+
+      // Procesar horario del asistente
+      case 19:
+         procesarHorarioAsistente($_POST['asignaturas'], $_POST['disponibilidad']);
+      break;
+
       default:
          die("Error");
-         break;
+      break;
    }   
 }
 else{
@@ -154,7 +169,10 @@ function muestra_itinerarios($id_carrera){
 }
 
 function existe_itinerario($id_carrera, $id_itinerario){
-   if(is_numeric($id_carrera) && is_numeric($id_itinerario)){
+   if($id_itinerario == NULL)
+      return true;
+
+   if(is_numeric($id_carrera) && (is_numeric($id_itinerario))){
       $idao = new Itinerario_dao();
 
       $itinerarios = $idao->checkItinerario($id_carrera, $id_itinerario);
@@ -271,6 +289,27 @@ function getCarrerasByFacultad($facultad){
    $cdao = new Carrera_dao();
    echo json_encode($cdao->getListadoByFacultad($facultad));
    unset($cdao);
+}
+
+function getListadoAsignaturasExcepto($seleccion){
+   $adao = new Asignatura_dao();
+   echo json_encode($adao->listadoExcepto($seleccion));
+   unset($adao);
+}
+
+//TODO: recibe un array con los id de las asignaturas 
+//      y la disponibilidad ('completa' = 9~20, 'mañana' = 9~14, 'tarde' = 15~20)
+function procesarHorarioAsistente($asignaturas, $disponibilidad){
+   $listado = json_decode($asignaturas, true);
+   
+   foreach ($listado as $asignatura) {
+      $id = $asignatura['id'];
+      $nombre = $asignatura['nombre'];
+      $abreviatura = $asignatura['abreviatura'];
+      $creditos = $asignatura['creditos'];
+   }
+
+   echo json_encode("OK");
 }
 
 ?>

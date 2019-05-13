@@ -29,7 +29,7 @@
                 </select>
 
                 <select id="selector-itinerario" name="itinerario" class="custom-select text-dark my-1" disabled>
-                    <option value="none" selected>Selecciona itinerario</option>
+                    <option value="none" disabled selected>Selecciona itinerario</option>
                 </select>
 
                 <input id="boton-enviar" class="btn btn-light w-100 my-1" type="submit" value="Empezar" disabled>
@@ -43,6 +43,10 @@
                 if($car != NULL && $iti != NULL)
                     echo '<a href="/asistente.php" class="btn btn-light btn-continue w-100 my-1">Continuar con <span class="continue-text">'. $car->getNombre() 
                         .'</span> <span class="continue-text">('. $iti->getNombre() .')</span></a>';
+
+                else if($car != NULL && $iti == NULL)
+                    echo '<a href="/asistente.php" class="btn btn-light btn-continue w-100 my-1">Continuar con <span class="continue-text">'. $car->getNombre() 
+                        .'</span> <span class="continue-text">(Itinerario Único)</span></a>';
 
                 ?>
 

@@ -158,12 +158,6 @@ class Docente_dao implements iDAO{
         $orden = $d->getOrden();
         $usuario  = $d->getUsuario();
         $pass  = $d->getPassword();
-        
-        
-
-        // Escenarios posibles en ACTUALIZAR
-        // - cambiar todos los datos posibles en GESTOR: nombre, departamento, contraseña
-        // - cambiar todos los datos posibles en DOCENTE: nombre, departamento, contraseña, preferencias
 
         if($actualizar){
             $pass = ($docente->getPassword() == $pass || $pass == "")  ? $docente->getPassword() : $pass;
@@ -231,7 +225,7 @@ class Docente_dao implements iDAO{
     }
     
 
-    public function login($usuario, $pass){
+    public function login($usuario, $pass, $change_password = false){
         $conn = Connection::connect();
 
         if (!($sentencia = $conn->prepare("SELECT * FROM `docentes` WHERE usuario LIKE ? AND pass LIKE ?;"))) {
@@ -252,12 +246,36 @@ class Docente_dao implements iDAO{
         if($result->num_rows === 0)
             return false;
 
-        $r = $result->fetch_assoc();
+        if($change_password == false){
+            $r = $result->fetch_assoc();
 
-        $_SESSION['docente-id'] = $r["id"];
-        $_SESSION['docente-usuario'] = $r["usuario"];
-        $_SESSION['docente-departamento'] = $r["departamento"];
-        $_SESSION['docente-preferencias'] = $r["preferencias"];
+            $_SESSION['docente-id'] = $r["id"];
+            $_SESSION['docente-usuario'] = $r["usuario"];
+            $_SESSION['docente-departamento'] = $r["departamento"];
+            $_SESSION['docente-preferencias'] = $r["preferencias"];
+            
+            header("HTTP/1.1 301 Moved Permanently"); 
+            header("Location: /docentes");
+        }
+
+        return true;
+    }
+
+    public function change_password($id, $pass){
+        $conn = Connection::connect();
+
+        if (!($sentencia = $conn->prepare("UPDATE `docentes` SET `pass`= ? WHERE `id` = ?;"))) {
+            echo "Falló la preparación: (" . $conn->errno . ") " . $conn->error;
+        }
+
+        if (!$sentencia->bind_param("si", $pass, $id)) {
+            echo "Falló la vinculación de parámetros: (" . $sentencia->errno . ") " . $sentencia->error;
+        }
+
+        $sentencia->execute();
+
+        $sentencia->close();
+        $conn->close();
 
         return true;
     }

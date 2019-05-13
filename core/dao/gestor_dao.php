@@ -98,9 +98,8 @@ class Gestor_dao implements iDAO{
         $sentencia->close();
         $conn->close();
     }
-    
 
-    public function login($usuario, $pass){
+    public function login($usuario, $pass, $change_password = false){
         $conn = Connection::connect();
 
         if (!($sentencia = $conn->prepare("SELECT * FROM `gestores` WHERE usuario LIKE ? AND pass LIKE ?;"))) {
@@ -121,10 +120,15 @@ class Gestor_dao implements iDAO{
         if($result->num_rows === 0)
             return false;
 
-        $r = $result->fetch_assoc();
+        if($change_password == false){
+            $r = $result->fetch_assoc();
 
-        $_SESSION['gestor-id'] = $r["id"];
-        $_SESSION['gestor-usuario'] = $r["usuario"];
+            $_SESSION['gestor-id'] = $r["id"];
+            $_SESSION['gestor-usuario'] = $r["usuario"];
+                        
+            header("HTTP/1.1 301 Moved Permanently"); 
+            header("Location: /gestion");
+        }
 
         return true;
     }
@@ -136,24 +140,14 @@ class Gestor_dao implements iDAO{
             echo "Falló la preparación: (" . $conn->errno . ") " . $conn->error;
         }
 
-        if (!$sentencia->bind_param("ss", $usuario, $pass)) {
+        if (!$sentencia->bind_param("si", $pass, $id)) {
             echo "Falló la vinculación de parámetros: (" . $sentencia->errno . ") " . $sentencia->error;
         }
 
         $sentencia->execute();
 
-        $result = $sentencia->get_result();
-
         $sentencia->close();
         $conn->close();
-
-        if($result->num_rows === 0)
-            return false;
-
-        $r = $result->fetch_assoc();
-
-        $_SESSION['gestor-id'] = $r["id"];
-        $_SESSION['gestor-usuario'] = $r["usuario"];
 
         return true;
     }

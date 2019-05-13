@@ -2,6 +2,22 @@
 
 define("SALT", "7a96d15502f3bf22fb619916778abaf9a4fd37a926c273834458e85c1b5b2e1d");
 
+// Funciones para marcar la sección actual del menú
+function active($apartado){
+    $cur = (isset($_GET['gestionar'])) ? $_GET['gestionar'] : "/";
+
+    if(($apartado == $cur)){
+        echo "active";
+    }
+}
+function sr_only($apartado){
+    $cur = (isset($_GET['gestionar'])) ? $_GET['gestionar'] : "/";
+
+    if($apartado == $cur){
+        echo '<span class="sr-only">(current)</span>';
+    }
+}
+
 function get_head(){
     $re = '/^(\/\w+).*$/m';
     $cur = $_SERVER['REQUEST_URI'];

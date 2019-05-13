@@ -21,7 +21,7 @@ class Clase {
 var asignaturas = {};
 
 var user= {
-    asignaturas : [],
+    asignaturas : {},
     clases      : {},
     creditos    : 0,
     cuatrimestre: 1,
@@ -30,7 +30,7 @@ var user= {
         if (typeof this.asignaturas[asignatura.id] === 'undefined') {
             this.asignaturas[asignatura.id] = asignatura;
             
-            this.creditos += asignatura.creditos;
+            this.creditos += parseFloat(asignatura.creditos);
             $('#creditos').text(this.creditos);
 
             appendAsignatura(asignatura);
@@ -62,6 +62,13 @@ var user= {
         cuatrimestre = 1;
     }
 };
+
+$(function () {
+    $('[data-toggle="popover"]').popover({
+        trigger: 'hover',
+        placement: 'right'
+    });
+  })
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -105,6 +112,7 @@ function curso_seleccionado(curso) {
             }
         },
         error: function( jqXhr, textStatus, errorThrown ){
+            $('body').html(jqXhr.responseText);
         }
     });
 }
@@ -152,6 +160,7 @@ function asignatura_seleccionada(idasignatura){
             }
         },
         error: function( jqXhr, textStatus, errorThrown ){
+            $('body').html(jqXhr.responseText);
         }
     });
     return false;
@@ -266,10 +275,6 @@ function cambiarCuatrimestre(){
 
 }
 
-//let cur = ($('#addasignatura-curso').val() != "none");
-//let asi = ($('#addasignatura-asignatura').val() != "none");
-//var aaa = new Asignatura(1234, "Métodos Matemáticos de la Ingeniería", "MMI", 6);
-
 function addAsignatura(){    
     let cur = $('#addasignatura-curso').val();
     let asi = $('#addasignatura-asignatura').val();
@@ -293,6 +298,7 @@ function addAsignatura(){
             }
         },
         error: function( jqXhr, textStatus, errorThrown ){
+            $('body').html(jqXhr.responseText);
         }
     });
     return false;
@@ -309,8 +315,32 @@ function vaciarHorario(){
 }
 
 function procesarHorario(){
-    alert("Procesando horario");
-    //TODO: ¿A qué estás esperando para hacer esta parte?
+    if(Object.keys(user.asignaturas) == 0){
+        alert("Primero, añade algunas asignaturas");
+        return;
+    }
+
+    let data = "op=19";
+        data += "&asignaturas="+JSON.stringify(user.asignaturas);
+        data += "&disponibilidad="+ $('#selector-disponibilidad').val();
+        $.ajax({
+            url: '/async',
+            dataType: 'json',
+            type: 'post',
+            data: data,
+            success: function( data, textStatus, jQxhr ){
+                if(jQxhr.responseText.indexOf("Error")>=0){
+                    alert("Devuelve algo 'correcto', pero error: " + data);
+                }
+                else{
+                   alert('Todo va bien');
+                }
+            },
+            error: function( jqXhr, textStatus, errorThrown ){
+                alert('Error');
+            }
+        });
+
 }
 
 function exportar(){

@@ -86,7 +86,7 @@ class Asignatura_dao implements iDAO{
             if(!in_array($r["id"], $selected)){
                 $asignaturas[] = new Asignatura($r["id"], $r["id_carrera"], $r["itinerario"], $r["nombre"],
                                                 $r["abreviatura"], $r["curso"], $r["id_departamento"],
-                                                $r["id_departamento_dos"], $r["creditos"]);
+                                                $r["id_departamento_dos"], $r["creditos"], $r['docentes']);
             }
         }
         $sentencia->close();
@@ -263,7 +263,7 @@ class Asignatura_dao implements iDAO{
         {
             $asignaturas[] = new Asignatura($r["id"], $r["id_carrera"], $r["itinerario"], $r["nombre"],
                                             $r["abreviatura"], $r["curso"], $r["id_departamento"],
-                                            $r["id_departamento_dos"], $r["creditos"]);
+                                            $r["id_departamento_dos"], $r["creditos"], $r['docentes']);
         }
         $sentencia->close();
         $conn->close();
@@ -342,6 +342,36 @@ class Asignatura_dao implements iDAO{
         return $asignaturas;
     }
 
+    // Devuelve todas las asignaturas excepto las indicadas en $seleccion
+    public function listadoExcepto($seleccion = array()){
+        $conn = Connection::connect();
+
+        $stmt = "SELECT `asignaturas`.id, `asignaturas`.nombre, `carreras`.`nombre` as 'carrera'
+                 FROM `asignaturas`, `carreras`
+                 WHERE  `asignaturas`.`id_carrera` = `carreras`.`id`
+                 ORDER BY `carrera`, `nombre`;";       
+
+        if (!($sentencia = $conn->prepare($stmt))) {
+            echo "Falló la preparación: (" . $conn->errno . ") " . $conn->error;
+        }
+
+        $sentencia->execute();
+
+        $result = $sentencia->get_result();
+        
+        $sentencia->close();
+        $conn->close();
+
+        $asignaturas = array();
+
+        while($r = $result->fetch_assoc())
+        {
+            if(!in_array($r['id'], $seleccion))
+                $asignaturas[] = array('id' => $r["id"], 'nombre' => $r["nombre"], 'carrera' => $r["carrera"]);
+        }
+
+        return $asignaturas;
+    }
 
     // Filtrado para la gestión de Clases
     public function filtrarAsignaturas($facultad = -1, $carrera = -1, $itinerario = -1){

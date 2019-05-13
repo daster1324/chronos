@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 01-05-2019 a las 13:20:00
+-- Tiempo de generación: 12-05-2019 a las 17:29:22
 -- Versión del servidor: 10.1.37-MariaDB
 -- Versión de PHP: 7.0.33
 
@@ -30,7 +30,6 @@ USE `chronos`;
 -- Estructura de tabla para la tabla `asignaturas`
 --
 
-DROP TABLE IF EXISTS `asignaturas`;
 CREATE TABLE `asignaturas` (
   `id` int(10) NOT NULL,
   `id_carrera` int(2) NOT NULL,
@@ -40,16 +39,9 @@ CREATE TABLE `asignaturas` (
   `curso` varchar(1) COLLATE utf8_spanish2_ci NOT NULL,
   `id_departamento` int(2) NOT NULL,
   `id_departamento_dos` int(2) DEFAULT NULL,
-  `creditos` int(2) NOT NULL
+  `creditos` decimal(3,1) NOT NULL DEFAULT '0.0',
+  `docentes` int(2) NOT NULL DEFAULT '0'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish2_ci;
-
---
--- Volcado de datos para la tabla `asignaturas`
---
-
-INSERT INTO `asignaturas` (`id`, `id_carrera`, `itinerario`, `nombre`, `abreviatura`, `curso`, `id_departamento`, `id_departamento_dos`, `creditos`) VALUES
-(1, 1, NULL, 'Fundamentos de la Programación', 'FP', '1', 1, NULL, 12),
-(2, 1, 2, 'Redes y Seguridad', 'RyS', '3', 2, 1, 9);
 
 -- --------------------------------------------------------
 
@@ -57,7 +49,6 @@ INSERT INTO `asignaturas` (`id`, `id_carrera`, `itinerario`, `nombre`, `abreviat
 -- Estructura de tabla para la tabla `carreras`
 --
 
-DROP TABLE IF EXISTS `carreras`;
 CREATE TABLE `carreras` (
   `id` int(2) NOT NULL,
   `nombre` varchar(150) COLLATE utf8_spanish2_ci NOT NULL,
@@ -65,39 +56,20 @@ CREATE TABLE `carreras` (
   `id_facultad_dg` int(2) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish2_ci;
 
---
--- Volcado de datos para la tabla `carreras`
---
-
-INSERT INTO `carreras` (`id`, `nombre`, `id_facultad`, `id_facultad_dg`) VALUES
-(1, 'Ingeniería Informática', 1, NULL),
-(2, 'Ingeniería del Software', 1, NULL),
-(3, 'Ingeniería de Computadores', 1, NULL);
-
 -- --------------------------------------------------------
 
 --
 -- Estructura de tabla para la tabla `clases`
 --
 
-DROP TABLE IF EXISTS `clases`;
 CREATE TABLE `clases` (
   `id` bigint(15) NOT NULL,
   `id_asignatura` int(10) NOT NULL,
   `cuatrimestre` int(1) NOT NULL,
   `dia` varchar(1) COLLATE utf8_spanish2_ci NOT NULL,
   `hora` int(2) NOT NULL,
-  `grupo` varchar(10) COLLATE utf8_spanish2_ci NOT NULL,
-  `edificio` int(1) NOT NULL
+  `grupo` varchar(10) COLLATE utf8_spanish2_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish2_ci;
-
---
--- Volcado de datos para la tabla `clases`
---
-
-INSERT INTO `clases` (`id`, `id_asignatura`, `cuatrimestre`, `dia`, `hora`, `grupo`, `edificio`) VALUES
-(1, 3, 2, 'j', 0, 'b', 2),
-(2, 2, 1, 'm', 6, 'a', 1);
 
 -- --------------------------------------------------------
 
@@ -105,20 +77,27 @@ INSERT INTO `clases` (`id`, `id_asignatura`, `cuatrimestre`, `dia`, `hora`, `gru
 -- Estructura de tabla para la tabla `departamentos`
 --
 
-DROP TABLE IF EXISTS `departamentos`;
 CREATE TABLE `departamentos` (
   `id` int(2) NOT NULL,
   `nombre` varchar(100) COLLATE utf8_spanish2_ci NOT NULL,
   `id_facultad` int(2) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish2_ci;
 
+-- --------------------------------------------------------
+
 --
--- Volcado de datos para la tabla `departamentos`
+-- Estructura de tabla para la tabla `docentes`
 --
 
-INSERT INTO `departamentos` (`id`, `nombre`, `id_facultad`) VALUES
-(1, 'Álgebra', 2),
-(2, 'ISIA', 1);
+CREATE TABLE `docentes` (
+  `id` int(4) NOT NULL,
+  `usuario` varchar(32) COLLATE utf8_spanish2_ci NOT NULL,
+  `pass` varchar(64) COLLATE utf8_spanish2_ci NOT NULL,
+  `nombre` varchar(64) COLLATE utf8_spanish2_ci NOT NULL,
+  `departamento` int(2) NOT NULL,
+  `preferencias` varchar(100) COLLATE utf8_spanish2_ci DEFAULT NULL,
+  `orden` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish2_ci;
 
 -- --------------------------------------------------------
 
@@ -126,20 +105,23 @@ INSERT INTO `departamentos` (`id`, `nombre`, `id_facultad`) VALUES
 -- Estructura de tabla para la tabla `facultades`
 --
 
-DROP TABLE IF EXISTS `facultades`;
 CREATE TABLE `facultades` (
   `id` int(2) NOT NULL,
   `nombre` varchar(100) COLLATE utf8_spanish2_ci NOT NULL,
   `campus` varchar(100) COLLATE utf8_spanish2_ci DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish2_ci;
 
+-- --------------------------------------------------------
+
 --
--- Volcado de datos para la tabla `facultades`
+-- Estructura de tabla para la tabla `gestores`
 --
 
-INSERT INTO `facultades` (`id`, `nombre`, `campus`) VALUES
-(1, '1', 'Moncola'),
-(2, '2', 'Somosaguas');
+CREATE TABLE `gestores` (
+  `id` int(2) NOT NULL,
+  `usuario` varchar(32) COLLATE utf8_spanish2_ci NOT NULL,
+  `pass` varchar(64) COLLATE utf8_spanish2_ci NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish2_ci;
 
 -- --------------------------------------------------------
 
@@ -147,22 +129,11 @@ INSERT INTO `facultades` (`id`, `nombre`, `campus`) VALUES
 -- Estructura de tabla para la tabla `itinerarios`
 --
 
-DROP TABLE IF EXISTS `itinerarios`;
 CREATE TABLE `itinerarios` (
   `id` int(2) NOT NULL,
   `id_carrera` int(2) NOT NULL,
   `nombre` varchar(150) COLLATE utf8_spanish2_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish2_ci;
-
---
--- Volcado de datos para la tabla `itinerarios`
---
-
-INSERT INTO `itinerarios` (`id`, `id_carrera`, `nombre`) VALUES
-(1, 1, 'Computación'),
-(2, 1, 'Tecnología de la Información'),
-(3, 2, 'Itinerario Único'),
-(4, 3, 'Itinerario Único');
 
 --
 -- Índices para tablas volcadas
@@ -200,9 +171,23 @@ ALTER TABLE `departamentos`
   ADD KEY `id_facultad` (`id_facultad`);
 
 --
+-- Indices de la tabla `docentes`
+--
+ALTER TABLE `docentes`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `usuario` (`usuario`),
+  ADD KEY `departamento` (`departamento`);
+
+--
 -- Indices de la tabla `facultades`
 --
 ALTER TABLE `facultades`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indices de la tabla `gestores`
+--
+ALTER TABLE `gestores`
   ADD PRIMARY KEY (`id`);
 
 --
@@ -220,31 +205,84 @@ ALTER TABLE `itinerarios`
 -- AUTO_INCREMENT de la tabla `carreras`
 --
 ALTER TABLE `carreras`
-  MODIFY `id` int(2) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(2) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `clases`
 --
 ALTER TABLE `clases`
-  MODIFY `id` bigint(15) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` bigint(15) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `departamentos`
 --
 ALTER TABLE `departamentos`
-  MODIFY `id` int(2) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(2) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT de la tabla `docentes`
+--
+ALTER TABLE `docentes`
+  MODIFY `id` int(4) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `facultades`
 --
 ALTER TABLE `facultades`
-  MODIFY `id` int(2) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(2) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT de la tabla `gestores`
+--
+ALTER TABLE `gestores`
+  MODIFY `id` int(2) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `itinerarios`
 --
 ALTER TABLE `itinerarios`
-  MODIFY `id` int(2) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(2) NOT NULL AUTO_INCREMENT;
+
+--
+-- Restricciones para tablas volcadas
+--
+
+--
+-- Filtros para la tabla `asignaturas`
+--
+ALTER TABLE `asignaturas`
+  ADD CONSTRAINT `fk_carreras_asignaturas` FOREIGN KEY (`id_carrera`) REFERENCES `carreras` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fk_itinerarios_asignaturas` FOREIGN KEY (`itinerario`) REFERENCES `carreras` (`id`) ON DELETE CASCADE;
+
+--
+-- Filtros para la tabla `carreras`
+--
+ALTER TABLE `carreras`
+  ADD CONSTRAINT `fk_facultades_carreras` FOREIGN KEY (`id_facultad`) REFERENCES `facultades` (`id`) ON DELETE CASCADE;
+
+--
+-- Filtros para la tabla `clases`
+--
+ALTER TABLE `clases`
+  ADD CONSTRAINT `fk_asignaturas_clases` FOREIGN KEY (`id_asignatura`) REFERENCES `asignaturas` (`id`) ON DELETE CASCADE;
+
+--
+-- Filtros para la tabla `departamentos`
+--
+ALTER TABLE `departamentos`
+  ADD CONSTRAINT `fk_departamento_docente` FOREIGN KEY (`id_facultad`) REFERENCES `facultades` (`id`) ON DELETE CASCADE;
+
+--
+-- Filtros para la tabla `docentes`
+--
+ALTER TABLE `docentes`
+  ADD CONSTRAINT `fk_departamento_docentes` FOREIGN KEY (`departamento`) REFERENCES `departamentos` (`id`) ON DELETE CASCADE;
+
+--
+-- Filtros para la tabla `itinerarios`
+--
+ALTER TABLE `itinerarios`
+  ADD CONSTRAINT `fk_carreras_itinerarios` FOREIGN KEY (`id_carrera`) REFERENCES `carreras` (`id`) ON DELETE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

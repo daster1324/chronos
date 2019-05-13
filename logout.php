@@ -13,4 +13,15 @@ if (ini_get("session.use_cookies")) {
 }
 
 session_destroy();
-header("Location: /gestion");
+
+switch ($_GET['redirect']) {
+    case 'gestion':
+    case 'docentes':
+    $destino = $_GET['redirect'];
+        break;
+    
+    default:
+    $destino = "";
+        break;
+}
+header("Location: /".$destino);

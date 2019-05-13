@@ -1,29 +1,36 @@
 <?php
 
+function plugin_informatica($fichero, $destino){
+    include('loaders/informatica.php');
+    echo test_informatica();
+    if($destino == 'horario'){
+        importar_horario_informatica($fichero);
+    }
+    else{
+        importar_horario_docencia($fichero);
+    }
+}
 
-/**
- *  Datos a tener en cuenta
- * 
- *  - Optativas del Itinerario de Computación
- *  --  Fundamentos de los Lenguajes Informáticos (FLI)
- *  --  Programación Concurrente (PC)
- *  --  Programación Declarativa (PD)
- *  --  Métodos Algorítmicos en Resolución de Problemas (MAR)
- *  --  Inteligencia Artificial (IA)
- *  --  Procesadores de Lenguajes (PL)
- *  --  Desarrollo de Sistemas Interactivos (detección manual) (DSI)
- * 
- *  - Optativas del Itinerario de Información
- *  --  Software Corporativo (SC)
- *  --  Aplicaciones Web (AW)
- *  --  Ampliación de Bases de Datos (ABD)
- *  --  Auditoría Informática (AI)
- *  --  Redes y Seguridad (RyS)
- *  --  Desarrollo de Sistemas Interactivos (detección manual) (DSI)
- *  --  Evaluación de Configuraciones (ECO)
- * 
- */
 
+function load_horario($facultad, $fichero){
+    switch ($facultad) {
+        case '1': // Informática
+            plugin_informatica($fichero, 'horario');
+        break;
+        
+        default: break;
+    }
+}
+
+function load_docencia($facultad, $fichero){
+    switch ($facultad) {
+        case '1': // Informática
+            plugin_informatica($fichero, 'docencia');
+        break;
+        
+        default: break;
+    }
+}
 
 
 
