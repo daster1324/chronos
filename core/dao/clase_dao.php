@@ -77,7 +77,7 @@ class Clase_dao implements iDAO{
 
         while($r = $result->fetch_assoc())
         {
-            $clases[] = new Clase($r["id"], $r["id_asignatura"], $r["carrera"], $r["cuatrimestre"], $r["dia"],
+            $clases[] = new Clase($r["id"], $r["id_asignatura"], $r["id_carrera"], $r["cuatrimestre"], $r["dia"],
             $r["hora"], $r["grupo"]);
         }
 
