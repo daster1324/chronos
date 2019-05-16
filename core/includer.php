@@ -9,6 +9,8 @@ require("clase.php");
 require("departamento.php");
 require("facultad.php");
 require("itinerario.php");
+require("docente.php");
+require("gestor.php");
 
 // Conector a la BD
 require("connection.php");
@@ -21,8 +23,10 @@ require("dao/clase_dao.php");
 require("dao/departamento_dao.php");
 require("dao/facultad_dao.php");
 require("dao/itinerario_dao.php");
-// Vistas
+require("dao/docente_dao.php");
+require("dao/gestor_dao.php");
 
-// Auxiliares
+// Loader
+require("loader.php");
 
 ?>
