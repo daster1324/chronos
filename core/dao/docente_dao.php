@@ -38,7 +38,7 @@ class Docente_dao implements iDAO{
 
         $r = $result->fetch_assoc();
                     
-        $docente = new Docente($r['id'], $r['nombre'], $r['departamento'], $r['preferencias'], $r['orden'], $r['usuario']);
+        $docente = new Docente($r['id'], $r['nombre'], $r['departamento'], $r['email'], $r['preferencias'], $r['orden'], $r['usuario'], $r['pass']);
 
         $sentencia->close();
         $conn->close();
@@ -66,7 +66,7 @@ class Docente_dao implements iDAO{
 
         $r = $result->fetch_assoc();
                     
-        $docente = new Docente($r['id'], $r['nombre'], $r['departamento'], $r['preferencias'], $r['orden'], $r['usuario'], $r['pass']);
+        $docente = new Docente($r['id'], $r['nombre'], $r['departamento'], $r['email'], $r['preferencias'], $r['orden'], $r['usuario'], $r['pass']);
 
         $sentencia->close();
         $conn->close();
@@ -80,7 +80,7 @@ class Docente_dao implements iDAO{
 
         $ddao = new Departamento_dao();
 
-        $stmt = "SELECT id, nombre, departamento, usuario, orden FROM `docentes` WHERE `id` = ?;";       
+        $stmt = "SELECT id, nombre, departamento, usuario, orden, email FROM `docentes` WHERE `id` = ?;";       
 
         if (!($sentencia = $conn->prepare($stmt))) {
             echo "Falló la preparación: (" . $conn->errno . ") " . $conn->error;
@@ -102,7 +102,7 @@ class Docente_dao implements iDAO{
         while($r = $result->fetch_assoc())
         {
             $facultad = $ddao->getById($r['departamento'])->getId_facultad();
-            $docentes = array('id' => $r['id'], 'nombre' => $r['nombre'], 'facultad' => $facultad,  'departamento' => $r['departamento'], 'usuario' => $r['usuario'], 'orden' => $r['orden']);
+            $docentes = array('id' => $r['id'], 'nombre' => $r['nombre'], 'facultad' => $facultad, 'email' => $r['email'], 'departamento' => $r['departamento'], 'usuario' => $r['usuario'], 'orden' => $r['orden']);
         }
 
         unset($ddao);
@@ -134,7 +134,7 @@ class Docente_dao implements iDAO{
 
         $r = $result->fetch_assoc();
 
-        $docente = new Docente($r['id'], $r['nombre'], $r['departamento']);
+        $docente = new Docente($r['id'], $r['nombre'], $r['departamento'], $r['email']);
 
         return $docente;
     }
@@ -158,6 +158,7 @@ class Docente_dao implements iDAO{
         $orden = $d->getOrden();
         $usuario  = $d->getUsuario();
         $pass  = $d->getPassword();
+        $email = $d->getEmail();
 
         if($actualizar){
             $pass = ($docente->getPassword() == $pass || $pass == "")  ? $docente->getPassword() : $pass;
@@ -188,10 +189,10 @@ class Docente_dao implements iDAO{
             $preferencias  = $d->getPreferencias();
             $orden = $d->getOrden();            
 
-            if (!($sentencia = $conn->prepare("INSERT INTO `docentes` (`id`, `usuario`, `pass`, `nombre`, `departamento`, `preferencias`, `orden`) VALUES (?, ?, ?, ?, ?, ?, ?);"))) {
+            if (!($sentencia = $conn->prepare("INSERT INTO `docentes` (`id`, `usuario`, `pass`, `nombre`, `email`, `departamento`, `preferencias`, `orden`) VALUES (?, ?, ?, ?, ?, ?, ?, ?);"))) {
                 echo "Falló la preparación: (" . $conn->errno . ") " . $conn->error;
             }
-            if (!$sentencia->bind_param("isssisi", $id, $usuario, $pass, $nombre, $departamento, $preferencias, $orden)) {
+            if (!$sentencia->bind_param("issssisi", $id, $usuario, $pass, $nombre, $email, $departamento, $preferencias, $orden)) {
                 echo "Falló la vinculación de parámetros: (" . $sentencia->errno . ") " . $sentencia->error;
             }
             $sentencia->execute();

@@ -51,6 +51,36 @@ class Asignatura_dao implements iDAO{
         return $asignatura;
     }
 
+    public function getByIdCarrera($id, $id_carrera){        
+        $conn = Connection::connect();
+    
+        if (!($sentencia = $conn->prepare("SELECT * FROM `asignaturas` WHERE id = ? AND id_carrera = ?;"))) {
+            echo "Falló la preparación: (" . $conn->errno . ") " . $conn->error;
+        }
+
+        if (!$sentencia->bind_param("ii", $id, $id_carrera)) {
+            echo "Falló la vinculación de parámetros: (" . $sentencia->errno . ") " . $sentencia->error;
+        }
+
+        $sentencia->execute();
+
+        $result = $sentencia->get_result();
+
+        if($result->num_rows === 0)
+            return NULL;
+
+        $r = $result->fetch_assoc();
+
+        $asignatura = new Asignatura($r["id"], $r["id_carrera"], $r["itinerario"], $r["nombre"],
+        $r["abreviatura"], $r["curso"], $r["id_departamento"],
+        $r["id_departamento_dos"], $r["creditos"], $r["docentes"]);
+
+        $sentencia->close();
+        $conn->close();
+
+        return $asignatura;
+    }
+
     /**
      * Devuelve un array con las asignaturas del curso indicado en la carrera indicada y que no estén en el listado de seleccionadas.
      * Devuelve NULL si no hay ninguna asignatura con ese $id 
@@ -106,7 +136,7 @@ class Asignatura_dao implements iDAO{
     public function getByCarreraCursoItinerario($carrera, $curso, $itinerario){
         $conn = Connection::connect();
 
-        $stmt = "SELECT * FROM `asignaturas` WHERE id_carrera = ? AND curso = ? AND (itinerario IS NULL or itinerario = ?);";       
+        $stmt = "SELECT * FROM `asignaturas` WHERE id_carrera = ? AND curso = ? AND (itinerario IS NULL or itinerario = ?) ORDER BY nombre;";       
 
         if (!($sentencia = $conn->prepare($stmt))) {
             echo "Falló la preparación: (" . $conn->errno . ") " . $conn->error;
@@ -177,7 +207,7 @@ class Asignatura_dao implements iDAO{
     public function store($a){
         $conn = Connection::connect();
 
-        $actualizar = ($this->getById($a->getId()) != NULL);
+        $actualizar = ($this->getByIdCarrera($a->getId(), $a->getId_carrera()) != NULL);
 
         $id = $a->getId();
         $id_carrera = $a->getId_carrera();
@@ -512,7 +542,7 @@ class Asignatura_dao implements iDAO{
     public function calcula_creditos(){
         $conn = Connection::connect();
 
-        $stmt = "SELECT `id_asignatura`, `grupo`, count(*) as 'bloques' FROM `clases`  GROUP BY `id_asignatura`, `grupo` ORDER BY `id_asignatura`;";       
+        $stmt = "SELECT `id_asignatura`, `id_carrera` `grupo`, count(*) as 'bloques' FROM `clases`  GROUP BY `id_asignatura`, `id_carrera`, `grupo` ORDER BY `id_asignatura`;";       
 
         if (!($sentencia = $conn->prepare($stmt))) {
             echo "Falló la preparación: (" . $conn->errno . ") " . $conn->error;

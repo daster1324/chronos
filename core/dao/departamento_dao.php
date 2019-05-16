@@ -201,6 +201,7 @@ class Departamento_dao implements iDAO{
         $id  = $d->getId();
         $nombre  = $d->getNombre();
         $id_facultad  = $d->getid_facultad();
+        $siglas = $d->getSiglas();
 
         if($actualizar){
             if (!($sentencia = $conn->prepare("UPDATE `departamentos` SET `nombre` = ?, `id_facultad` = ? WHERE `id` = ?;"))) {
@@ -214,10 +215,10 @@ class Departamento_dao implements iDAO{
             $conn->close();
         }
         else{
-            if (!($sentencia = $conn->prepare("INSERT INTO `departamentos` (`id`, `nombre`, `id_facultad`) VALUES (?, ?, ?);"))) {
+            if (!($sentencia = $conn->prepare("INSERT INTO `departamentos` (`id`, `nombre`, `id_facultad`, `siglas`) VALUES (?, ?, ?, ?);"))) {
                 echo "Falló la preparación: (" . $conn->errno . ") " . $conn->error;
             }
-            if (!$sentencia->bind_param("isi", $id, $nombre, $id_facultad)) {
+            if (!$sentencia->bind_param("isis", $id, $nombre, $id_facultad, $siglas)) {
                 echo "Falló la vinculación de parámetros: (" . $sentencia->errno . ") " . $sentencia->error;
             }
             $sentencia->execute();

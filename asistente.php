@@ -48,9 +48,6 @@
                 <div class="action-button">
                 <button data-toggle="modal" data-target="#procesar-horario" type="button" class="btn btn-secondary">Procesar horario</button>
                 </div>
-                <!--div class="action-button">
-                    <button onclick="exportar()" type="button" class="btn btn-secondary">Exportar</button>
-                </div-->
 
                 <div class="w-100 mt-3 mb-2 text-center">Asignaturas seleccionadas <i class="fas fa-exclamation-circle" data-container="body" data-toggle="popover" data-placement="right" data-content="El orden de esta lista indica la prioridad. Intentaremos crearte el horario tomando primero las asignaturas de más arriba."></i></div>
 
@@ -75,11 +72,6 @@
 
                     <!-- Semana -->
                     <div id="semana">
-                    <?php 
-                        //TODO: Mirar si la carrera tiene las clases a en punto o a y media y mostrar las horas acordes
-                        //      Mostrar todas las posibles horas es bastante ineficiente. En pantallas 720p, fuerza scroll por falta de sitio.
-                        //      En los doble grados sí que es posible que hiciera falta mostrar todas las horas.
-                    ?>
                         <!-- horas -->
                             <div id="horas">
                                 <div class="bg-secondary font-weight-bold cabecera hora"><span>Hora</span></div>
@@ -279,9 +271,9 @@
                 <form id="form-add-asignatura">
                     <p>Dinos que franja de horas es la que más se adapta a tu disponibilidad</p>
                     <select class="custom-select text-dark mb-4" name="disponibilidad" id="selector-disponibilidad">
-                        <option value="completa" selected>Completa (9:00 ~ 20:00)</option>
-                        <option value="mañanas">Mañanas (9:00 ~ 14:00)</option>
-                        <option value="tardes">Tardes (15:00 ~ 20:00)</option>
+                        <option value="allday" selected>Completa (9:00 ~ 20:00)</option>
+                        <option value="morning">Mañanas (9:00 ~ 14:00)</option>
+                        <option value="afternoon">Tardes (15:00 ~ 20:00)</option>
                     </select>
                 </form>
             </div>

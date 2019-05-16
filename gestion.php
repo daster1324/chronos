@@ -83,12 +83,13 @@
 
                         $nombre = $_POST['nombre-departamento'];
                         $facultad = $_POST['facultad'];
+                        $siglas = $_POST['siglas-departamento'];
 
                         $existe = $ddao->busca($nombre, $facultad);
                         $mensaje = 1;
 
                         if(!$existe){
-                            $ddao->store(new Departamento(NULL, $nombre, $facultad));
+                            $ddao->store(new Departamento(NULL, $nombre, $facultad, $siglas));
                         }
                         else{
                             $mensaje = 4;
@@ -130,12 +131,13 @@
                 
                 case 'clase':
                     $gea = $_POST['asignatura'];
+                    $carrera = $_POST['carrera'];
                     $cuatrimestre = $_POST['cuatrimestre'];
                     $grupo = $_POST['grupo'];
                     $horario = $_POST['horario'];
 
                     $cldao = new Clase_dao();
-                    $existe = $cldao->getById($gea);
+                    $existe = $cldao->getById($gea, $carrera);
                     $mensaje = 1;
 
                     if($existe == NULL){
@@ -155,6 +157,7 @@
                     $departamento = $_POST['departamento'];
                     $nombre = $_POST['nombre-docente'];
                     $usuario = $_POST['usuario-docente'];
+                    $email = $_POST['email-docente'];
                     $pass = $usuario . SALT . $_POST['password-docente'];
                     $pass = hash("sha256", $pass);
 
@@ -164,7 +167,7 @@
                     $mensaje = 1;
 
                     if($existe == NULL){
-                        $dodao->store(new Docente(NULL, $nombre, $departamento, "", 0, $usuario, $pass));
+                        $dodao->store(new Docente(NULL, $nombre, $departamento, $email, "", 0, $usuario, $pass));
                     }
                     else{
                         $mensaje = 4;
@@ -230,9 +233,10 @@
                         $id = $_POST['id-departamento'];
                         $nombre = $_POST['nombre-departamento'];
                         $id_facultad = $_POST['facultad'];
+                        $siglas = $_POST['siglas-departamento'];
 
                         $ddao = new Departamento_dao();
-                        $ddao->store(new Departamento($id, $nombre, $id_facultad));
+                        $ddao->store(new Departamento($id, $nombre, $id_facultad, $store));
                         
                         unset($ddao);
                         header("HTTP/1.1 301 Moved Permanently"); 
@@ -265,10 +269,10 @@
                     $nombre = $_POST['nombre-docente'];
                     $departamento = $_POST['departamento'];
                     $pass = ($_POST['password-docente'] == "¿Te crees hacker o qué?") ? NULL : hash("sha256", $_POST['user-docente'] . SALT . $_POST['password-docente']);
-                    $orden = $_POST['orden'];
+                    $orden = (isset($_POST['orden'])) ? $_POST['orden'] : 0;
 
                     $dodao = new Docente_dao();
-                    $dodao->store(new Docente($id, $nombre, $departamento, "", 0, "", $pass, $orden));
+                    $dodao->store(new Docente($id, $nombre, $departamento, "", "", 0, "", $pass, $orden));
 
                     unset($dodao);
                     header("HTTP/1.1 301 Moved Permanently"); 
@@ -824,6 +828,10 @@
                         <label for="nombre-departamento" class="my-1">Nombre del departamento</label>
                         <input type="text" class="form-control" name="nombre-departamento" id="nombre-departamento" placeholder="Nombre" required>
                     </div>
+                    <div class="form-group my-1">
+                        <label for="siglas-departamento" class="my-1">Siglas del departamento</label>
+                        <input type="text" class="form-control" name="siglas-departamento" id="siglas-departamento" placeholder="Siglas" required>
+                    </div>
                     <input type="hidden" name="page" value="departamento">
                     <input type="hidden" id="id-departamento" name="id-departamento" value="0">
                     <input type="hidden" id="accion-departamento" name="accion" value="add">
@@ -1128,7 +1136,7 @@
                             <!-- Selector Facultad -->
                                 <div id="container-selector-facultad">
                                     <label for="selector-facultad" class="my-1">Facultad*</label>
-                                    <select id="selector-facultad" name="facultad" class="custom-select text-dark">
+                                    <select id="selector-facultad" name="facultad" class="custom-select text-dark" required>
                                         <option disabled="disabled" selected="selected" value="">Selecciona una facultad</option>
                                         <?php
                                             foreach ($facultades as $facultad) {
@@ -1141,7 +1149,7 @@
                             <!-- Selector Carrera -->
                                 <div id="container-selector-carrera">
                                     <label for="selector-carrera" class="my-1">Carrera*</label>
-                                    <select id="selector-carrera" name="carrera" class="custom-select text-dark" disabled>
+                                    <select id="selector-carrera" name="carrera" class="custom-select text-dark" disabled required>
                                         <option disabled="disabled" selected="selected" value="">Selecciona una carrera</option>
                                     </select>
                                 </div>
@@ -1158,7 +1166,7 @@
                             <div class="row align-items-end mr-0">
                                 <!-- Selector Cuatrimestre -->
                                     <div class="form-group col-md my-1">
-                                        <label for="selector-cuatrimestre" class="my-1">Cuatrimestre</label>
+                                        <label for="selector-cuatrimestre" class="my-1">Cuatrimestre*</label>
                                         <select id="selector-cuatrimestre" name="cuatrimestre" class="custom-select text-dark" required>
                                             <option disabled="disabled" selected="selected" value="">Selecciona un cuatrimestre</option>
                                             <option value="1">1º</option>
@@ -1169,7 +1177,7 @@
 
                                 <!-- Grupo -->
                                     <div class="form-group my-1">
-                                        <label for="add-clase-grupo" class="my-1">Grupo</label>
+                                        <label for="add-clase-grupo" class="my-1">Grupo*</label>
                                         <input type="text" maxlength="1" class="form-control" name="grupo" id="add-clase-grupo" placeholder="A" pattern="[A-Za-z]" required>
                                     </div>
                                 <!-- /Grupo -->
@@ -1404,6 +1412,12 @@
                             <input type="number" min="0" class="form-control" name="orden-docente" id="orden-docente" placeholder="Orden" required>
                         </div>
                     <!-- /Orden Docente -->
+                    <!-- Email Docente -->
+                    <div class="form-group my-1">
+                        <label for="email-docente">Email docente</label>
+                        <input type="email" class="form-control" id="email-docente" name="email-docente" placeholder="nombre@ejemplo.com">
+                    </div>
+                    <!-- /Email Docente -->
                     <!-- Usuario Docente -->
                         <div class="form-group my-1">
                             <label for="usuario-docente" class="my-1">Usuario</label>

@@ -238,6 +238,7 @@ function editar_departamento(id){
                     $('#accion-title').text('Editar departamento');
                     $("#selector-facultad").val(data.id_facultad);
                     $('#nombre-departamento').val(data.nombre);
+                    $('#siglas-departamento').val(data.siglas);
                     $('#id-departamento').val(data.id);
                     $('#accion-departamento').val('edit');
                     $('#submit-departamento').text('Guardar cambios');
@@ -257,6 +258,7 @@ function cancelar_editar_departamento(){
     $('#accion-title').text('Añadir departamento');
     $('#selector-facultad').val('');
     $('#nombre-departamento').val('');
+    $('#siglas-departamento').val('');
     $('#id-departamento').val(0);
     $('#accion-departamento').val('add');
     $('#submit-departamento').text('Añadir');
@@ -967,6 +969,7 @@ function editar_docente(id){
                     $('#id-docente').val(data.id);
 
                     $('#nombre-docente').val(data.nombre);
+                    $('#email-docente').val(data.email);
 
                     $('#orden-docente').val(data.orden);
 
@@ -1002,9 +1005,11 @@ function cancelar_editar_docente(){
     $('#id-docente').val(0);
 
     $('#nombre-docente').val('');
+    $('#email-docente').val('');
 
     $('#usuario-docente').val('');
     $('#user-docente').val('');
+    $('#usuario-docente').prop( "disabled", false );
     
     $('#password-docente').val('');
 

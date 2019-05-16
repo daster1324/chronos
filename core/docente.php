@@ -6,14 +6,16 @@ class Docente implements JsonSerializable {
     private $usuario;       // String 32 chars   - Obligatorio
     private $departamento;  // Integer 3 digitos - Obligatorio
     private $nombre;        // String 64 chars   - Obligatorio
+    private $email;         // String 254 chars  - Obligatorio
     private $preferencias;  // String 100 chars  - Opcional
     private $orden;         // Integer 2 digitos - Opcional
     private $pass;          // String 64 chars   - Obligatorio
 
-    public function __construct($id, $nombre, $departamento, $preferencias = "", $orden = 0, $usuario = "", $pass = ""){
+    public function __construct($id, $nombre, $departamento, $email = "", $preferencias = "", $orden = 0, $usuario = "", $pass = ""){
         $this->id = $id;
         $this->usuario = $usuario;
         $this->nombre = $nombre;
+        $this->email = $email;
         $this->departamento = $departamento;
         $this->preferencias = $preferencias;
         $this->orden = $orden;
@@ -33,6 +35,10 @@ class Docente implements JsonSerializable {
 
     public function getNombre(){
         return $this->nombre;
+    }
+
+    public function getEmail(){
+        return $this->email;
     }
 
     public function getDepartamento(){
@@ -66,6 +72,10 @@ class Docente implements JsonSerializable {
         $this->nombre = $nombre;
     }
 
+    public function setEmail($email){
+        $this->email = $email;
+    }
+
     public function setDepartamento($departamento){
         $this->departamento = $departamento;
     }
@@ -88,11 +98,12 @@ class Docente implements JsonSerializable {
     public function jsonSerialize() {
         return [
             'id' => $this->id,
-            'usuario' => $this->usuario,
-            'nombre' => $this->nombre,
-            'departamento' => $this->departamento,
-            'preferencias' => $this->preferencias,
-            'orden' => $this->orden
+            'usuario'       => $this->usuario,
+            'nombre'        => $this->nombre,
+            'email'         => $this->email,
+            'departamento'  => $this->departamento,
+            'preferencias'  => $this->preferencias,
+            'orden'         => $this->orden
         ];
     }
 }
