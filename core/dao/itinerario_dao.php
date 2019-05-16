@@ -80,10 +80,10 @@ class Itinerario_dao implements iDAO{
         return $itinerarios;
     }
 
-    public function busca($nombre, $id_carrera){
+    public function busca($nombre, $id_carrera, &$id){
         $conn = Connection::connect();
 
-        if (!($sentencia = $conn->prepare("SELECT * FROM `itinerarios` WHERE nombre = ? AND id_carrera = ?;"))) {
+        if (!($sentencia = $conn->prepare("SELECT * FROM `itinerarios` WHERE nombre LIKE ? AND id_carrera = ?;"))) {
             echo "Falló la preparación: (" . $conn->errno . ") " . $conn->error;
         }
 
@@ -98,8 +98,15 @@ class Itinerario_dao implements iDAO{
         $sentencia->close();
         $conn->close();
 
-        if($result->num_rows === 0)
+        if($result->num_rows === 0){
+            $id = NULL;
             return false;
+        }
+            
+
+        $r = $result->fetch_assoc();
+
+        $id = $r['id'];
 
         return true;
     }

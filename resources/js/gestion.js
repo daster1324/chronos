@@ -605,7 +605,7 @@ function addClase(dia){
     let dura_txt = $('#duracion-' + dia + ' option:selected').text();
 
     if(inicio_val == "" || dura_val == "" || inicio_val == null || dura_val == null || inicio_val == undefined || dura_val == undefined){
-        alert("Selecciones 'Hora de Inicio' y 'Duración'")
+        alert("Selecciona 'Hora de Inicio' y 'Duración'")
         return;
     }
 
@@ -935,7 +935,7 @@ function docente_editar_departamento(facultad, seleccion = null){
                 }
             },
             error: function( jqXhr, textStatus, errorThrown ){
-                alert('');
+                alert('Error');
             }
         });
     }

@@ -44,6 +44,32 @@ class Carrera_dao implements iDAO{
         return $carrera;
     }
 
+    public function getIdByName($name){
+        $conn = Connection::connect();
+
+        if (!($sentencia = $conn->prepare("SELECT * FROM `carreras` WHERE nombre = ?;"))) {
+            echo "Falló la preparación: (" . $conn->errno . ") " . $conn->error;
+        }
+
+        if (!$sentencia->bind_param("s", $name)) {
+            echo "Falló la vinculación de parámetros: (" . $sentencia->errno . ") " . $sentencia->error;
+        }
+
+        $sentencia->execute();
+        $result = $sentencia->get_result();
+
+        $sentencia->close();
+        $conn->close();
+
+
+        if($result->num_rows === 0)
+            return NULL;
+
+        $r = $result->fetch_assoc();
+
+        return $r["id"];
+    }
+
     /**
      * Devuelve un objeto con los datos de todas las carreras.
      * Devuelve NULL si no hay ninguna carrera registrada 

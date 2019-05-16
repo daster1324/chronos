@@ -112,7 +112,6 @@ function curso_seleccionado(curso) {
             }
         },
         error: function( jqXhr, textStatus, errorThrown ){
-            $('body').html(jqXhr.responseText);
         }
     });
 }
@@ -160,7 +159,6 @@ function asignatura_seleccionada(idasignatura){
             }
         },
         error: function( jqXhr, textStatus, errorThrown ){
-            $('body').html(jqXhr.responseText);
         }
     });
     return false;
@@ -298,7 +296,6 @@ function addAsignatura(){
             }
         },
         error: function( jqXhr, textStatus, errorThrown ){
-            $('body').html(jqXhr.responseText);
         }
     });
     return false;

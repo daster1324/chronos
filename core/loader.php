@@ -3,11 +3,19 @@
 function plugin_informatica($fichero, $destino){
     include('loaders/informatica.php');
     echo test_informatica();
-    if($destino == 'horario'){
-        importar_horario_informatica($fichero);
-    }
-    else{
-        importar_horario_docencia($fichero);
+    try{
+        if($destino == 'horario'){
+            importar_horario_informatica($fichero);
+        }
+        else{
+            importar_horario_docencia($fichero);
+        }
+        header("HTTP/1.1 301 Moved Permanently"); 
+        header("Location: /gestion?gestionar=importar&message=1");
+    }catch (Exception $e) {
+        echo 'Excepción capturada: ',  $e->getMessage(), "\n";
+        header("HTTP/1.1 301 Moved Permanently"); 
+        header("Location: /gestion?gestionar=importar&message=2");
     }
 }
 

@@ -91,7 +91,7 @@ function busca_filtrado(next){
             }
         },
         error: function( jqXhr, textStatus, errorThrown ){
-            alert('petó');
+            alert('Error');
         }
     });
 }

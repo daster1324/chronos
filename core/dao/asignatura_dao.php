@@ -95,6 +95,49 @@ class Asignatura_dao implements iDAO{
         return $asignaturas;
     }
 
+    /**
+     * Devuelve un array con las asignaturas del curso indicado en la carrera indicada y que no estén en el listado de seleccionadas.
+     * Devuelve NULL si no hay ninguna asignatura con ese $id 
+     * 
+     * @param $carrera - id de la carrera
+     * @param $curso - curso en cuestion
+     * @param $itinerario - itinerario
+     */
+    public function getByCarreraCursoItinerario($carrera, $curso, $itinerario){
+        $conn = Connection::connect();
+
+        $stmt = "SELECT * FROM `asignaturas` WHERE id_carrera = ? AND curso = ? AND (itinerario IS NULL or itinerario = ?);";       
+
+        if (!($sentencia = $conn->prepare($stmt))) {
+            echo "Falló la preparación: (" . $conn->errno . ") " . $conn->error;
+        }
+
+        if (!$sentencia->bind_param("isi", $carrera, $curso, $itinerario)) {
+            echo "Falló la vinculación de parámetros: (" . $sentencia->errno . ") " . $sentencia->error;
+        }
+
+        $sentencia->execute();
+
+        $result = $sentencia->get_result();
+
+        $sentencia->close();
+        $conn->close();
+
+        if($result->num_rows === 0)
+            return NULL;
+
+        $asignaturas = array();
+
+        while($r = $result->fetch_assoc())
+        {
+            $asignaturas[] = new Asignatura($r["id"], $r["id_carrera"], $r["itinerario"], $r["nombre"],
+                                            $r["abreviatura"], $r["curso"], $r["id_departamento"],
+                                            $r["id_departamento_dos"], $r["creditos"], $r['docentes']);   
+        }
+
+        return $asignaturas;
+    }
+
     public function getListado(){
         $conn = Connection::connect();
 
@@ -464,6 +507,53 @@ class Asignatura_dao implements iDAO{
         }
 
         return $asignaturas;
+    }
+
+    public function calcula_creditos(){
+        $conn = Connection::connect();
+
+        $stmt = "SELECT `id_asignatura`, `grupo`, count(*) as 'bloques' FROM `clases`  GROUP BY `id_asignatura`, `grupo` ORDER BY `id_asignatura`;";       
+
+        if (!($sentencia = $conn->prepare($stmt))) {
+            echo "Falló la preparación: (" . $conn->errno . ") " . $conn->error;
+        }
+
+        $sentencia->execute();
+
+        $result = $sentencia->get_result();
+
+        $anterior = '';
+
+        while($r = $result->fetch_assoc())
+        {
+            if($anterior != $r['id_asignatura']){
+
+                switch ($r['bloques']) {
+                    case 6: $creditos = 4.5; break; 
+                    case 8: $creditos = 6; break;
+                    case 12: $creditos = 9; break;
+                    case 16: $creditos = 12; break;
+                    
+                    default: $creditos = 0; break;
+                }
+
+                $stmt = "UPDATE `asignaturas` SET `creditos`= ? WHERE `id` = ?;";
+
+                if (!($sentencia = $conn->prepare($stmt))) {
+                    echo "Falló la preparación: (" . $conn->errno . ") " . $conn->error;
+                }
+
+                if (!$sentencia->bind_param("di", $creditos, $r['id_asignatura'])) {
+                    echo "Falló la vinculación de parámetros: (" . $sentencia->errno . ") " . $sentencia->error;
+                }
+                $sentencia->execute();
+
+                $anterior = $r['id_asignatura'];
+            }
+        }
+
+        $sentencia->close();
+        $conn->close();
     }
 }
 

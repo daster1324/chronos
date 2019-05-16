@@ -1465,15 +1465,28 @@
 
     //TODO: Falta por hacer
     function show_importar(){
+        if(isset($_GET['message'])){
+            switch ($_GET['message']) {
+                case 1:
+                    echo '<div class="alert alert-success" role="alert">Fichero importado con éxito</div>';
+                break;
+
+                case 2:
+                echo '<div class="alert alert-danger" role="alert">Error al importar el fichero</div>';
+                break;
+
+                default: break;
+            }
+            unset($_GET['message']);
+        }
+
         if(isset($_POST['submit'])){
             if(!file_exists($_FILES['file']['tmp_name']) || !is_uploaded_file($_FILES['file']['tmp_name'])) {
                 ?>
                 <div class="alert alert-danger" role="alert">¡ERROR! ¡No se ha recibido ningún fichero!</div>
                 <?php
             }
-            else{
-                var_dump($_FILES);
-                
+            else{                
                 $fichero = fopen($_FILES['file']['tmp_name'], 'r');
                 load_horario($_POST['facultad'], $fichero);
                 fclose($fichero);
@@ -1685,7 +1698,11 @@
                         <option disabled="disabled" selected="selected" value="">Selecciona una facultad</option>
                         <?php
                         foreach ($facultades as $facultad) {
-                            echo '<option value="'.$facultad->getId().'">'.$facultad->getNombre().'</option>';
+                            echo '<option value="'.$facultad->getId().'" ';
+
+                            if($facultad->getNombre() != "Informática") echo 'disabled';
+
+                            echo '>'.$facultad->getNombre().'</option>';
                         }
                         ?>
                     </select>

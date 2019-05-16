@@ -10,7 +10,7 @@
  *  --  Métodos Algorítmicos en Resolución de Problemas (MAR)
  *  --  Inteligencia Artificial (IA)
  *  --  Procesadores de Lenguajes (PL)
- *  --  Desarrollo de Sistemas Interactivos (detección manual) (DSI)
+ *  --  Desarrollo de Sistemas Interactivos (detección manual) (DSI) 803280
  * 
  *  - Optativas del Itinerario de Información
  *  --  Software Corporativo (SC)
@@ -18,7 +18,7 @@
  *  --  Ampliación de Bases de Datos (ABD)
  *  --  Auditoría Informática (AI)
  *  --  Redes y Seguridad (RyS)
- *  --  Desarrollo de Sistemas Interactivos (detección manual) (DSI)
+ *  --  Desarrollo de Sistemas Interactivos (detección manual) (DSI) 803287
  *  --  Evaluación de Configuraciones (ECO)
  * 
  */
@@ -114,87 +114,167 @@ function test_informatica(){
    echo '';
 }
 
+/**
+ * Devuelve el ID de una carrera a partir de sus siglas
+ */
+function get_id_carrera($siglas){
+    $cdao = new Carrera_dao();
+
+    switch (strtolower($siglas)) {
+        case 'gi': return $cdao->getIdByName("Ingeniería Informática");
+        case 'gs': return $cdao->getIdByName("Ingeniería del Software");
+        case 'gc': return $cdao->getIdByName("Ingeniería de Computadores");
+        case 'gdv': return $cdao->getIdByName("Desarrollo de Videojuegos");
+
+        default: break;
+    }
+
+    unset($cdao);
+}
+
+/**
+ * Hace uso de la carrera, la asignatura y el listado manual para obtener el ID del itinerario
+ */
+function get_itinerario($id_carrera, $id_asignatura){
+    $idao = new Itinerario_dao();
+    $id_itinerario = NULL;
+
+    switch ($id_asignatura) {
+        case '803274': 
+        case '803275': 
+        case '803276': 
+        case '803277': 
+        case '803278': 
+        case '803279': 
+        case '803280': 
+            $idao->busca("Computación", $id_carrera, $id_itinerario);
+            break;
+        
+        case '803281':  
+        case '803282': 
+        case '803283': 
+        case '803284': 
+        case '803285': 
+        case '803286': 
+        case '803287':
+            $idao->busca("%Información", $id_carrera, $id_itinerario);
+            break;
+        
+        default: break;
+    }
+    unset($idao);
+    return $id_itinerario;
+}
+
+/**
+ *  Convierte el texto en el dato correspondiente
+ */
+function parse_curso($input){
+    switch ($input) {
+        case '1º':
+        case '2º':
+        case '3º':
+        case '4º':
+        case '5º':
+        case '6º':
+            return substr($input, 0, 1);
+        
+        case 'Optativas itinerario 3º':
+            return '3';
+
+        case 'Optativas itinerario 4º':
+            return '4';
+            
+        default:
+            return '0';
+    }
+}
+
+/**
+ * Obtiene el ID de un departamento a partir de sus siglas
+ */
+function get_departamento($input){
+    $ddao = new Departamento_dao();
+    
+    $toReturn = $ddao->getIdBySiglas($input);
+
+    unset($ddao);
+
+    return $toReturn;
+}
+
 //TODO: Terminar
 function importar_horario_informatica($fichero){
-        fgetcsv($fichero, 400, $delimiter=";"); //Lee las cabeceras
+    fgetcsv($fichero, 400, $delimiter=";"); //Lee las cabeceras
 
-    while (!feof($fichero) ) {
-        // Comenzar el bucle aquí
-        //datos en crudo
-        $linea = fgetcsv($fichero, 400, $delimiter=";");
+    $clases = array();
 
-        //Datos para crear la asignatura
-        // Carrera
-        $titulacion = parse_titulacion($linea[0]);
+    $adao  = new Asignatura_dao();
+    $cldao = new Clase_dao();
+    while (($linea = fgetcsv($fichero, 400, $delimiter=";")) !== FALSE) {
+          ///////////               /////////
+         // Datos para crear la asignatura /
+        /////////               ///////////
+        $id_asignatura = $linea[2];
+        $id_carrera = get_id_carrera($linea[0]);
+        $id_itinerario = get_itinerario($id_carrera, $id_asignatura);
 
-        // Itinerario (opcional) -> sacar de la tabla a mano -> hacer un switch con la relación
-
-
-        $re = '/^(.+)\((.*)\)$/m';
+        // Separa el nombre de la asignatura de su abreviatura
+        $re = '/^(.+) \((.*)\)$/m';
         $asignatura = $linea[3];
         preg_match_all($re, $asignatura, $matches, PREG_SET_ORDER, 0);
-        // Nombre de la asignatura
-        $asignatura_nombre = $matches[0][1];
 
-        // Abreviatura de la asignatura
+        $asignatura_nombre = $matches[0][1];
         $asignatura_abreviatura = $matches[0][2];
 
-        // Curso
         $curso = parse_curso($linea[1]);
 
-        $re = '/^(.*)\/*(.*)*$/m';
+        // Separa los nombres de los departamentos
+        $re = '/^([a-zA-Z\.]+)|([a-zA-Z\.]+)([a-zA-Z\.]*)$/m';
         $departamentos = $linea[5];
         preg_match_all($re, $departamentos, $matches, PREG_SET_ORDER, 0);
-        // Departamento 1
-        $departamento_uno = $matches[0][1];
 
-        // Departamento 2
-        $departamento_dos = (isset($matches[0][2])) ? $matches[0][2] : null;      
-
-        // Código Gea
-        $gea = $linea[2];
-
-        // Creditos -> Hay relación entre las horas de clase y los créditos 
-        // (3h/semana = 4,5 creditos/cuatrimestre) (4h/semana = 6 creditos/cuatrimestre) 
-
-
-
-
-        // Datos para crear la clase
-        $grupo = $linea[4];
+        $departamento_uno = get_departamento($matches[0][0]);
+        $departamento_dos = (isset($matches[1][0])) ? get_departamento($matches[1][0]) : null;      
         
+        if($adao->getById($id_asignatura) == NULL){
+            $adao->store(new Asignatura($id_asignatura, $id_carrera, $id_itinerario, $asignatura_nombre, $asignatura_abreviatura, $curso, $departamento_uno, $departamento_dos, 0, 0));
+        }
+        
+          ///////////          /////////
+         // Datos para crear la clase /
+        /////////          ///////////
+        $grupo = strtolower($linea[4]);
         $cuatrimestre = $linea[6];
+       
+        // dh -> Dias-Horas -- Separa los días de las horas
+        $dh = '/((\w*):[0-2]*[0-9]-[0-2]*[0-9]:[0-5][0-9])/m';
+        preg_match_all($dh, $linea[7], $clases, PREG_SET_ORDER, 0);
 
-        $docencia = parse_docencia($linea[7]);
+        foreach ($clases as $clase) {
+            // hs -> Hour-Splitter -- Separa las horas para poder procesarlas
+            $hs = '/\w*:([0-2]*[0-9])-([0-2]*[0-9]):([0-5][0-9])/m';
+            preg_match_all($hs, $clase[0], $horas, PREG_SET_ORDER, 0);
+            $duracion = ($horas[0][3] == 50) ? $horas[0][2] - $horas[0][1] + 1 : $horas[0][2] - $horas[0][1];
 
-        //Borrar
-        $lineas[] = $linea;
+            // ls -> Letter-Splitter -- Separa las letras
+            $ls = '/([a-zA-Z])/m';
+            $dias = $clase[2];
+            preg_match_all($ls, $dias, $dias_ls, PREG_SET_ORDER, 0);
+
+            foreach ($dias_ls as $dia) {
+                for ($i=0; $i < $duracion*2; $i++) { 
+                    $cldao->store(new Clase('', $id_asignatura, $cuatrimestre, $dia[0], $horas[0][1]-8+$i, $grupo));
+                }
+            }
+        }
     }
-    echo '';
+    $adao->calcula_creditos();
+
+    unset($adao);
+    unset($cldao);
 }
 
-function parse_titulacion($input){
-    switch (strtolower($input)) {
-        case 'gc':  return 'Ingeniería de Computadores';
-        case 'gi':  return 'Ingeniería Informática';
-        case 'gc':  return 'Ingeniería del Software';
-        case 'gdv': return 'Desarrollo de Videojuegos';
-        
-        default: return '';
-    }
-}
-
-//TODO: Procesar para limpiar 'º' o para marcar como optativa (general o itinerario)
-function parse_curso($input){
-
-    return $input;
-}
-
-//TODO: Procesar para extraer los días y horas de clase
-function parse_docencia($input){
-
-    return $input;
-}
 
 //TODO: Ver si se puede hacer algo similar, pero para los profesores
 function importar_docencia_informatica($fichero){

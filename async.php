@@ -195,7 +195,7 @@ function existe_itinerario($id_carrera, $id_itinerario){
 
 function consultaAsignaturas($curso){
    $adao = new Asignatura_dao();
-   $cursos = $adao->getByCarreraCurso($_SESSION['carrera'], $curso);
+   $cursos = $adao->getByCarreraCursoItinerario($_SESSION['carrera'], $curso, $_SESSION['itinerario']);
    echo json_encode($cursos);
 }
 

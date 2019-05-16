@@ -5,6 +5,7 @@ class Departamento_dao implements iDAO{
 /*
     private $id;            // Integer 2 digitos - Obligatorio
     private $nombre;        // String 100 chars  - Obligatorio
+    private $siglas;        // String 10 chars   - Obligatorio
     private $id_facultad;   // Integer 2 digitos - Obligatorio
 */
     public function __construct(){}
@@ -35,12 +36,40 @@ class Departamento_dao implements iDAO{
 
         $r = $result->fetch_assoc();
 
-        $departamento = new Departamento($r["id"], $r["nombre"], $r["id_facultad"]);
+        $departamento = new Departamento($r["id"], $r["nombre"], $r["id_facultad"], $r['siglas']);
 
         $sentencia->close();
         $conn->close();
 
         return $departamento;
+    }
+
+    /**
+     * Obtiene el ID del departamento correspondiente con las siglas proporcionadas
+     */
+    public function getIdBySiglas($siglas){
+        $conn = Connection::connect();
+
+        if (!($sentencia = $conn->prepare("SELECT * FROM `departamentos` WHERE siglas LIKE ?;"))) {
+            echo "Falló la preparación: (" . $conn->errno . ") " . $conn->error;
+        }
+
+        if (!$sentencia->bind_param("s", $siglas)) {
+            echo "Falló la vinculación de parámetros: (" . $sentencia->errno . ") " . $sentencia->error;
+        }
+
+        $sentencia->execute();
+        $result = $sentencia->get_result();
+        
+        $sentencia->close();
+        $conn->close();
+
+        if($result->num_rows === 0)
+            return NULL;
+
+        $r = $result->fetch_assoc();
+
+        return $r["id"];
     }
 
     /**
@@ -67,7 +96,7 @@ class Departamento_dao implements iDAO{
 
         while($r = $result->fetch_assoc())
         {
-            $departamentos[$r["id"]] = new Departamento($r["id"], $r["nombre"], $r["id_facultad"]);
+            $departamentos[$r["id"]] = new Departamento($r["id"], $r["nombre"], $r["id_facultad"], $r['siglas']);
         }
 
         return $departamentos;
@@ -97,7 +126,7 @@ class Departamento_dao implements iDAO{
 
         while($r = $result->fetch_assoc())
         {
-            $departamentos[$r["id"]] = new Departamento($r["id"], $r["nombre"], $r["id_facultad"]);
+            $departamentos[$r["id"]] = new Departamento($r["id"], $r["nombre"], $r["id_facultad"], $r['siglas']);
         }
 
         return $departamentos;
@@ -151,7 +180,7 @@ class Departamento_dao implements iDAO{
 
         while($r = $result->fetch_assoc())
         {
-            $departamentos[$r["id"]] = new Departamento($r["id"], $r["nombre"], $r["id_facultad"]);
+            $departamentos[$r["id"]] = new Departamento($r["id"], $r["nombre"], $r["id_facultad"], $r['siglas']);
         }
 
         return $departamentos;
