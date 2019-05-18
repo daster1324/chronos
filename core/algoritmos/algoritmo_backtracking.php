@@ -35,9 +35,9 @@ class Algoritmo_backtracking{
             $aux = array_fill(0,13,true);
             $aux2 = array_fill(0,13,false);
             $aux= array_merge($aux,$aux2);
-        }else if(strcasecmp($disp,"tarde") == 0){
+        }else if(strcasecmp($disp,"afternoon") == 0){
             $aux = array_fill(0,13,false);
-            $aux = array_fill(0,13,true);
+            $aux2 = array_fill(0,13,true);
             $aux= array_merge($aux,$aux2);
         }
 		
