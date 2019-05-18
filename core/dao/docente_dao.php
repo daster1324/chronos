@@ -355,6 +355,50 @@ class Docente_dao implements iDAO{
         return $docentes;
     }
 
+    public function store_preferencias($preferencias, $id_docente){
+        $conn = Connection::connect();
+
+        if (!($sentencia = $conn->prepare("UPDATE `docentes` SET `preferencias`= ? WHERE `id` = ?;"))) {
+            echo "Falló la preparación: (" . $conn->errno . ") " . $conn->error;
+        }
+
+        if (!$sentencia->bind_param("si", $preferencias, $id_docente)) {
+            echo "Falló la vinculación de parámetros: (" . $sentencia->errno . ") " . $sentencia->error;
+        }
+
+        $sentencia->execute();
+
+        $sentencia->close();
+        $conn->close();
+
+        return true;
+    }
+
+    public function get_preferencias($id_docente){
+        $conn = Connection::connect();
+
+        if (!($sentencia = $conn->prepare("SELECT `preferencias` FROM `docentes` WHERE `id` = ?;"))) {
+            echo "Falló la preparación: (" . $conn->errno . ") " . $conn->error;
+        }
+
+        if (!$sentencia->bind_param("i", $id_docente)) {
+            echo "Falló la vinculación de parámetros: (" . $sentencia->errno . ") " . $sentencia->error;
+        }
+
+        $sentencia->execute();
+
+        $result = $sentencia->get_result();
+        
+        $sentencia->close();
+        $conn->close();
+
+        if($result->num_rows === 0)
+            return NULL;
+
+        $r = $result->fetch_assoc();
+
+        return $r['preferencias'];
+    }
 }
 
 

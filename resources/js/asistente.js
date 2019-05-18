@@ -335,6 +335,7 @@ function procesarHorario(){
             },
             error: function( jqXhr, textStatus, errorThrown ){
                 alert('Error');
+                $('body').append(jqXhr.responseText);
             }
         });
 

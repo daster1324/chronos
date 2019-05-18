@@ -419,7 +419,7 @@ class Asignatura_dao implements iDAO{
     public function listadoExcepto($seleccion = array()){
         $conn = Connection::connect();
 
-        $stmt = "SELECT `asignaturas`.id, `asignaturas`.nombre, `carreras`.`nombre` as 'carrera'
+        $stmt = "SELECT `asignaturas`.id, `asignaturas`.nombre, `asignaturas`.creditos, `carreras`.`nombre` as 'carrera'
                  FROM `asignaturas`, `carreras`
                  WHERE  `asignaturas`.`id_carrera` = `carreras`.`id`
                  ORDER BY `carrera`, `nombre`;";       
@@ -440,7 +440,7 @@ class Asignatura_dao implements iDAO{
         while($r = $result->fetch_assoc())
         {
             if(!in_array($r['id'], $seleccion))
-                $asignaturas[] = array('id' => $r["id"], 'nombre' => $r["nombre"], 'carrera' => $r["carrera"]);
+                $asignaturas[] = array('id' => $r["id"], 'nombre' => $r["nombre"], 'creditos' => $r["creditos"], 'carrera' => $r["carrera"]);
         }
 
         return $asignaturas;

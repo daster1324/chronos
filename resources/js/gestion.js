@@ -22,6 +22,17 @@ function borrar(){
     }    
 }
 
+function selectAll(){
+    $('.gestion-list-element input').prop('checked', true);
+    $('#select-all-button').hide();
+    $('#unselect-all-button').show();
+}
+
+function unselectAll(){
+    $('.gestion-list-element input').prop('checked', false);
+    $('#select-all-button').show();
+    $('#unselect-all-button').hide();
+}
 
 // Facultades
 

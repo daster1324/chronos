@@ -263,7 +263,7 @@ function importar_horario_informatica($fichero){
 
             foreach ($dias_ls as $dia) {
                 for ($i=0; $i < $duracion*2; $i++) { 
-                    $cldao->store(new Clase('', $id_asignatura, $id_carrera, $cuatrimestre, $dia[0], $horas[0][1]-8+$i, $grupo));
+                    $cldao->store(new Clase('', $id_asignatura, $id_carrera, $cuatrimestre, $dia[0], ($horas[0][1]-8)*2+$i, $grupo));
                 }
             }
         }
@@ -277,7 +277,11 @@ function importar_horario_informatica($fichero){
 
 //TODO: Ver si se puede hacer algo similar, pero para los profesores
 function importar_docencia_informatica($fichero){
-     
+    fgetcsv($fichero, 400, $delimiter=";"); //Lee las cabeceras
+
+    while (($linea = fgetcsv($fichero, 400, $delimiter=";")) !== FALSE){
+        var_dump($linea);
+    }
 }
 
 ?>

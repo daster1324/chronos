@@ -6,7 +6,7 @@ class Connection{
         $host = "localhost";
         $user = "chronos";
         $pass = "chronos";
-        $dbname = "chronos";
+        $dbname = "chronos_app";
 
         $conn = mysqli_connect($host, $user, $pass, $dbname);
         $conn->set_charset("utf8");
@@ -15,10 +15,6 @@ class Connection{
         }
 
         return $conn;
-    }
-
-    public static function disconnect($conn){
-        mysqli_close($conn);
     }
 
 }

@@ -568,6 +568,8 @@
                         ?>
                         </fieldset>
                         <button type="button" class="btn btn-primary" onclick="borrar()">Borrar</button>
+                        <button id="select-all-button" type="button" class="btn btn-primary" onclick="selectAll()">Seleccionar Todo</button>
+                        <button id="unselect-all-button" style="display:none" type="button" class="btn btn-primary" onclick="unselectAll()">Deseleccionar Todo</button>
                     </form>
                 <?php 
                 } 
@@ -671,6 +673,8 @@
                         ?>
                         </fieldset>
                         <button id="borrar-seleccion" type="button" class="btn btn-primary" onclick="borrar()">Borrar</button>
+                        <button id="select-all-button" type="button" class="btn btn-primary" onclick="selectAll()">Seleccionar Todo</button>
+                        <button id="unselect-all-button" style="display:none" type="button" class="btn btn-primary" onclick="unselectAll()">Deseleccionar Todo</button>
                     </form>
                 <?php 
                 } 
@@ -767,6 +771,8 @@
                         ?>
                         </fieldset>
                         <button id="borrar-seleccion" type="button" class="btn btn-primary" onclick="borrar()">Borrar</button>
+                        <button id="select-all-button" type="button" class="btn btn-primary" onclick="selectAll()">Seleccionar Todo</button>
+                        <button id="unselect-all-button" style="display:none" type="button" class="btn btn-primary" onclick="unselectAll()">Deseleccionar Todo</button>
                     </form>
                 <?php 
                 } 
@@ -866,6 +872,8 @@
                         ?>
                         </fieldset>
                         <button id="borrar-seleccion" type="button" class="btn btn-primary" onclick="borrar()">Borrar</button>
+                        <button id="select-all-button" type="button" class="btn btn-primary" onclick="selectAll()">Seleccionar Todo</button>
+                        <button id="unselect-all-button" style="display:none" type="button" class="btn btn-primary" onclick="unselectAll()">Deseleccionar Todo</button>
                     </form>
                 <?php 
                 } 
@@ -1077,6 +1085,8 @@
                             <input type="hidden" name="accion" value="remove">
                         </fieldset>
                         <button id="borrar-seleccion" type="button" class="btn btn-primary" onclick="borrar()">Borrar</button>
+                        <button id="select-all-button" type="button" class="btn btn-primary" onclick="selectAll()">Seleccionar Todo</button>
+                        <button id="unselect-all-button" style="display:none" type="button" class="btn btn-primary" onclick="unselectAll()">Deseleccionar Todo</button>
                     </form>
                 <?php 
                 } 
@@ -1241,6 +1251,8 @@
                             <input type="hidden" name="accion" value="remove">
                             </fieldset>
                             <button type="button" class="btn btn-primary" onclick="borrar()">Borrar</button>
+                            <button id="select-all-button" type="button" class="btn btn-primary" onclick="selectAll()">Seleccionar Todo</button>
+                            <button id="unselect-all-button" style="display:none" type="button" class="btn btn-primary" onclick="unselectAll()">Deseleccionar Todo</button>
                         </form>
                     <?php 
                     } 
@@ -1467,6 +1479,8 @@
                         ?>
                         </fieldset>
                         <button id="borrar-seleccion" type="button" class="btn btn-primary" onclick="borrar()">Borrar</button>
+                        <button id="select-all-button" type="button" class="btn btn-primary" onclick="selectAll()">Seleccionar Todo</button>
+                        <button id="unselect-all-button" style="display:none" type="button" class="btn btn-primary" onclick="unselectAll()">Deseleccionar Todo</button>
                     </form>
                 <?php 
                 } 

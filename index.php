@@ -14,7 +14,7 @@
         <div class="section px-2">
             <form id="form-inicial" class="app-form" method="post" onsubmit="return submitForm();">
                 <h1 class="font-weight-light text-center text-light">Chronos</h1>
-                <select id="selector-carrera" name="carrera" class="custom-select text-dark my-1">
+                <select id="selector-carrera" name="carrera" class="custom-select text-dark my-1" required>
                     <option value="none" selected>Selecciona carrera</option>
                     <?php
 
@@ -28,7 +28,7 @@
                     ?>
                 </select>
 
-                <select id="selector-itinerario" name="itinerario" class="custom-select text-dark my-1" disabled>
+                <select id="selector-itinerario" name="itinerario" class="custom-select text-dark my-1" disabled required>
                     <option value="none" disabled selected>Selecciona itinerario</option>
                 </select>
 

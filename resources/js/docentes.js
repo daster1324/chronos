@@ -6,6 +6,10 @@ $(document).ready(function(){
 	    var clean_uri = uri.substring(0, uri.indexOf("&"));
 	    window.history.replaceState({}, document.title, clean_uri);
     }
+
+    for (let index = 0; index < 6; index++) {
+        preferencias[index] = $('#selector-preferencia-'+(index + 1)).val();
+    }
 });
 
 $('.preferencia-asignatura').change(function (e) { 

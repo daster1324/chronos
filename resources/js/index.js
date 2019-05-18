@@ -95,6 +95,7 @@ function itinerario_seleccionado(idcarrera, iditinerario){
     
     if(iditinerario != 'null')
         data += "&iditinerario="+iditinerario;
+        
 
     $.ajax({
         url: '/async',
@@ -122,13 +123,10 @@ function itinerario_seleccionado(idcarrera, iditinerario){
  * @param {*} itinerarios 
  */
 function set_itinerarios(itinerarios){
-    let last_id;
-
     let $it_selector = $('#selector-itinerario');
     $it_selector.children('option:not(:first)').remove();
 
     $.each(itinerarios, function (i, item) {
-        last_id = item.id;
         $it_selector.append($('<option>', { 
             value: item.id,
             text : item.nombre 
@@ -141,11 +139,6 @@ function set_itinerarios(itinerarios){
         text : 'Itinerario Único' 
     }));
     
-
-    if(itinerarios.length == 1){
-        $("#selector-itinerario").val(last_id);
-        enableSend();
-    }
 }
 
 /**
@@ -153,7 +146,7 @@ function set_itinerarios(itinerarios){
  */
 function checkStatus(){
     let car = ($('#selector-carrera').val() != "none");
-    let iti = ($('#selector-itinerario').val() != "none");
+    let iti = ($('#selector-itinerario').val() != "none") && ($('#selector-itinerario').val() != null);
     let estado = 0;
 
     if(!car && !iti) estado = 0;
@@ -181,6 +174,11 @@ function checkStatus(){
  * En caso de no serlo, refresca la página para eliminar posibles manipulaciones de datos
  */
 function submit(){
+    if($('#selector-itinerario').prop('selectedIndex') == 0){
+        alert('Selecciona un itinerario');
+        return;
+    }
+
     let car = $('#selector-carrera').val();
     let iti = $('#selector-itinerario').val();
 
@@ -188,6 +186,7 @@ function submit(){
     
     if(iti != 'null')
         data += "&iditinerario="+iti;
+        
 
     $.ajax({
         url: '/async',

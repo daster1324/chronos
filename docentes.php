@@ -7,8 +7,10 @@
 
     // Funciones para contenido dinámico
 
-    if(isset($_POST)){
-        var_dump($_POST);
+    if(isset($_POST['submit-preferencias'])){
+        $dodao = new Docente_dao();
+        $dodao->store_preferencias($_POST['preferencias'], $_SESSION['docente-id']);
+        unset($dodao);
     }
 
     function showLogin(){
@@ -145,6 +147,14 @@
         <?php
     }
 
+    function excepto_progresivo($i, $preferencias){
+        $toReturn = array();
+        for ($index=0; $index < $i; $index++) { 
+            $toReturn[] = $preferencias[$index];
+        }
+        return $toReturn;
+    }
+
     function show_inicio(){
         if(isset($_GET['message'])){
             ?> <div class="alert alert-success" role="alert"> <?php
@@ -165,8 +175,15 @@
         $dodao = new Docente_dao();
         $docente = $dodao->getById($_SESSION['docente-id']);
 
+        $hay_preferencias = strlen($docente->getPreferencias()) > 0;
+        $preferencias = json_decode($docente->getPreferencias());
+
         $adao = new Asignatura_dao();
-        $asignaturas = $adao->listadoExcepto();
+
+        if(!$hay_preferencias){
+            $asignaturas = $adao->listadoExcepto();
+        }
+        
 
         ?>
 
@@ -177,16 +194,31 @@
                 <form action="?gestionar=preferencias" method="post">
 
                     <?php
-                        for ($i=1; $i < 7; $i++) { 
+                        for ($i=1; $i < 7; $i++) {
+                            if($hay_preferencias && $i <= count($preferencias)+1){
+                                $asignaturas = $adao->listadoExcepto(excepto_progresivo($i-1, $preferencias));
+                            }
                             ?>
                             <!-- Preferencia <?= $i; ?> -->
                                 <label for="selector-preferencia-<?= $i; ?>" class="mt-2 mb-1">Preferencia <?= $i; ?></label>
-                                <select id="selector-preferencia-<?= $i; ?>" name="preferencia-<?= $i; ?>" class="custom-select text-dark preferencia-asignatura" <?php if($i==1)echo 'required'; else echo 'disabled'; ?>>
+                                <select id="selector-preferencia-<?= $i; ?>" name="preferencia-<?= $i; ?>" class="custom-select text-dark preferencia-asignatura" 
+                                    <?php 
+                                        if($i==1)
+                                            echo 'required'; 
+                                        if ($i > count($preferencias) + 1)
+                                            echo 'disabled'; ?>
+                                >
                                     <option disabled="disabled" selected="selected" value="">Selecciona una asignatura</option>
                                     <?php
-                                    if($i == 1)
+                                    if($i == 1 || $i <= count($preferencias)+1)
                                     foreach ($asignaturas as $asignatura) {
-                                        echo '<option value="'.$asignatura['id'].'">('.$asignatura['carrera'].') ['.$asignatura['id'].'] '.$asignatura['nombre'].'</option>';
+                                        echo '<option ';
+
+                                        if(isset($preferencias[$i-1]))
+                                            if($asignatura['id'] == (int)$preferencias[$i-1])
+                                                echo ' selected ';
+
+                                        echo' value="'.$asignatura['id'].'">('.$asignatura['carrera'].') ['.$asignatura['id'].'] '.$asignatura['nombre'].'</option>';
                                     }
                                     ?>
                                 </select>
