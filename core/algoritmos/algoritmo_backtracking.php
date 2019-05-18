@@ -27,7 +27,7 @@ class Algoritmo_backtracking{
     $nombre;
     $abreviatura;
     $creditos;*/
-    public function __construct($disp,$listadoAsig){
+    public function __construct($disp,$listadoAsig,$carrera){
         $aux = array();
         if(strcasecmp($disp,"allday") == 0){
             $aux = array_fill(1,25,true);
@@ -48,7 +48,7 @@ class Algoritmo_backtracking{
         $cDao= new Clase_dao();
 
         foreach($listadoAsig as $asig){
-            $this->_ListadoAsignaturas[]=$cDao->getByIdAsignaturaFormat($asig["id"]);
+            $this->_ListadoAsignaturas[]=$cDao->getByIdAsignaturaFormat($asig["id"],$carrera);
         }
     }
     //WARNING: SE PASA POR REFERENCIA POR EFICIENCIA(evitar la copia de arrays).NO EDITAR LAS VARIABLES

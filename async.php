@@ -310,7 +310,8 @@ function procesarHorarioAsistente($asignaturas, $disponibilidad){
    }
 
    $disp=json_decode($disponibilidad);
-   $alg=new algoritmo_backtracking($disponibilidad,$listado);
+   
+   $alg=new algoritmo_backtracking($disponibilidad,$listado,$_SESSION['carrera']);
    $sol=$alg->ejecuta();
    // la solucion es una array en la que cada posicion es un array de tipo clase,
    // es decir, cada posicion es una asignatura,en teoria ordenado por la preferencia del usuario

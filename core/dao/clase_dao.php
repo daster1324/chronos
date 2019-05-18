@@ -94,14 +94,14 @@ class Clase_dao implements iDAO{
      * 
      * @param $asignatura - asignatura de la clase a buscar
      */
-    public function getByIdAsignaturaFormat($id){
+    public function getByIdAsignaturaFormat($id,$idc){
         $conn = Connection::connect();
 
-        if (!($sentencia = $conn->prepare("SELECT * FROM `clases` WHERE id_asignatura = ?;"))) {
+        if (!($sentencia = $conn->prepare("SELECT * FROM `clases` WHERE id_asignatura = ? AND id_carrera = ?;"))) {
             echo "Falló la preparación: (" . $conn->errno . ") " . $conn->error;
         }
 
-        if (!$sentencia->bind_param("i", $id)) {
+        if (!$sentencia->bind_param("ii", $id,$idc)) {
             echo "Falló la vinculación de parámetros: (" . $sentencia->errno . ") " . $sentencia->error;
         }
 
@@ -118,6 +118,8 @@ class Clase_dao implements iDAO{
             $r["hora"], $r["grupo"]);
 
             $clases[$clase->getgrupo()][] = $clase; //con esto en teoria tengo las clases agrupas por grupos
+            
+            
         }
         /*codigo original
         while($r = $result->fetch_assoc())
