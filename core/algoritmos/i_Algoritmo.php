@@ -1,6 +1,6 @@
 <?php
 
-interface iAlgoritmo{
+interface i_Algoritmo{
     public function ejecuta();
     
 }

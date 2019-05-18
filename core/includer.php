@@ -29,4 +29,8 @@ require("dao/gestor_dao.php");
 // Loader
 require("loader.php");
 
+//algoritmos
+require("algoritmos/algoritmo_backtracking.php");
+require("algoritmos/i_Algoritmo.php");
+
 ?>
