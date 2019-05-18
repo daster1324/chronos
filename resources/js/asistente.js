@@ -324,7 +324,7 @@ function procesarHorario(){
     });
 
     let data = "op=19";
-        data += "&asignaturas="+JSON.stringify(user.asignaturas);
+        data += "&asignaturas="+JSON.stringify(listado_ordenado);
         data += "&disponibilidad="+ $('#selector-disponibilidad').val();
         $.ajax({
             url: '/async',
