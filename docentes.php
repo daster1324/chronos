@@ -9,8 +9,11 @@
 
     if(isset($_POST['submit-preferencias'])){
         $dodao = new Docente_dao();
-        $dodao->store_preferencias($_POST['preferencias'], $_SESSION['docente-id']);
+        $orden = $dodao->store_preferencias($_POST['preferencias'], $_SESSION['docente-id']);
         unset($dodao);
+
+        header("HTTP/1.1 301 Moved Permanently"); 
+        header("Location: /docentes?gestionar=docentes&message=3");
     }
 
     function showLogin(){
@@ -165,6 +168,10 @@
 
                 case 2:
                     echo "Preferencias modificadas";
+                break;
+
+                case 3:
+                    echo "No puedes cambiar tus preferencias. Ya se ha establecido el orden de selección.";
                 break;
 
                 default: break;

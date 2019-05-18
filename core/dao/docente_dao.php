@@ -358,6 +358,13 @@ class Docente_dao implements iDAO{
     public function store_preferencias($preferencias, $id_docente){
         $conn = Connection::connect();
 
+        $docente = $this->getById($id_docente);
+        
+        // Si ya tiene puesto un orden, no puede cambiar
+        if($docente != NULL && $docente->getOrden() != 0){
+            return;
+        }
+
         if (!($sentencia = $conn->prepare("UPDATE `docentes` SET `preferencias`= ? WHERE `id` = ?;"))) {
             echo "Falló la preparación: (" . $conn->errno . ") " . $conn->error;
         }
