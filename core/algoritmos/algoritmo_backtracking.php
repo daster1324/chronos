@@ -1,4 +1,3 @@
-
 <?php
 /*  atributos clase asignatura
     private $id;                    // Integer 10 digitos   - Obligatorio
@@ -30,7 +29,7 @@ class Algoritmo_backtracking{
     $creditos;*/
     public function __construct($disp,$listadoAsig){
         $aux = array();
-        if(strcasecmp($disp,"allday") != 0){
+        if(strcasecmp($disp,"allday") == 0){
             $aux = array_fill(1,25,true);
         }else if(strcasecmp($disp,"morning") == 0){
             $aux = array_fill(1,12,true);
@@ -46,7 +45,7 @@ class Algoritmo_backtracking{
 
         $cDao= new Clase_dao();
         foreach($listadoAsig as $asig){
-            $this->_ListadoAsignaturas[]=$cDao->getByIdAsignatura($asig["id"]);
+            $this->_ListadoAsignaturas[]=$cDao->getByIdAsignaturaFormat($asig["id"]);
         }
     }
     //WARNING: SE PASA POR REFERENCIA POR EFICIENCIA(evitar la copia de arrays).NO EDITAR LAS VARIABLES

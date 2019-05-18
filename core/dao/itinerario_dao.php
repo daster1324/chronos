@@ -18,6 +18,9 @@ class Itinerario_dao implements iDAO{
     public function getById($id){
         $conn = Connection::connect();
 
+        if($id == 'o')
+            return "Común";
+
         if (!($sentencia = $conn->prepare("SELECT * FROM `itinerarios` WHERE id = ?;"))) {
             echo "Falló la preparación: (" . $conn->errno . ") " . $conn->error;
         }
@@ -64,18 +67,48 @@ class Itinerario_dao implements iDAO{
 
         $result = $sentencia->get_result();
 
-        if($result->num_rows === 0)
-            return NULL;
+        $sentencia->close();
+        $conn->close();
+
+        $itinerarios = array();
 
         while($r = $result->fetch_assoc())
         {
             $itinerarios[] = new Itinerario($r["id"], $r["id_carrera"], $r["nombre"]);
         }
 
+        return $itinerarios;
+    }
+
+    public function busca($nombre, $id_carrera, &$id){
+        $conn = Connection::connect();
+
+        if (!($sentencia = $conn->prepare("SELECT * FROM `itinerarios` WHERE nombre LIKE ? AND id_carrera = ?;"))) {
+            echo "Falló la preparación: (" . $conn->errno . ") " . $conn->error;
+        }
+
+        if (!$sentencia->bind_param("si", $nombre, $id_carrera)) {
+            echo "Falló la vinculación de parámetros: (" . $sentencia->errno . ") " . $sentencia->error;
+        }
+
+        $sentencia->execute();
+
+        $result = $sentencia->get_result();
+        
         $sentencia->close();
         $conn->close();
 
-        return $itinerarios;
+        if($result->num_rows === 0){
+            $id = NULL;
+            return false;
+        }
+            
+
+        $r = $result->fetch_assoc();
+
+        $id = $r['id'];
+
+        return true;
     }
 
     /**
@@ -176,6 +209,52 @@ class Itinerario_dao implements iDAO{
         $conn->close();
     }
     
+    public function count(){        
+        $conn = Connection::connect();
+    
+        if (!($sentencia = $conn->prepare("SELECT count(`id`) AS `cuenta` FROM `itinerarios`;"))) {
+            echo "Falló la preparación: (" . $conn->errno . ") " . $conn->error;
+        }
+
+        $sentencia->execute();
+
+        $result = $sentencia->get_result();
+
+        $sentencia->close();
+        $conn->close();
+
+        if($result->num_rows === 0)
+            return 0;
+
+        $r = $result->fetch_assoc();
+
+        return $r['cuenta'];
+    }
+
+    public function getListado(){
+        $conn = Connection::connect();
+
+        if (!($sentencia = $conn->prepare("SELECT * FROM `itinerarios` ORDER BY `id_carrera`, `nombre`;"))) {
+            echo "Falló la preparación: (" . $conn->errno . ") " . $conn->error;
+        }
+
+        $sentencia->execute();
+
+        $result = $sentencia->get_result();
+
+        $sentencia->close();
+        $conn->close();
+
+        if($result->num_rows === 0)
+            return NULL;
+
+        while($r = $result->fetch_assoc())
+        {
+            $itinerarios[] = new Itinerario($r["id"], $r["id_carrera"], $r["nombre"]);
+        }
+
+        return $itinerarios;
+    }
 }
 
 

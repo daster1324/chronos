@@ -42,7 +42,7 @@ class Clase_dao implements iDAO{
 
         $r = $result->fetch_assoc();
 
-        $asignatura = new Clase($r["id"], $r["id_asignatura"], $r["cuatrimestre"], $r["dia"],
+        $asignatura = new Clase($r["id"], $r["id_asignatura"], $r["carrera"], $r["cuatrimestre"], $r["dia"],
         $r["hora"], $r["grupo"]);
 
         $sentencia->close();
@@ -77,7 +77,44 @@ class Clase_dao implements iDAO{
 
         while($r = $result->fetch_assoc())
         {
-            $clase = new Clase($r["id"], $r["id_asignatura"], $r["cuatrimestre"], $r["dia"],
+            $clases[] = new Clase($r["id"], $r["id_asignatura"], $r["id_carrera"], $r["cuatrimestre"], $r["dia"],
+            $r["hora"], $r["grupo"]);
+        }
+
+        $sentencia->close();
+        $conn->close();
+
+        return $clases;
+    }
+
+    /**
+     * Devuelve un array con las clases correspondientes a la asignatura dada,
+     *  con un formato agrupado por grupos.
+     * Devuelve NULL si no hay ninguna clase
+     * 
+     * @param $asignatura - asignatura de la clase a buscar
+     */
+    public function getByIdAsignaturaFormat($id){
+        $conn = Connection::connect();
+
+        if (!($sentencia = $conn->prepare("SELECT * FROM `clases` WHERE id_asignatura = ?;"))) {
+            echo "Falló la preparación: (" . $conn->errno . ") " . $conn->error;
+        }
+
+        if (!$sentencia->bind_param("i", $id)) {
+            echo "Falló la vinculación de parámetros: (" . $sentencia->errno . ") " . $sentencia->error;
+        }
+
+        $sentencia->execute();
+
+        $result = $sentencia->get_result();
+
+        if($result->num_rows === 0)
+            return NULL;
+
+        while($r = $result->fetch_assoc())
+        {
+            $clase = new Clase($r["id"], $r["id_asignatura"], $r["id_carrera"], $r["cuatrimestre"], $r["dia"],
             $r["hora"], $r["grupo"]);
 
             $clases[$clase->getgrupo()][] = $clase; //con esto en teoria tengo las clases agrupas por grupos
@@ -105,6 +142,7 @@ class Clase_dao implements iDAO{
 
         $id = $clase->getId();
         $id_asignatura = $clase->getId_asignatura();
+        $id_carrera = $clase->getId_carrera();
         $cuatrimestre = $clase->getCuatrimestre();
         $dia = $clase->getDia();
         $hora = $clase->getHora();
@@ -124,10 +162,10 @@ class Clase_dao implements iDAO{
             $conn->close();
         }
         else{
-            if (!($sentencia = $conn->prepare("INSERT INTO `clases` (`id`, `id_asignatura`, `cuatrimestre`, `dia`, `hora`, `grupo`) VALUES (?, ?, ?, ?, ?, ?);"))) {
+            if (!($sentencia = $conn->prepare("INSERT INTO `clases` (`id`, `id_asignatura`, `id_carrera`, `cuatrimestre`, `dia`, `hora`, `grupo`) VALUES (?, ?, ?, ?, ?, ?, ?);"))) {
                 echo "Falló la preparación: (" . $conn->errno . ") " . $conn->error;
             }
-            if (!$sentencia->bind_param("iiisis", $id, $id_asignatura, $cuatrimestre, $dia, $hora, $grupo)) {
+            if (!$sentencia->bind_param("iiiisis", $id, $id_asignatura, $id_carrera, $cuatrimestre, $dia, $hora, $grupo)) {
                 echo "Falló la vinculación de parámetros: (" . $sentencia->errno . ") " . $sentencia->error;
             }
             $sentencia->execute();
@@ -145,7 +183,7 @@ class Clase_dao implements iDAO{
      * @param $grupo - Grupo al que pertenece el horario
      * @param $horario - JSON con los días, horas y duraciones de las clases
      */
-    public function procesaHorario($gea, $cuatrimestre, $grupo, $horario){
+    public function procesaHorario($gea, $carrera, $cuatrimestre, $grupo, $horario){
         $dec_horario = json_decode($horario);
 
         foreach ($dec_horario as $nombre_dia => $duraciones) {
@@ -154,7 +192,7 @@ class Clase_dao implements iDAO{
             $clase_hora = 0;
             foreach ($duraciones as $duracion) {
                 if($duracion != null){
-                    $this->add_multiple(new Clase(NULL, $gea, $cuatrimestre, $dia, $clase_hora, $grupo), $duracion);
+                    $this->add_multiple(new Clase(NULL, $gea, $carrera, $cuatrimestre, $dia, $clase_hora, $grupo), $duracion);
                 }
                 $clase_hora++;
             }
