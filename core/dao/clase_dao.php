@@ -88,6 +88,50 @@ class Clase_dao implements iDAO{
     }
 
     /**
+     * Devuelve un array con las clases correspondientes a la asignatura dada,
+     *  con un formato agrupado por grupos.
+     * Devuelve NULL si no hay ninguna clase
+     * 
+     * @param $asignatura - asignatura de la clase a buscar
+     */
+    public function getByIdAsignaturaFormat($id){
+        $conn = Connection::connect();
+
+        if (!($sentencia = $conn->prepare("SELECT * FROM `clases` WHERE id_asignatura = ?;"))) {
+            echo "Falló la preparación: (" . $conn->errno . ") " . $conn->error;
+        }
+
+        if (!$sentencia->bind_param("i", $id)) {
+            echo "Falló la vinculación de parámetros: (" . $sentencia->errno . ") " . $sentencia->error;
+        }
+
+        $sentencia->execute();
+
+        $result = $sentencia->get_result();
+
+        if($result->num_rows === 0)
+            return NULL;
+
+        while($r = $result->fetch_assoc())
+        {
+            $clase = new Clase($r["id"], $r["id_asignatura"], $r["id_carrera"], $r["cuatrimestre"], $r["dia"],
+            $r["hora"], $r["grupo"]);
+
+            $clases[$clase->getgrupo()][] = $clase; //con esto en teoria tengo las clases agrupas por grupos
+        }
+        /*codigo original
+        while($r = $result->fetch_assoc())
+        {
+            $clases[] = new Clase($r["id"], $r["id_asignatura"], $r["cuatrimestre"], $r["dia"],
+            $r["hora"], $r["grupo"]);
+        }*/
+        $sentencia->close();
+        $conn->close();
+
+        return $clases;
+    }
+
+    /**
      * Guarda en la base de datos la clase proporcionada
      * En caso de que ya exista, se actualizan los datos
      * 
