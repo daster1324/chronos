@@ -230,7 +230,7 @@ function enableAdd() { $("#addasignatura-add").prop( "disabled", false ); }
 function disableAdd(){ $("#addasignatura-add").prop( "disabled", true ); }
 
 function appendAsignatura(asignatura){
-    let node = `<div class="asignatura border border-light bg-dark asignatura-`+asignatura.id+`">
+    let node = `<div data="`+asignatura.id+`" class="asignatura border border-light bg-dark asignatura-`+asignatura.id+`">
         <div class="sort-asignatura">
             <i class="fas fa-sort"></i>
         </div>
@@ -316,6 +316,12 @@ function procesarHorario(){
         alert("Primero, añade algunas asignaturas");
         return;
     }
+    let listado_ordenado = [];
+    let i = 0;
+    $('.asignatura ').each(function(){
+        listado_ordenado[i] = user.asignaturas[$(this).attr('data')];
+        i++;
+    });
 
     let data = "op=19";
         data += "&asignaturas="+JSON.stringify(user.asignaturas);
