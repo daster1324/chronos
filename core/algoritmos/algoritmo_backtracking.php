@@ -32,11 +32,13 @@ class Algoritmo_backtracking{
         if(strcasecmp($disp,"allday") == 0){
             $aux = array_fill(1,25,true);
         }else if(strcasecmp($disp,"morning") == 0){
-            $aux = array_fill(1,12,true);
-            $aux = array_fill(13,25,false);
+            $aux = array_fill(0,13,true);
+            $aux2 = array_fill(0,13,false);
+            $aux= array_merge($aux,$aux2);
         }else if(strcasecmp($disp,"tarde") == 0){
-            $aux = array_fill(1,12,false);
-            $aux = array_fill(13,25,true);
+            $aux = array_fill(0,13,false);
+            $aux = array_fill(0,13,true);
+            $aux= array_merge($aux,$aux2);
         }
 		
         $this->_horario1 = array("L"=>$aux,"M"=>$aux,"X"=>$aux,"J"=>$aux,"V"=>$aux);
@@ -44,6 +46,7 @@ class Algoritmo_backtracking{
         //$this->_ListadoAsignaturas = $listadoAsig;
 
         $cDao= new Clase_dao();
+
         foreach($listadoAsig as $asig){
             $this->_ListadoAsignaturas[]=$cDao->getByIdAsignaturaFormat($asig["id"]);
         }
