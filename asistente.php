@@ -90,120 +90,15 @@
                                 <div class="bg-secondary mt-1 font-weight-bold hora"><span>20:00</span></div>
                             </div>
                         <!-- /horas -->
+                        <?php
+                            print_dia("Lunes");
+                            print_dia("Martes");
+                            print_dia("Miércoles");
+                            print_dia("Jueves");
+                            print_dia("Viernes");
+                            print_dia("Sábado");
 
-                        <!-- lunes -->
-                            <div id="lunes" class="dia ml-1">
-                                <div class="bg-secondary font-weight-bold cabecera dia"><span>Lunes</span></div>
-                                <div class="casillero hora-vacia mt-1 dia"><span></span></div><!-- 8:00 -->
-                                <div class="casillero hora-vacia mt-1 dia"><span></span></div><!-- 9:00 -->
-                                <div class="casillero hora-vacia mt-1 dia"><span></span></div><!-- 10:00 -->
-                                <div class="casillero hora-vacia mt-1 dia"><span></span></div><!-- 11:00 -->
-                                <div class="casillero hora-vacia mt-1 dia"><span></span></div><!-- 12:00 -->
-                                <div class="casillero hora-vacia mt-1 dia"><span></span></div><!-- 13:00 -->
-                                <div class="casillero hora-vacia mt-1 dia"><span></span></div><!-- 14:00 -->
-                                <div class="casillero hora-vacia mt-1 dia"><span></span></div><!-- 15:00 -->
-                                <div class="casillero hora-vacia mt-1 dia"><span></span></div><!-- 16:00 -->
-                                <div class="casillero hora-vacia mt-1 dia"><span></span></div><!-- 17:00 -->
-                                <div class="casillero hora-vacia mt-1 dia"><span></span></div><!-- 18:00 -->
-                                <div class="casillero hora-vacia mt-1 dia"><span></span></div><!-- 19:00 -->
-                                <div class="casillero hora-vacia mt-1 dia"><span></span></div><!-- 20:00 -->
-                            </div>
-                        <!-- /lunes -->
-
-                        <!-- martes -->
-                            <div id="martes" class="dia ml-1">
-                                <div class="bg-secondary font-weight-bold cabecera dia"><span>Martes</span></div>
-                                <div class="casillero hora-vacia mt-1 dia"><span></span></div><!-- 8:00 -->
-                                <div class="casillero hora-vacia mt-1 dia"><span></span></div><!-- 9:00 -->
-                                <div class="casillero hora-vacia mt-1 dia"><span></span></div><!-- 10:00 -->
-                                <div class="casillero hora-vacia mt-1 dia"><span></span></div><!-- 11:00 -->
-                                <div class="casillero hora-vacia mt-1 dia"><span></span></div><!-- 12:00 -->
-                                <div class="casillero hora-vacia mt-1 dia"><span></span></div><!-- 13:00 -->
-                                <div class="casillero hora-vacia mt-1 dia"><span></span></div><!-- 14:00 -->
-                                <div class="casillero hora-vacia mt-1 dia"><span></span></div><!-- 15:00 -->
-                                <div class="casillero hora-vacia mt-1 dia"><span></span></div><!-- 16:00 -->
-                                <div class="casillero hora-vacia mt-1 dia"><span></span></div><!-- 17:00 -->
-                                <div class="casillero hora-vacia mt-1 dia"><span></span></div><!-- 18:00 -->
-                                <div class="casillero hora-vacia mt-1 dia"><span></span></div><!-- 19:00 -->
-                                <div class="casillero hora-vacia mt-1 dia"><span></span></div><!-- 20:00 -->
-                            </div>
-                        <!-- /martes -->
-
-                        <!-- miercoles -->
-                            <div id="miercoles" class="dia ml-1">
-                                <div class="bg-secondary font-weight-bold cabecera dia"><span>Miércoles</span></div>
-                                <div class="casillero hora-vacia mt-1 dia"><span></span></div><!-- 8:00 -->
-                                <div class="casillero hora-vacia mt-1 dia"><span></span></div><!-- 9:00 -->
-                                <div class="casillero hora-vacia mt-1 dia"><span></span></div><!-- 10:00 -->
-                                <div class="casillero hora-vacia mt-1 dia"><span></span></div><!-- 11:00 -->
-                                <div class="casillero hora-vacia mt-1 dia"><span></span></div><!-- 12:00 -->
-                                <div class="casillero hora-vacia mt-1 dia"><span></span></div><!-- 13:00 -->
-                                <div class="casillero hora-vacia mt-1 dia"><span></span></div><!-- 14:00 -->
-                                <div class="casillero hora-vacia mt-1 dia"><span></span></div><!-- 15:00 -->
-                                <div class="casillero hora-vacia mt-1 dia"><span></span></div><!-- 16:00 -->
-                                <div class="casillero hora-vacia mt-1 dia"><span></span></div><!-- 17:00 -->
-                                <div class="casillero hora-vacia mt-1 dia"><span></span></div><!-- 18:00 -->
-                                <div class="casillero hora-vacia mt-1 dia"><span></span></div><!-- 19:00 -->
-                                <div class="casillero hora-vacia mt-1 dia"><span></span></div><!-- 20:00 -->
-                            </div>
-                        <!-- /miercoles -->
-
-                        <!-- jueves -->
-                            <div id="jueves" class="dia ml-1">
-                                <div class="bg-secondary font-weight-bold cabecera dia"><span>Jueves</span></div>
-                                <div class="casillero hora-vacia mt-1 dia"><span></span></div><!-- 8:00 -->
-                                <div class="casillero hora-vacia mt-1 dia"><span></span></div><!-- 9:00 -->
-                                <div class="casillero hora-vacia mt-1 dia"><span></span></div><!-- 10:00 -->
-                                <div class="casillero hora-vacia mt-1 dia"><span></span></div><!-- 11:00 -->
-                                <div class="casillero hora-vacia mt-1 dia"><span></span></div><!-- 12:00 -->
-                                <div class="casillero hora-vacia mt-1 dia"><span></span></div><!-- 13:00 -->
-                                <div class="casillero hora-vacia mt-1 dia"><span></span></div><!-- 14:00 -->
-                                <div class="casillero hora-vacia mt-1 dia"><span></span></div><!-- 15:00 -->
-                                <div class="casillero hora-vacia mt-1 dia"><span></span></div><!-- 16:00 -->
-                                <div class="casillero hora-vacia mt-1 dia"><span></span></div><!-- 17:00 -->
-                                <div class="casillero hora-vacia mt-1 dia"><span></span></div><!-- 18:00 -->
-                                <div class="casillero hora-vacia mt-1 dia"><span></span></div><!-- 19:00 -->
-                                <div class="casillero hora-vacia mt-1 dia"><span></span></div><!-- 20:00 -->
-                            </div>
-                        <!-- /jueves -->
-
-                        <!-- viernes -->
-                            <div id="viernes" class="dia ml-1">
-                                <div class="bg-secondary font-weight-bold cabecera dia"><span>Viernes</span></div>
-                                <div class="casillero hora-vacia mt-1 dia"><span></span></div><!-- 8:00 -->
-                                <div class="casillero hora-vacia mt-1 dia"><span></span></div><!-- 9:00 -->
-                                <div class="casillero hora-vacia mt-1 dia"><span></span></div><!-- 10:00 -->
-                                <div class="casillero hora-vacia mt-1 dia"><span></span></div><!-- 11:00 -->
-                                <div class="casillero hora-vacia mt-1 dia"><span></span></div><!-- 12:00 -->
-                                <div class="casillero hora-vacia mt-1 dia"><span></span></div><!-- 13:00 -->
-                                <div class="casillero hora-vacia mt-1 dia"><span></span></div><!-- 14:00 -->
-                                <div class="casillero hora-vacia mt-1 dia"><span></span></div><!-- 15:00 -->
-                                <div class="casillero hora-vacia mt-1 dia"><span></span></div><!-- 16:00 -->
-                                <div class="casillero hora-vacia mt-1 dia"><span></span></div><!-- 17:00 -->
-                                <div class="casillero hora-vacia mt-1 dia"><span></span></div><!-- 18:00 -->
-                                <div class="casillero hora-vacia mt-1 dia"><span></span></div><!-- 19:00 -->
-                                <div class="casillero hora-vacia mt-1 dia"><span></span></div><!-- 20:00 -->
-                            </div>
-                        <!-- /viernes -->
-
-                        <!-- sabado -->
-                            <div id="sabado" class="dia ml-1">
-                                <div class="bg-secondary font-weight-bold cabecera dia"><span>Sábado</span></div>
-                                <div class="casillero hora-vacia mt-1 dia"><span></span></div><!-- 8:00 -->
-                                <div class="casillero hora-vacia mt-1 dia"><span></span></div><!-- 9:00 -->
-                                <div class="casillero hora-vacia mt-1 dia"><span></span></div><!-- 10:00 -->
-                                <div class="casillero hora-vacia mt-1 dia"><span></span></div><!-- 11:00 -->
-                                <div class="casillero hora-vacia mt-1 dia"><span></span></div><!-- 12:00 -->
-                                <div class="casillero hora-vacia mt-1 dia"><span></span></div><!-- 13:00 -->
-                                <div class="casillero hora-vacia mt-1 dia"><span></span></div><!-- 14:00 -->
-                                <div class="casillero hora-vacia mt-1 dia"><span></span></div><!-- 15:00 -->
-                                <div class="casillero hora-vacia mt-1 dia"><span></span></div><!-- 16:00 -->
-                                <div class="casillero hora-vacia mt-1 dia"><span></span></div><!-- 17:00 -->
-                                <div class="casillero hora-vacia mt-1 dia"><span></span></div><!-- 18:00 -->
-                                <div class="casillero hora-vacia mt-1 dia"><span></span></div><!-- 19:00 -->
-                                <div class="casillero hora-vacia mt-1 dia"><span></span></div><!-- 20:00 -->
-                            </div>
-                        <!-- /sabado -->
+                        ?>
                     </div>
                     <!-- /Semana -->
 
@@ -271,7 +166,7 @@
                 <form id="form-add-asignatura">
                     <p>Dinos que franja de horas es la que más se adapta a tu disponibilidad</p>
                     <select class="custom-select text-dark mb-4" name="disponibilidad" id="selector-disponibilidad">
-                        <option value="allday" selected>Completa (9:00 ~ 20:00)</option>
+                        <option value="allday" selected>Todo el día (9:00 ~ 20:00)</option>
                         <option value="morning">Mañanas (9:00 ~ 14:00)</option>
                         <option value="afternoon">Tardes (15:00 ~ 20:00)</option>
                     </select>
@@ -279,7 +174,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Volver</button>
-                <button type="button" id="addasignatura-add" class="btn btn-primary" data-dismiss="modal" onclick="procesarHorario()">Añadir</button>
+                <button type="button" id="addasignatura-add" class="btn btn-primary" data-dismiss="modal" onclick="procesarHorario()">Comenzar</button>
             </div>
             </div>
         </div>
@@ -288,6 +183,46 @@
 <div id="debug"></div>
 
 <?php 
+
+    function print_dia($dia){
+        switch ($dia) {
+            case 'Miércoles':
+                $dia_id = 'miercoles';
+                break;
+
+            case 'Sábado':
+                $dia_id = 'sabado';
+                break;
+            
+            default:
+                $dia_id = strtolower($dia);
+                break;
+        }
+
+        $d = (strtolower($dia_id) == "miercoles") ? 'x' : strtolower($dia[0]);
+
+        ?>
+        <!-- <?= $dia ?> -->
+        <div id="<?= $dia_id ?>" class="dia ml-1">
+            <div class="bg-secondary font-weight-bold cabecera dia"><span><?= $dia ?></span></div>
+            <div id="hora-<?= $d ?>-0" class="casillero hora-vacia mt-1 dia"><span></span></div>
+            <div id="hora-<?= $d ?>-2" class="casillero hora-vacia mt-1 dia"><span></span></div>
+            <div id="hora-<?= $d ?>-4" class="casillero hora-vacia mt-1 dia"><span></span></div>
+            <div id="hora-<?= $d ?>-6" class="casillero hora-vacia mt-1 dia"><span></span></div>
+            <div id="hora-<?= $d ?>-8" class="casillero hora-vacia mt-1 dia"><span></span></div>
+            <div id="hora-<?= $d ?>-10" class="casillero hora-vacia mt-1 dia"><span></span></div>
+            <div id="hora-<?= $d ?>-12" class="casillero hora-vacia mt-1 dia"><span></span></div>
+            <div id="hora-<?= $d ?>-14" class="casillero hora-vacia mt-1 dia"><span></span></div>
+            <div id="hora-<?= $d ?>-16" class="casillero hora-vacia mt-1 dia"><span></span></div>
+            <div id="hora-<?= $d ?>-18" class="casillero hora-vacia mt-1 dia"><span></span></div>
+            <div id="hora-<?= $d ?>-20" class="casillero hora-vacia mt-1 dia"><span></span></div>
+            <div id="hora-<?= $d ?>-22" class="casillero hora-vacia mt-1 dia"><span></span></div>
+            <div id="hora-<?= $d ?>-24" class="casillero hora-vacia mt-1 dia"><span></span></div>
+        </div>
+    <!-- <?= $dia ?> -->
+    <?php
+    }
+
     get_scriptsAndFooter(); 
     
     die();

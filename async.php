@@ -297,8 +297,6 @@ function getListadoAsignaturasExcepto($seleccion){
    unset($adao);
 }
 
-//TODO: recibe un array con los id de las asignaturas 
-//      y la disponibilidad ('completa' = 9~20, 'mañana' = 9~14, 'tarde' = 15~20)
 function procesarHorarioAsistente($asignaturas, $disponibilidad){
    $listado = json_decode($asignaturas, true);
    
@@ -319,10 +317,7 @@ function procesarHorarioAsistente($asignaturas, $disponibilidad){
    // es decir, si se coge una asignatura y esta tiene 4 horas de clase, saldra una array de una posicion
    // que sera un array de 4 posiciones.
 
-
    echo json_encode($sol);
-
-
 }
 
 ?>

@@ -11,9 +11,10 @@ class Asignatura {
 }
 
 class Clase {
-    constructor(dia, hora, abreviatura) {
+    constructor(dia, hora, grupo, abreviatura) {
         this.dia = dia;
         this.hora = hora;
+        this.grupo = grupo;
         this.abreviatura = abreviatura;
     }
 }
@@ -22,7 +23,25 @@ var asignaturas = {};
 
 var user= {
     asignaturas : {},
-    clases      : {},
+    clases      : {
+        0 : {
+            "l" : [],
+            "m" : [],
+            "x" : [],
+            "j" : [],
+            "v" : [],
+            "s" : [],
+        },
+        1 : {
+            "l" : [],
+            "m" : [],
+            "x" : [],
+            "j" : [],
+            "v" : [],
+            "s" : [],
+        }
+
+    },
     creditos    : 0,
     cuatrimestre: 1,
     addAsig     : function(asignatura){
@@ -40,9 +59,17 @@ var user= {
         }
     },
     addClases   : function(clases){
-        //TODO: recibe un array con clases de una asignatura y las almacena
 
+        clases.forEach(function(clase){
+            let cuatrimestre = clase.cuatrimestre - 1;
+            let dia = clase.dia.toLowerCase();
+            let grupo = clase.grupo;
+            let hora = clase.hora;
+            let id_asig = clase.id_asignatura;
 
+            let aux = new Clase(dia, hora, grupo, user.asignaturas[id_asig].abreviatura);
+            user.clases[cuatrimestre][dia][hora] = aux;
+        });
     },
     remAsig     : function(id) {
         this.creditos -= this.asignaturas[id].creditos;
@@ -254,6 +281,7 @@ $( function() {
     $( "#asignaturas-container" ).disableSelection();
 } );
 
+
 function cambiarCuatrimestre(){
     // Vaciar horario
     limpiarSemana();
@@ -267,10 +295,7 @@ function cambiarCuatrimestre(){
         user.cuatrimestre = 1;
         $('#cuatrimestre').text("Se está mostrando el primer cuatrimestre");
     }
-
-    //TODO: ¿A qué estás esperando para hacer esta parte?
-    
-
+    muestra_horario();
 }
 
 function addAsignatura(){    
@@ -332,11 +357,18 @@ function procesarHorario(){
             type: 'post',
             data: data,
             success: function( data, textStatus, jQxhr ){
-                if(jQxhr.responseText.indexOf("Error")>=0){
-                    alert("Devuelve algo 'correcto', pero error: " + data);
+                if(data == false){
+                    alert('No existe una combinación válida. Prueba con menos asignaturas.');
+                }
+                else if(jQxhr.responseText.indexOf("Error")>=0){
+                    alert("Se ha producido un error.");
                 }
                 else{
-                   alert('Todo va bien');
+                    data.forEach(function(asignatura){
+                            user.addClases(asignatura);
+                    });
+                    muestra_horario();
+                    alert('Hemos encontrado una combinación válida.');
                 }
             },
             error: function( jqXhr, textStatus, errorThrown ){
@@ -344,12 +376,24 @@ function procesarHorario(){
                 $('body').append(jqXhr.responseText);
             }
         });
-
+}
+function limpia_horario(){
+    $('.casillero:not(.hora-vacia)').each(function(){
+        $(this).toggleClass("hora-vacia");
+        $(this).html('<span></span>')
+    });
 }
 
-function exportar(){
-    alert("Exportando");
-    //TODO: ¿A qué estás esperando para hacer esta parte?
+function muestra_horario(){
+    limpia_horario();
+
+    Object.keys(user.clases[user.cuatrimestre - 1]).forEach(function(dia) {
+        Object.keys(user.clases[user.cuatrimestre - 1][dia]).forEach(function(entry) {
+            let c = user.clases[user.cuatrimestre - 1][dia][entry];
+            $('#hora-' + c.dia + "-" + c.hora).html('<span>'+ c.abreviatura +' (Grupo '+c.grupo.toUpperCase()+')</span>');
+            $('#hora-' + c.dia + "-" + c.hora).removeClass('hora-vacia')
+          });
+      });
 }
 
 function limpiarSemana(){

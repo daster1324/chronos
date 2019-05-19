@@ -1016,11 +1016,15 @@ function cancelar_editar_docente(){
     $('#id-docente').val(0);
 
     $('#nombre-docente').val('');
+
+    $('#orden-docente').val('');
+
     $('#email-docente').val('');
 
     $('#usuario-docente').val('');
     $('#user-docente').val('');
     $('#usuario-docente').prop( "disabled", false );
+    
     
     $('#password-docente').val('');
 
@@ -1030,3 +1034,10 @@ function cancelar_editar_docente(){
 
     $('#cancelar-docente').remove();
 }
+
+
+//selector-facultad
+$('#selector-facultad-reparto').change(function(){ 
+    let facultad = $(this).val();
+    docente_editar_departamento(facultad);
+});

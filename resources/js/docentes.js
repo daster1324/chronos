@@ -9,6 +9,7 @@ $(document).ready(function(){
 
     for (let index = 0; index < 6; index++) {
         preferencias[index] = $('#selector-preferencia-'+(index + 1)).val();
+        $("#preferencias").val(JSON.stringify(preferencias));
     }
 });
 

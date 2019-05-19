@@ -224,6 +224,10 @@ body{
     padding-top:19px;
 }
 
+.casillero:not(.hora-vacia) {
+    background-color: #6c757d !important;
+}
+
 /*  GESTION  */
 #horario-load-container {
     max-width: 500px;

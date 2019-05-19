@@ -46,6 +46,34 @@ class Docente_dao implements iDAO{
         return $docente;
     }
 
+    public function getByEmail($email){
+        $conn = Connection::connect();
+
+        if (!($sentencia = $conn->prepare("SELECT * FROM `docentes` WHERE email = ?;"))) {
+            echo "Falló la preparación: (" . $conn->errno . ") " . $conn->error;
+        }
+
+        if (!$sentencia->bind_param("s", $email)) {
+            echo "Falló la vinculación de parámetros: (" . $sentencia->errno . ") " . $sentencia->error;
+        }
+
+        $sentencia->execute();
+
+        $result = $sentencia->get_result();
+
+        $sentencia->close();
+        $conn->close();
+
+        if($result->num_rows === 0)
+            return NULL;
+
+        $r = $result->fetch_assoc();
+                    
+        $docente = new Docente($r['id'], $r['nombre'], $r['departamento'], $r['email'], $r['preferencias'], $r['orden'], $r['usuario'], $r['pass']);
+
+        return $docente;
+    }
+
     public function getAllDataById($id){
         $conn = Connection::connect();
 
@@ -329,6 +357,36 @@ class Docente_dao implements iDAO{
         return $docentes;
     }
 
+    public function getListadoOrdenado($departamento){
+        $conn = Connection::connect();
+
+        $stmt = "SELECT * FROM `docentes` WHERE departamento = ? ORDER BY `orden`;";       
+
+        if (!($sentencia = $conn->prepare($stmt))) {
+            echo "Falló la preparación: (" . $conn->errno . ") " . $conn->error;
+        }
+
+        if (!$sentencia->bind_param("i", $departamento)) {
+            echo "Falló la vinculación de parámetros: (" . $sentencia->errno . ") " . $sentencia->error;
+        }
+
+        $sentencia->execute();
+
+        $result = $sentencia->get_result();
+
+        $sentencia->close();
+        $conn->close();
+
+        $docentes = array();
+
+        while($r = $result->fetch_assoc())
+        {
+            $docentes[] = new Docente($r['id'], $r['nombre'], $r['departamento'], $r['email'], $r['preferencias'], $r['orden'], $r['usuario']);
+        }
+
+        return $docentes;
+    }
+
     public function getListadoPublico(){
         $conn = Connection::connect();
 
@@ -359,10 +417,12 @@ class Docente_dao implements iDAO{
         $conn = Connection::connect();
 
         $docente = $this->getById($id_docente);
+
+        $estado = '';
         
         // Si ya tiene puesto un orden, no puede cambiar
         if($docente != NULL && $docente->getOrden() != 0){
-            return;
+            return 'blocked';
         }
 
         if (!($sentencia = $conn->prepare("UPDATE `docentes` SET `preferencias`= ? WHERE `id` = ?;"))) {
@@ -378,7 +438,11 @@ class Docente_dao implements iDAO{
         $sentencia->close();
         $conn->close();
 
-        return true;
+        if(strlen($docente->getPreferencias()) == 0)
+            return 'added';
+        
+        return 'updated';
+
     }
 
     public function get_preferencias($id_docente){

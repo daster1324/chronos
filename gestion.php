@@ -1500,7 +1500,7 @@
                 break;
 
                 case 2:
-                echo '<div class="alert alert-danger" role="alert">Error al importar el fichero</div>';
+                    echo '<div class="alert alert-danger" role="alert">Error al importar el fichero</div>';
                 break;
 
                 default: break;
@@ -1508,7 +1508,7 @@
             unset($_GET['message']);
         }
 
-        if(isset($_POST['submit'])){
+        if(isset($_POST['submit-horario'])){
             if(!file_exists($_FILES['file']['tmp_name']) || !is_uploaded_file($_FILES['file']['tmp_name'])) {
                 ?>
                 <div class="alert alert-danger" role="alert">¡ERROR! ¡No se ha recibido ningún fichero!</div>
@@ -1517,6 +1517,19 @@
             else{                
                 $fichero = fopen($_FILES['file']['tmp_name'], 'r');
                 load_horario($_POST['facultad'], $fichero);
+                fclose($fichero);
+            }
+        }
+
+        if(isset($_POST['submit-reparto'])){
+            if(!file_exists($_FILES['file']['tmp_name']) || !is_uploaded_file($_FILES['file']['tmp_name'])) {
+                ?>
+                <div class="alert alert-danger" role="alert">¡ERROR! ¡No se ha recibido ningún fichero!</div>
+                <?php
+            }
+            else{                
+                $fichero = fopen($_FILES['file']['tmp_name'], 'r');
+                load_reparto($_POST['facultad'], $_POST['departamento'], $fichero);
                 fclose($fichero);
             }
         }
@@ -1538,7 +1551,7 @@
             <!-- Formulario Docentes -->
             <div id="listado" class="col-md-6 mb-3 mb-md-0 p-1">
             <div class="border p-3">                    
-                    <h4 class="mb-3" id="accion-title">Cargar Docentes</h4>
+                    <h4 class="mb-3" id="accion-title">Reparto Docente</h4>
                     <?php docentesLoad($facultades); ?>
                 </div>
             </div>
@@ -1721,8 +1734,8 @@
     function horarioLoad($facultades){
         ?>
                 <form action="" method="post" id="horario-load-form" enctype="multipart/form-data">
-                    <label for="selector-facultad" class="my-1">Facultad</label>
-                    <select id="selector-facultad" name="facultad" class="custom-select text-dark mb-4" required>
+                    <label for="selector-facultad-horario" class="my-1">Facultad</label>
+                    <select id="selector-facultad-horario" name="facultad" class="custom-select text-dark mb-4" required>
                         <option disabled="disabled" selected="selected" value="">Selecciona una facultad</option>
                         <?php
                         foreach ($facultades as $facultad) {
@@ -1739,7 +1752,7 @@
                         <input type="file" name="file" class="form-control-file" id="horario-load-input" accept=".csv">
                         <input type="hidden" name="load-horario">
                     </div>
-                    <button type="submit" name="submit" class="btn btn-secondary mb-2">Subir fichero</button>
+                    <button type="submit" name="submit-horario" class="btn btn-secondary mb-2">Subir fichero</button>
                 </form>
         <?php
     }
@@ -1747,8 +1760,8 @@
     function docentesLoad($facultades){
         ?>
                 <form action="" method="post" id="docentes-load-form" enctype="multipart/form-data">
-                    <label for="selector-facultad" class="my-1">Facultad</label>
-                    <select id="selector-facultad" name="facultad" class="custom-select text-dark mb-4" required>
+                    <label for="selector-facultad-docente" class="my-1">Facultad</label>
+                    <select id="selector-facultad-docente" name="facultad" class="custom-select text-dark mb-4" required>
                         <option disabled="disabled" selected="selected" value="">Selecciona una facultad</option>
                         <?php
                         foreach ($facultades as $facultad) {
@@ -1756,12 +1769,16 @@
                         }
                         ?>
                     </select>
+                    <label for="selector-departamento-docente" class="my-1">Departamento</label>
+                    <select id="selector-departamento-docente" name="departamento" class="custom-select text-dark mb-4" required disabled>
+                        <option disabled="disabled" selected="selected" value="">Selecciona un departamento</option>
+                    </select>
                     <div class="form-group">
                         <label class="mb-2" for="docentes-load-input">Seleccione el fichero o arrástrelo sobre el botón. (.csv)</label>
                         <input type="file" name="file" class="form-control-file" id="docentes-load-input" accept=".csv">
                         <input type="hidden" name="load-docentes">
                     </div>
-                    <button type="submit" name="submit" class="btn btn-secondary mb-2">Subir fichero</button>
+                    <button type="submit" name="submit-reparto" class="btn btn-secondary mb-2">Subir fichero</button>
                 </form>    
         <?php
     }

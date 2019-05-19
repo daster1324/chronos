@@ -9,11 +9,27 @@
 
     if(isset($_POST['submit-preferencias'])){
         $dodao = new Docente_dao();
-        $orden = $dodao->store_preferencias($_POST['preferencias'], $_SESSION['docente-id']);
+        $estado = $dodao->store_preferencias($_POST['preferencias'], $_SESSION['docente-id']);
         unset($dodao);
 
+        switch ($estado) {
+            case 'added':
+                $message = 1;
+                break;
+
+            case 'updated':
+                $message = 2;
+                break;
+
+            case 'blocked':
+                $message = 3;
+                break;
+            
+            default: break;
+        }
+
         header("HTTP/1.1 301 Moved Permanently"); 
-        header("Location: /docentes?gestionar=docentes&message=3");
+        header("Location: /docentes?gestionar=docentes&message=".$message);  
     }
 
     function showLogin(){

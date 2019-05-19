@@ -89,7 +89,7 @@ class Docente implements JsonSerializable {
     }
 
     public function setOrden($orden){
-        $this->orden = orden;
+        $this->orden = $orden;
     }
 
     /**

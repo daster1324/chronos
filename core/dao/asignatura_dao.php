@@ -422,10 +422,15 @@ class Asignatura_dao implements iDAO{
         $stmt = "SELECT `asignaturas`.id, `asignaturas`.nombre, `asignaturas`.creditos, `carreras`.`nombre` as 'carrera'
                  FROM `asignaturas`, `carreras`
                  WHERE  `asignaturas`.`id_carrera` = `carreras`.`id`
+                 AND (`asignaturas`.`id_departamento` = ? OR `asignaturas`.`id_departamento_dos` = ?)
                  ORDER BY `carrera`, `nombre`;";       
 
         if (!($sentencia = $conn->prepare($stmt))) {
             echo "Falló la preparación: (" . $conn->errno . ") " . $conn->error;
+        }
+        
+        if (!$sentencia->bind_param("ii", $_SESSION["docente-departamento"], $_SESSION["docente-departamento"])) {
+            echo "Falló la vinculación de parámetros: (" . $sentencia->errno . ") " . $sentencia->error;
         }
 
         $sentencia->execute();

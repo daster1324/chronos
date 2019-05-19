@@ -1,6 +1,6 @@
 <?php
 
-function plugin_informatica($fichero, $destino){
+function plugin_informatica($fichero, $destino, $departamento = NULL){
     include('loaders/informatica.php');
     echo test_informatica();
     try{
@@ -8,17 +8,17 @@ function plugin_informatica($fichero, $destino){
             importar_horario_informatica($fichero);
         }
         else{
-            importar_horario_docencia($fichero);
+            importar_reparto_informatica($departamento, $fichero);
         }
         header("HTTP/1.1 301 Moved Permanently"); 
         header("Location: /gestion?gestionar=importar&message=1");
+
     }catch (Exception $e) {
         echo 'Excepción capturada: ',  $e->getMessage(), "\n";
         header("HTTP/1.1 301 Moved Permanently"); 
         header("Location: /gestion?gestionar=importar&message=2");
     }
 }
-
 
 function load_horario($facultad, $fichero){
     switch ($facultad) {
@@ -30,17 +30,14 @@ function load_horario($facultad, $fichero){
     }
 }
 
-function load_docencia($facultad, $fichero){
+function load_reparto($facultad, $departamento, $fichero){
     switch ($facultad) {
         case '1': // Informática
-            plugin_informatica($fichero, 'docencia');
+            plugin_informatica($fichero, 'reparto', $departamento);
         break;
         
         default: break;
     }
 }
-
-
-
 
 ?>

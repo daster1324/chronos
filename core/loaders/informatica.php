@@ -275,13 +275,50 @@ function importar_horario_informatica($fichero){
 }
 
 
-//TODO: Ver si se puede hacer algo similar, pero para los profesores
-function importar_docencia_informatica($fichero){
+function importar_reparto_informatica($departamento, $fichero){
     fgetcsv($fichero, 400, $delimiter=";"); //Lee las cabeceras
 
+    $dodao = new Docente_dao();
+
+    //Primero, bloquear usuarios
     while (($linea = fgetcsv($fichero, 400, $delimiter=";")) !== FALSE){
-        var_dump($linea);
+        $docente = $dodao->getByEmail($linea[1]);
+        $docente->setOrden($linea[0]);
+        $dodao->store($docente);
     }
+
+    $listado = $dodao->getListadoOrdenado($departamento);
+
+    $adao = new Asignatura_dao();
+
+    foreach ($listado as $docente) {
+        $preferencias = json_decode($docente->getPreferencias());
+        $prefs_posibles = array();
+
+        foreach ($preferencias as $preferencia) {
+            $asignatura = $adao->getById((int)$preferencia);
+
+            if($asignatura->getDocentes() > 0){
+                $prefs_posibles[] = $preferencia;
+                $asignatura->setDocentes($asignatura->getDocentes() - 1);
+                $adao->store($asignatura);
+            }
+        }
+
+        $docente->setPreferencias(json_encode($prefs_posibles));
+
+        $dodao->store($docente);
+    }
+
+
+    unset($dodao);
+    unset($adao);
+}
+
+function volcar($variable){
+    echo '<div class="p-2 bg-light">';
+    var_dump($variable);
+    echo '</div>';
 }
 
 ?>
