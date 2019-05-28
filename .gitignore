@@ -3,3 +3,4 @@ test*
 ex_*
 *.log
 SyncToy*
+.idea/*

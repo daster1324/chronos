@@ -97,7 +97,7 @@ class Clase_dao implements iDAO{
     public function getByIdAsignaturaFormat($id,$idc){
         $conn = Connection::connect();
 
-        if (!($sentencia = $conn->prepare("SELECT * FROM `clases` WHERE id_asignatura = ? AND id_carrera = ?;"))) {
+        if (!($sentencia = $conn->prepare("SELECT * FROM `clases` WHERE id_asignatura = ? AND id_carrera = ? ORDER BY `cuatrimestre`, `grupo`;"))) {
             echo "Falló la preparación: (" . $conn->errno . ") " . $conn->error;
         }
 

@@ -299,25 +299,14 @@ function getListadoAsignaturasExcepto($seleccion){
 
 function procesarHorarioAsistente($asignaturas, $disponibilidad){
    $listado = json_decode($asignaturas, true);
-   
-   foreach ($listado as $asignatura) {
-      $id = $asignatura['id'];
-      $nombre = $asignatura['nombre'];
-      $abreviatura = $asignatura['abreviatura'];
-      $creditos = $asignatura['creditos'];
-   }
 
    $disp=json_decode($disponibilidad);
    
-   $alg=new algoritmo_backtracking($disponibilidad,$listado,$_SESSION['carrera']);
-   $sol=$alg->ejecuta();
-   // la solucion es una array en la que cada posicion es un array de tipo clase,
-   // es decir, cada posicion es una asignatura,en teoria ordenado por la preferencia del usuario
-   //, y dentro de cada posicion hay una array con todas las filas de la base de datos de un grupo de esa asignatura,
-   // es decir, si se coge una asignatura y esta tiene 4 horas de clase, saldra una array de una posicion
-   // que sera un array de 4 posiciones.
+   $alg = new algoritmo_backtracking($disponibilidad,$listado,$_SESSION['carrera']);
+   $sol = $alg->ejecuta();
 
    echo json_encode($sol);
+   unset($alg);
 }
 
 ?>

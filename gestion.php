@@ -141,7 +141,7 @@
                     $mensaje = 1;
 
                     if($existe == NULL){
-                        $cldao->procesaHorario($gea, $cuatrimestre, $grupo, $horario);
+                        $cldao->procesaHorario($gea, $carrera, $cuatrimestre, $grupo, $horario);
                     }
                     else{
                         $mensaje = 4;
@@ -1491,7 +1491,6 @@
         <?php
     }
 
-    //TODO: Falta por hacer
     function show_importar(){
         if(isset($_GET['message'])){
             switch ($_GET['message']) {

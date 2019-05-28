@@ -83,9 +83,17 @@ var user= {
         $('#creditos').text(this.creditos);
 
         $("#asignaturas-container .asignatura").remove();
-        this.asignaturas = [];
-        this.clases = [];
+        this.asignaturas = {};
+        this.clases = { 0 : { "l" : [], "m" : [], "x" : [], "j" : [], "v" : [], "s" : [], }, 
+                        1 : { "l" : [], "m" : [], "x" : [], "j" : [], "v" : [], "s" : [], }
+                      };
 
+        cuatrimestre = 1;
+    },
+    remAllClasses      : function(){
+        this.clases = { 0 : { "l" : [], "m" : [], "x" : [], "j" : [], "v" : [], "s" : [], }, 
+                        1 : { "l" : [], "m" : [], "x" : [], "j" : [], "v" : [], "s" : [], }
+                      };
         cuatrimestre = 1;
     }
 };
@@ -332,11 +340,14 @@ function quitarAsignatura(idasignatura){
 
 function vaciarHorario(){
     user.remAll();
-
+    limpia_horario();
     limpiarSemana();
 }
 
 function procesarHorario(){
+    user.remAllClasses();      //Eliminamos las clases que tuviera guardadas
+    limpia_horario();
+
     if(Object.keys(user.asignaturas) == 0){
         alert("Primero, añade algunas asignaturas");
         return;
@@ -368,7 +379,6 @@ function procesarHorario(){
                             user.addClases(asignatura);
                     });
                     muestra_horario();
-                    alert('Hemos encontrado una combinación válida.');
                 }
             },
             error: function( jqXhr, textStatus, errorThrown ){
