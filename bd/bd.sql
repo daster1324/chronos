@@ -3,10 +3,11 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 12-05-2019 a las 17:29:22
+-- Tiempo de generación: 30-05-2019 a las 19:36:53
 -- Versión del servidor: 10.1.37-MariaDB
 -- Versión de PHP: 7.0.33
 
+SET FOREIGN_KEY_CHECKS=0;
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET AUTOCOMMIT = 0;
 START TRANSACTION;
@@ -19,10 +20,8 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Base de datos: `chronos`
+-- Base de datos: `chronos_app`
 --
-CREATE DATABASE IF NOT EXISTS `chronos` DEFAULT CHARACTER SET utf8 COLLATE utf8_spanish2_ci;
-USE `chronos`;
 
 -- --------------------------------------------------------
 
@@ -65,6 +64,7 @@ CREATE TABLE `carreras` (
 CREATE TABLE `clases` (
   `id` bigint(15) NOT NULL,
   `id_asignatura` int(10) NOT NULL,
+  `id_carrera` int(2) NOT NULL,
   `cuatrimestre` int(1) NOT NULL,
   `dia` varchar(1) COLLATE utf8_spanish2_ci NOT NULL,
   `hora` int(2) NOT NULL,
@@ -80,6 +80,7 @@ CREATE TABLE `clases` (
 CREATE TABLE `departamentos` (
   `id` int(2) NOT NULL,
   `nombre` varchar(100) COLLATE utf8_spanish2_ci NOT NULL,
+  `siglas` varchar(10) COLLATE utf8_spanish2_ci NOT NULL DEFAULT '',
   `id_facultad` int(2) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish2_ci;
 
@@ -94,6 +95,7 @@ CREATE TABLE `docentes` (
   `usuario` varchar(32) COLLATE utf8_spanish2_ci NOT NULL,
   `pass` varchar(64) COLLATE utf8_spanish2_ci NOT NULL,
   `nombre` varchar(64) COLLATE utf8_spanish2_ci NOT NULL,
+  `email` varchar(256) COLLATE utf8_spanish2_ci NOT NULL,
   `departamento` int(2) NOT NULL,
   `preferencias` varchar(100) COLLATE utf8_spanish2_ci DEFAULT NULL,
   `orden` int(11) NOT NULL
@@ -143,10 +145,10 @@ CREATE TABLE `itinerarios` (
 -- Indices de la tabla `asignaturas`
 --
 ALTER TABLE `asignaturas`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `id_carrera` (`id_carrera`),
+  ADD PRIMARY KEY (`id`,`id_carrera`) USING BTREE,
   ADD KEY `id_departamento` (`id_departamento`),
-  ADD KEY `itinerario` (`itinerario`);
+  ADD KEY `itinerario` (`itinerario`),
+  ADD KEY `fk_carreras_asignaturas` (`id_carrera`);
 
 --
 -- Indices de la tabla `carreras`
@@ -161,6 +163,7 @@ ALTER TABLE `carreras`
 --
 ALTER TABLE `clases`
   ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `id_asignatura_2` (`id_asignatura`,`cuatrimestre`,`dia`,`hora`,`grupo`,`id_carrera`) USING BTREE,
   ADD KEY `id_asignatura` (`id_asignatura`);
 
 --
@@ -252,7 +255,7 @@ ALTER TABLE `itinerarios`
 --
 ALTER TABLE `asignaturas`
   ADD CONSTRAINT `fk_carreras_asignaturas` FOREIGN KEY (`id_carrera`) REFERENCES `carreras` (`id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `fk_itinerarios_asignaturas` FOREIGN KEY (`itinerario`) REFERENCES `carreras` (`id`) ON DELETE CASCADE;
+  ADD CONSTRAINT `fk_itinerarios_asignaturas` FOREIGN KEY (`itinerario`) REFERENCES `itinerarios` (`id`) ON DELETE CASCADE;
 
 --
 -- Filtros para la tabla `carreras`
@@ -283,6 +286,7 @@ ALTER TABLE `docentes`
 --
 ALTER TABLE `itinerarios`
   ADD CONSTRAINT `fk_carreras_itinerarios` FOREIGN KEY (`id_carrera`) REFERENCES `carreras` (`id`) ON DELETE CASCADE;
+SET FOREIGN_KEY_CHECKS=1;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

@@ -507,7 +507,7 @@
                 break;
 
                 case 2:
-                    echo "Facultad(es) eliminada(s)";
+                    echo "Facultad(es) editada(s)";
                 break;
                 
                 case 3:
