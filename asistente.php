@@ -96,7 +96,7 @@
                             print_dia("Miércoles");
                             print_dia("Jueves");
                             print_dia("Viernes");
-                            print_dia("Sábado");
+                            //print_dia("Sábado");
 
                         ?>
                     </div>

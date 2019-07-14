@@ -46,6 +46,11 @@ function get_head(){
         case '/gestion.php':
             $title = "Chronos | Gestión";
             break;
+
+        case '/proyecto':
+        case '/proyecto.php':
+            $title = "Chronos | El proyecto";
+            break;
     
         default:
             $title = "No deberías haber llegado a aquí...";
@@ -74,6 +79,8 @@ function get_head(){
 
 function get_scriptsAndFooter(){
 ?>
+    
+
     <script src="resources/js/jquery.min.js"></script>
     <script src="resources/js/ui/jquery-ui.js"></script>
     <script src="resources/js/popper.min.js"></script>
@@ -91,12 +98,15 @@ function get_scriptsAndFooter(){
 
     switch ($cur) {
         case '/':
+            print_agradecimientos();
             echo '    <script src="resources/js/index.js"></script>';
+            echo '<script>alert("¡Hola! Estás en una versión de prueba de Chronos. Intentamos que los datos que ofrecemos estén actualizados, pero puede que se hayan realizado cambios de última hora que no estén reflejados en esta plataforma. Recomendamos que, una vez obtenido el horario, se compruebe si el resultado es correcto.");</script>';
             break;
     
         case '/asistente':
         case '/asistente.php':
             echo '    <script src="resources/js/asistente.js"></script>';
+            echo '<script>alert("¡Hola de nuevo! Solo recordarte que estás en una versión de prueba de Chronos. Te recomendamos que, una vez obtenido el horario, compruebes si el resultado es correcto.");</script>';
             break;
     
         case '/docentes':
@@ -108,13 +118,30 @@ function get_scriptsAndFooter(){
         case '/gestion.php':
             echo '    <script src="resources/js/gestion.js"></script>';
             break;
+
+        case '/proyecto':
+        case '/proyecto.php':
+            print_agradecimientos();
+            echo '    <script src="resources/js/index.js"></script>';
+            break;
     
         default:
             echo '';
             break;
     }
     ?>
+    
     </body>
 </html>
 <?php
+}
+
+function print_agradecimientos(){
+    ?>
+    <footer class="container-fluid text-light mt-5 py-2">
+        <h6 class="mb-4">Agradecimientos a</h6>
+        <img class="img-fluid" src="/resources/images/LogoOSLUCMBlanco.png" alt="Logo de la Oficina de Software Libre y Tecnologías Abiertas de la Universidad Complutense de Madrid">
+        <img class="img-fluid" src="/resources/images/Logo-ASCII-vectorizado-inv.png" alt="Logo de la Asociación Socio-Cultural de Ingenierías en Informática">
+    </footer>
+    <?php
 }

@@ -1,5 +1,9 @@
 /* CSS común */
 
+.main-content-index {
+    height: 60vh;  
+}
+
 .main-content {
     height: 100vh;  
 }
@@ -330,4 +334,13 @@ body{
     .modal-lg {
         max-width: 1000px;
     }
+}
+
+footer img {
+    max-height: 85px;
+}
+
+.logo-sup{
+    font-size: 7pt;
+    top: -1.1em;
 }

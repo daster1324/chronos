@@ -219,7 +219,7 @@ function importar_horario_informatica($fichero){
         $id_itinerario = get_itinerario($id_carrera, $id_asignatura);
 
         // Separa el nombre de la asignatura de su abreviatura
-        $re = '/^(.+) \((.*)\)$/m';
+        $re = '/(.+) \((.*)\)/m';
         $asignatura = $linea[3];
         preg_match_all($re, $asignatura, $matches, PREG_SET_ORDER, 0);
 
@@ -229,7 +229,7 @@ function importar_horario_informatica($fichero){
         $curso = parse_curso($linea[1]);
 
         // Separa los nombres de los departamentos
-        $re = '/^([a-zA-Z\.]+)|([a-zA-Z\.]+)([a-zA-Z\.]*)$/m';
+        $re = '/([a-zA-Z\.]+)|([a-zA-Z\.]+)([a-zA-Z\.]*)/m';
         $departamentos = $linea[5];
         preg_match_all($re, $departamentos, $matches, PREG_SET_ORDER, 0);
 
