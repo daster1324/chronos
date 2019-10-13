@@ -125,6 +125,7 @@ function get_id_carrera($siglas){
         case 'gs': return $cdao->getIdByName("Ingeniería del Software");
         case 'gc': return $cdao->getIdByName("Ingeniería de Computadores");
         case 'gdv': return $cdao->getIdByName("Desarrollo de Videojuegos");
+        case 'dgim': return $cdao->getIdByName("D.G. Informática - Matemáticas");
 
         default: break;
     }
@@ -219,7 +220,7 @@ function importar_horario_informatica($fichero){
         $id_itinerario = get_itinerario($id_carrera, $id_asignatura);
 
         // Separa el nombre de la asignatura de su abreviatura
-        $re = '/(.+) \((.*)\)/m';
+        $re = '/(.+)[^a-zA-Z]\((.+)\)/u';
         $asignatura = $linea[3];
         preg_match_all($re, $asignatura, $matches, PREG_SET_ORDER, 0);
 
@@ -229,7 +230,7 @@ function importar_horario_informatica($fichero){
         $curso = parse_curso($linea[1]);
 
         // Separa los nombres de los departamentos
-        $re = '/([a-zA-Z\.]+)|([a-zA-Z\.]+)([a-zA-Z\.]*)/m';
+        $re = '/([a-zA-Z\.]+)|([a-zA-Z\.]+)([a-zA-Z\.]*)/u';
         $departamentos = $linea[5];
         preg_match_all($re, $departamentos, $matches, PREG_SET_ORDER, 0);
 
@@ -247,17 +248,17 @@ function importar_horario_informatica($fichero){
         $cuatrimestre = $linea[6];
        
         // dh -> Dias-Horas -- Separa los días de las horas
-        $dh = '/((\w*):[0-2]*[0-9]-[0-2]*[0-9]:[0-5][0-9])/m';
+        $dh = '/((\w*):[0-2]*[0-9]-[0-2]*[0-9]:[0-5][0-9])/u';
         preg_match_all($dh, $linea[7], $clases, PREG_SET_ORDER, 0);
 
         foreach ($clases as $clase) {
             // hs -> Hour-Splitter -- Separa las horas para poder procesarlas
-            $hs = '/\w*:([0-2]*[0-9])-([0-2]*[0-9]):([0-5][0-9])/m';
+            $hs = '/\w*:([0-2]*[0-9])-([0-2]*[0-9]):([0-5][0-9])/u';
             preg_match_all($hs, $clase[0], $horas, PREG_SET_ORDER, 0);
             $duracion = ($horas[0][3] == 50) ? $horas[0][2] - $horas[0][1] + 1 : $horas[0][2] - $horas[0][1];
 
             // ls -> Letter-Splitter -- Separa las letras
-            $ls = '/([a-zA-Z])/m';
+            $ls = '/([a-zA-Z])/u';
             $dias = $clase[2];
             preg_match_all($ls, $dias, $dias_ls, PREG_SET_ORDER, 0);
 

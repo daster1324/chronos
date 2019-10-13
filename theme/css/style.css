@@ -1,3 +1,11 @@
+.casillero.dia {
+    background-color: #6c757d !important;
+}
+
+.mt-1, .my-1 {
+    margin-top: 0.15rem !important;
+}
+
 /* CSS común */
 
 .main-content-index {

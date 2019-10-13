@@ -72,23 +72,11 @@
 
                     <!-- Semana -->
                     <div id="semana">
+                        
                         <!-- horas -->
-                            <div id="horas">
-                                <div class="bg-secondary font-weight-bold cabecera hora"><span>Hora</span></div>
-                                <div class="bg-secondary mt-1 font-weight-bold hora"><span>8:00</span></div>
-                                <div class="bg-secondary mt-1 font-weight-bold hora"><span>9:00</span></div>
-                                <div class="bg-secondary mt-1 font-weight-bold hora"><span>10:00</span></div>
-                                <div class="bg-secondary mt-1 font-weight-bold hora"><span>11:00</span></div>
-                                <div class="bg-secondary mt-1 font-weight-bold hora"><span>12:00</span></div>
-                                <div class="bg-secondary mt-1 font-weight-bold hora"><span>13:00</span></div>
-                                <div class="bg-secondary mt-1 font-weight-bold hora"><span>14:00</span></div>
-                                <div class="bg-secondary mt-1 font-weight-bold hora"><span>15:00</span></div>
-                                <div class="bg-secondary mt-1 font-weight-bold hora"><span>16:00</span></div>
-                                <div class="bg-secondary mt-1 font-weight-bold hora"><span>17:00</span></div>
-                                <div class="bg-secondary mt-1 font-weight-bold hora"><span>18:00</span></div>
-                                <div class="bg-secondary mt-1 font-weight-bold hora"><span>19:00</span></div>
-                                <div class="bg-secondary mt-1 font-weight-bold hora"><span>20:00</span></div>
-                            </div>
+                        <?php  
+                            print_horas();
+                        ?>
                         <!-- /horas -->
                         <?php
                             print_dia("Lunes");
@@ -184,6 +172,40 @@
 
 <?php 
 
+    function print_horas(){
+        ?>
+        <div id="horas">
+            <div class="bg-secondary font-weight-bold cabecera hora"><span>Hora</span></div>
+            <div class="bg-secondary mt-1 font-weight-bold hora"><span>8:00</span></div>
+            <div class="bg-secondary mt-1 font-weight-bold hora"><span>8:30</span></div>
+            <div class="bg-secondary mt-1 font-weight-bold hora"><span>9:00</span></div>
+            <div class="bg-secondary mt-1 font-weight-bold hora"><span>9:30</span></div>
+            <div class="bg-secondary mt-1 font-weight-bold hora"><span>10:00</span></div>
+            <div class="bg-secondary mt-1 font-weight-bold hora"><span>10:30</span></div>
+            <div class="bg-secondary mt-1 font-weight-bold hora"><span>11:00</span></div>
+            <div class="bg-secondary mt-1 font-weight-bold hora"><span>11:30</span></div>
+            <div class="bg-secondary mt-1 font-weight-bold hora"><span>12:00</span></div>
+            <div class="bg-secondary mt-1 font-weight-bold hora"><span>12:30</span></div>
+            <div class="bg-secondary mt-1 font-weight-bold hora"><span>13:00</span></div>
+            <div class="bg-secondary mt-1 font-weight-bold hora"><span>13:30</span></div>
+            <div class="bg-secondary mt-1 font-weight-bold hora"><span>14:00</span></div>
+            <div class="bg-secondary mt-1 font-weight-bold hora"><span>14:30</span></div>
+            <div class="bg-secondary mt-1 font-weight-bold hora"><span>15:00</span></div>
+            <div class="bg-secondary mt-1 font-weight-bold hora"><span>15:30</span></div>
+            <div class="bg-secondary mt-1 font-weight-bold hora"><span>16:00</span></div>
+            <div class="bg-secondary mt-1 font-weight-bold hora"><span>16:30</span></div>
+            <div class="bg-secondary mt-1 font-weight-bold hora"><span>17:00</span></div>
+            <div class="bg-secondary mt-1 font-weight-bold hora"><span>17:30</span></div>
+            <div class="bg-secondary mt-1 font-weight-bold hora"><span>18:00</span></div>
+            <div class="bg-secondary mt-1 font-weight-bold hora"><span>18:30</span></div>
+            <div class="bg-secondary mt-1 font-weight-bold hora"><span>19:00</span></div>
+            <div class="bg-secondary mt-1 font-weight-bold hora"><span>19:30</span></div>
+            <div class="bg-secondary mt-1 font-weight-bold hora"><span>20:00</span></div>
+        </div>
+
+        <?php
+    }
+
     function print_dia($dia){
         switch ($dia) {
             case 'Miércoles':
@@ -206,17 +228,29 @@
         <div id="<?= $dia_id ?>" class="dia ml-1">
             <div class="bg-secondary font-weight-bold cabecera dia"><span><?= $dia ?></span></div>
             <div id="hora-<?= $d ?>-0" class="casillero hora-vacia mt-1 dia"><span></span></div>
+            <div id="hora-<?= $d ?>-1" class="casillero hora-vacia mt-1 dia"><span></span></div>
             <div id="hora-<?= $d ?>-2" class="casillero hora-vacia mt-1 dia"><span></span></div>
+            <div id="hora-<?= $d ?>-3" class="casillero hora-vacia mt-1 dia"><span></span></div>
             <div id="hora-<?= $d ?>-4" class="casillero hora-vacia mt-1 dia"><span></span></div>
+            <div id="hora-<?= $d ?>-5" class="casillero hora-vacia mt-1 dia"><span></span></div>
             <div id="hora-<?= $d ?>-6" class="casillero hora-vacia mt-1 dia"><span></span></div>
+            <div id="hora-<?= $d ?>-7" class="casillero hora-vacia mt-1 dia"><span></span></div>
             <div id="hora-<?= $d ?>-8" class="casillero hora-vacia mt-1 dia"><span></span></div>
+            <div id="hora-<?= $d ?>-9" class="casillero hora-vacia mt-1 dia"><span></span></div>
             <div id="hora-<?= $d ?>-10" class="casillero hora-vacia mt-1 dia"><span></span></div>
+            <div id="hora-<?= $d ?>-11" class="casillero hora-vacia mt-1 dia"><span></span></div>
             <div id="hora-<?= $d ?>-12" class="casillero hora-vacia mt-1 dia"><span></span></div>
+            <div id="hora-<?= $d ?>-13" class="casillero hora-vacia mt-1 dia"><span></span></div>
             <div id="hora-<?= $d ?>-14" class="casillero hora-vacia mt-1 dia"><span></span></div>
+            <div id="hora-<?= $d ?>-15" class="casillero hora-vacia mt-1 dia"><span></span></div>
             <div id="hora-<?= $d ?>-16" class="casillero hora-vacia mt-1 dia"><span></span></div>
+            <div id="hora-<?= $d ?>-17" class="casillero hora-vacia mt-1 dia"><span></span></div>
             <div id="hora-<?= $d ?>-18" class="casillero hora-vacia mt-1 dia"><span></span></div>
+            <div id="hora-<?= $d ?>-19" class="casillero hora-vacia mt-1 dia"><span></span></div>
             <div id="hora-<?= $d ?>-20" class="casillero hora-vacia mt-1 dia"><span></span></div>
+            <div id="hora-<?= $d ?>-21" class="casillero hora-vacia mt-1 dia"><span></span></div>
             <div id="hora-<?= $d ?>-22" class="casillero hora-vacia mt-1 dia"><span></span></div>
+            <div id="hora-<?= $d ?>-23" class="casillero hora-vacia mt-1 dia"><span></span></div>
             <div id="hora-<?= $d ?>-24" class="casillero hora-vacia mt-1 dia"><span></span></div>
         </div>
     <!-- <?= $dia ?> -->

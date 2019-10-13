@@ -1,8 +1,8 @@
 <?php
 
 class Algoritmo_backtracking{
-    private $_horario1; //arrays de 5X12
-    private $_horario2;
+    private $horario1q; //arrays de 5X12
+    private $horario2q;
     private $_ListadoAsignaturas; // array de asignaturas segun esta estructura
     
     public function __construct($disp,$listadoAsig,$carrera){
@@ -19,8 +19,8 @@ class Algoritmo_backtracking{
             $aux= array_merge($aux,$aux2);
         }
 		
-        $this->_horario1 = array("L"=>$aux,"M"=>$aux,"X"=>$aux,"J"=>$aux,"V"=>$aux);
-        $this->_horario2 = array("L"=>$aux,"M"=>$aux,"X"=>$aux,"J"=>$aux,"V"=>$aux);
+        $this->horario1q = array("L"=>$aux,"M"=>$aux,"X"=>$aux,"J"=>$aux,"V"=>$aux);
+        $this->horario2q = array("L"=>$aux,"M"=>$aux,"X"=>$aux,"J"=>$aux,"V"=>$aux);
 
         $cDao= new Clase_dao();
 
@@ -84,15 +84,21 @@ class Algoritmo_backtracking{
      */
     private function check($asignatura){
         $sol = True;
+        $aux = $this;
+        $baux = true;
 
 		foreach($asignatura as $a){
             if ($a->getcuatrimestre() == 1){
-                $sol = $sol && $this->_horario1[$a->getdia()][$a->gethora()]; 
+                $baux = $aux->horario1q[strtoupper($a->getdia())][$a->gethora()];
+                $sol = $sol && $baux;
             }
             if ($a->getcuatrimestre() == 2){
-                $sol = $sol && $this->_horario2[$a->getdia()][$a->gethora()];
+                $baux = $aux->horario2q[strtoupper($a->getdia())][$a->gethora()];
+                $sol = $sol && $baux;
             }
-            if(!$sol) break;
+            if(!$sol){
+              break;
+            } 
         }
 
         return $sol;
@@ -106,10 +112,10 @@ class Algoritmo_backtracking{
         
 		foreach($clase as $c){
             if ($c->getcuatrimestre() == 1){
-                $this->_horario1[$c->getdia()][$c->gethora()] = False; 
+                $this->horario1q[strtoupper($c->getdia())][$c->gethora()] = false; 
             }
             if ($c->getcuatrimestre() == 2){
-                $this->_horario2[$c->getdia()][$c->gethora()] = False;
+                $this->horario2q[strtoupper($c->getdia())][$c->gethora()] = false;
             }
         }
     }
@@ -119,10 +125,10 @@ class Algoritmo_backtracking{
     private function desactualizar(&$clase){
         foreach($clase as $c){
             if ($c->getcuatrimestre() == 1){
-                $this->_horario1[$c->getdia()][$c->gethora()] = true; 
+                $this->horario1q[$c->getdia()][$c->gethora()] = true; 
             }
             if ($c->getcuatrimestre() == 2){
-                $this->_horario2[$c->getdia()][$c->gethora()] = true;
+                $this->horario2q[$c->getdia()][$c->gethora()] = true;
             }
         }
     }
